@@ -1,0 +1,10 @@
+# Ignore Data Files:
+*.RData
+*.shp
+*.dbf
+*.csv
+*.Rhistory
+*.Rproj.user
+
+# Ignore OS Generated Backups:
+*~
