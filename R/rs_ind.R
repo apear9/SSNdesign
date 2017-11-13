@@ -6,6 +6,7 @@
 #' @param size a number. the size of the random sample of observations we will draw from SSN
 #' @examples
 #' # simulate an SSN object from which to sample
+#' library(SSN)
 #' ssn.1 <- createSSN(n = 1e2, obsDesign = systematicDesign(spacing = 0.5), path = paste0(tempdir(),'/sim_ssn_',sample(x = 1:100, size = 1),'1.ssn'), importToR = TRUE)
 #' # generate the logical vector we will use to subset the SSN object
 #' index.rnd <- rs_ind(ssn = ssn.1, size = 20)
