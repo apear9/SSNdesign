@@ -11,8 +11,8 @@ Description: Adaptive sampling design on stream networks.
 Depends: R (>= 3.3.3)
 License: We need to choose a license.
 Imports: 
-  SSN
-  magrittr
+  SSN,
+  magrittr,
   purrr
 Encoding: UTF-8
 LazyData: true
