@@ -22,12 +22,11 @@
 #' @export
 rs_ind <- function(ssn = ssn.obj,
                     size = 20){
-  as.SpatialPoints(x = ssn, data = 'Obs') %>%
-    .@coords %>%
-      nrow() %>%
-       sample(x = 1:., size = ., replace = FALSE) %>%
-         purrr::map_lgl(.x = ., function(x) x <= size) %>%
-           return(.)
+  ssn@obspoints@SSNPoints[[1]]@point.coords %>%
+    nrow() %>%
+      sample(x = 1:., size = ., replace = FALSE) %>%
+        purrr::map_lgl(.x = ., function(x) x <= size) %>%
+          return(.)
 }
 
 
