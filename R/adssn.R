@@ -8,5 +8,6 @@
 #' @docType package
 #' @name adssn
 #' @import SSN
+#' @importFrom magrittr %>%
 NULL
 ## NULL
