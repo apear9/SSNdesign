@@ -7,6 +7,7 @@
 #'
 #' @docType package
 #' @name adssn
-#' @importClassesFrom SSN SpatialStreamNetwork
+#' @import SSN
+#' @importFrom magrittr %>%
 NULL
 ## NULL
