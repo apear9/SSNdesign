@@ -1,3 +1,13 @@
+#' Create binaryID tables for a SpatialStreamNetwork
+#' 
+#' \code{createBinaryID()} generates binaryID tables in a binaryID database inside a .ssn folder.
+#' 
+#' @param ssn an object of class SpatialStreamNetwork
+#' @param o.write a logical value
+#' @return None. 
+#' 
+#' @section Warning:
+#' This function is not intended for direct use. It is used inside \code{importSSN()} and \code{importStreams()}.
 createBinaryID <- function (ssn, o.write) 
 {
   if (file.exists("binaryID.db") == TRUE) {

@@ -1,3 +1,13 @@
+#' Get row or element numbers for matches between two vectors
+#' 
+#' \code{matchIndices} is a function that returns row or element numbers where a set of values from one object occur in another. 
+#' 
+#' @param match.from a numeric or character vector 
+#' @param match.to a numeric or character vector
+#' @return A numeric vector containing the row indices of every match, in the order that they appear in match.from
+#' 
+#' @section Warning:
+#' This function is not intended for direct use. It is called inside the function \code{generateSites()}.
 matchIndices <- function(match.from, match.to){
   n1 <- length(match.from)
   n2 <- length(match.to)

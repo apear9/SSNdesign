@@ -1,4 +1,22 @@
-createFromSSN <- function (
+#' Simulate observed and/or predicted points on an empty SpatialStreamNetwork.
+#' 
+#' \code{generateSites()} performs the same function as {createSSN()} but on an existing SpatialStreamNetwork
+#' 
+#' @param ssn an object of class SpatialStreamNetwork
+#' @param edgeweights a string; the name of a column in the data slot of the SpatialStreamNetwork that is used to weight edges
+#' @param obsDesign a design function
+#' @param predDesign a design function 
+#' @param importToR a logical value
+#' @param treeFunction DEPRECATED
+#' @return An object of class SpatialStreamNetwork
+#' 
+#' @examples 
+#' \dontrun{NONE AS YET}
+#' 
+#' @section Warning:
+#' This function is currently written such that any observed or predicted sites generated on a SpatialStreamNetwork
+#' will overwrite any existing sites.
+generateSites <- function (
   ssn, 
   edgeweights,
   obsDesign, 

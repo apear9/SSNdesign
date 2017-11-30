@@ -1,4 +1,14 @@
-importDummySSN <- function (filepath, o.write = FALSE){
+#' Import a shapefile of stream edges without observed or predicted sites as a SpatialStreamNetwork
+#' 
+#' \code{importStreams()} performs the same function as \code{importSSN()} but for a dataset where there are no observed or predicted sites.
+#' 
+#' @param filepath a path to a .ssn folder
+#' @param o.write a logical value
+#' @return An object of class SpatialStreamNetwork
+#' 
+#' @examples
+#' \dontrun{NONE AS YET}
+importStreams <- function(filepath, o.write = FALSE){
   old.wd <- getwd()
   Path <- dirname(filepath)
   ssn.obj <- basename(filepath)
