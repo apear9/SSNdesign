@@ -56,6 +56,7 @@ importDummySSN <- function (filepath, o.write = FALSE){
   ssn@obspoints@SSNPoints[[1]]@point.data$netID <- as.factor(ssn@obspoints@SSNPoints[[1]]@point.data$netID)
   ssn@data$netID <- as.factor(ssn@data$netID)
   rm(network.line.coords, edges)
+  createBinaryID(ssn, o.write = o.write)
   setwd(old.wd)
   return(ssn)
 }
