@@ -1,5 +1,5 @@
 #' Create binaryID tables for a SpatialStreamNetwork
-#' 
+#' @import DBI RSQLite SSN
 #' \code{createBinaryID()} generates binaryID tables in a binaryID database inside a .ssn folder.
 #' 
 #' @param ssn an object of class SpatialStreamNetwork

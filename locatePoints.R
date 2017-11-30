@@ -1,5 +1,5 @@
 #' Place a point at some distance along a stream edge
-#' 
+#' @import SSN
 #' \code{locatePointOnEdge()} returns the coordinates of a point along a line,
 #'  as well as the distance from the first vertex to the point along the line.
 #' 

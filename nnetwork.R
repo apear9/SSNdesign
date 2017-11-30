@@ -1,5 +1,5 @@
 #' Find the number of distinct networks in a SpatialStreamNetwork
-#' 
+#' @import SSN
 #' \code{nnetwork()} is a function to find how many separate networks there are in a single SpatialStreamNetwork object.
 #' 
 #' @param ssn an object of class SpatialStreamNetwork

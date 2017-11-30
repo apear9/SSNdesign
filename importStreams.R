@@ -1,5 +1,5 @@
 #' Import a shapefile of stream edges without observed or predicted sites as a SpatialStreamNetwork
-#' 
+#' @import SSN DBI rgdal maptools RSQLite
 #' \code{importStreams()} performs the same function as \code{importSSN()} but for a dataset where there are no observed or predicted sites.
 #' 
 #' @param filepath a path to a .ssn folder

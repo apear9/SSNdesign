@@ -1,5 +1,5 @@
 #' Simulate observed and/or predicted points on an empty SpatialStreamNetwork.
-#' 
+#' @import SSN igraph maptools DBI RSQLite shp2graph rgdal
 #' \code{generateSites()} performs the same function as {createSSN()} but on an existing SpatialStreamNetwork
 #' 
 #' @param ssn an object of class SpatialStreamNetwork
@@ -46,7 +46,7 @@ generateSites <- function (
   on.exit(setwd(old_wd))
   setwd(path)
   if(is.character(ssn)){
-    ssn <- importDummySSN(ssn)
+    ssn <- importStreams(ssn)
   }
   n_networks <- nnetwork(ssn)
   edges <- vector(mode = "list", length = n_networks)
