@@ -1,6 +1,6 @@
 #' Simulate observed and/or predicted points on an empty SpatialStreamNetwork.
-#' @import SSN igraph maptools DBI RSQLite shp2graph rgdal
-#' \code{generateSites()} performs the same function as {createSSN()} but on an existing SpatialStreamNetwork
+#' 
+#' \code{generateSites()} simulates observed and predicted sites on an empty SpatialStreamNetwork
 #' 
 #' @param ssn an object of class SpatialStreamNetwork
 #' @param edgeweights a string; the name of a column in the data slot of the SpatialStreamNetwork that is used to weight edges
@@ -14,8 +14,9 @@
 #' \dontrun{NONE AS YET}
 #' 
 #' @section Warning:
-#' This function is currently written such that any observed or predicted sites generated on a SpatialStreamNetwork
-#' will overwrite any existing sites.
+#' This function is currently written such that any observed or predicted sites generated on a SpatialStreamNetwork will overwrite any existing sites.
+#' 
+#' @export
 generateSites <- function (
   ssn, 
   edgeweights,

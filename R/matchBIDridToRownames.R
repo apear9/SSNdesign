@@ -7,7 +7,7 @@
 #' @return A numeric vector containing the row indices of every match, in the order that they appear in match.from
 #' 
 #' @section Warning:
-#' This function is not intended for direct use. It is called inside the function \code{generateSites()}.
+#' This function is not intended for direct use.
 matchIndices <- function(match.from, match.to){
   n1 <- length(match.from)
   n2 <- length(match.to)

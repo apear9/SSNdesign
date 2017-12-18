@@ -8,6 +8,12 @@
 #' @docType package
 #' @name adssn
 #' @import SSN
+#' @import DBI
+#' @import shp2graph
+#' @import maptools
+#' @import igraph
+#' @import rgdal
+#' @import RSQLite
 #' @importFrom magrittr %>%
 NULL
 ## NULL
