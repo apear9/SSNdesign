@@ -306,7 +306,7 @@ generateSites <- function (
   if (length(combined_pred_location_data) > 0) {
     rownames(preds@data) <- preds@data[, "pid"]
     rownames(preds@coords) <- preds@data[, "pid"]
-    predss@data$locID <- as.factor(preds@data$locID)
+    preds@data$locID <- as.factor(preds@data$locID)
     if (is.factor(preds@data$netID)) {
       preds@data$netID <- as.character(preds@data$netID)
     }
