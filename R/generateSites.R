@@ -70,6 +70,7 @@ generateSites <- function (
     #edges_this_network <- edges[[netid]] # extract edges belonging to current network in loop
     #binary_id_table <- binary_ids_tables[[netid]] # extract table of netIDs belonging to current network in loop
     binary_id_table <- dbReadTable(conn, paste0("net", netid))
+    binary_id_table <- binary_id_table[order(as.numeric(binary_id_table$rid)), ]
     distance_matrix <- matrix(0, nrow(binary_id_table), nrow(binary_id_table)) # zero matrix on network
     colnames(distance_matrix) <- rownames(distance_matrix) <- binary_id_table$rid
     partial_match_function <- function(binary_id1, binary_id2) {
@@ -88,8 +89,7 @@ generateSites <- function (
       current_updist <- edges_this_network$DistanceUpstream[as.character(edges_this_network$SegmentID) == current_rid]
       matching_characters <- sapply(character_binary_ids, 
                                     partial_match_function, as.character(current_binary_id))
-      matching_substring <- substr(binary_id_table$binaryID, 
-                                   1, matching_characters)
+      matching_substring <- substr(binary_id_table$binaryID, 1, matching_characters)
       indices <- match(matching_substring, binary_id_table$binaryID)
       if (any(is.na(indices))) 
         stop("Internal Error")
