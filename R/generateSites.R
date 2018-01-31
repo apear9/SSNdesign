@@ -292,7 +292,7 @@ generateSites <- function (
   colnames(network.point.coords) <- c("NetworkID", "SegmentID", "DistanceUpstream")
   network.point.coords <- as.data.frame(network.point.coords)
   row.names(network.point.coords) <- row.names(sites@data)
-  attributes(network.point.coords)$locID <- as.numeric(levels(sites@data$locID))[sites@data$locID]
+  attributes(network.point.coords)$locID <- as.numeric(as.character(sites@data$locID))[sites@data$locID]
   network.point.coords[, 1] <- as.factor(network.point.coords[, 1])
   network.point.coords[, 2] <- as.factor(network.point.coords[, 2])
   network.point.coords[, 3] <- as.numeric(network.point.coords[, 3])
