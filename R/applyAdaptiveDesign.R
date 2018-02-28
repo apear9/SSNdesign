@@ -5,11 +5,10 @@
 #'  @param ssn an object of class SpatialStreamNetwork
 #'  @param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
 #'  @param model either a formula object or a linear model object (of classes lm, glm, etc.) from which a model formula can be extracted.
-#'  @param utility.function a function with the signature Utility Function. Built-in functions are d_optimality, ... 
+#'  @param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
 #'  @param prior.parameters a function to act as a prior for covariance parameter values
-#'  @param n.draws a numeric value, being the number of Markov Chain Monte Carlo draws to take when evaluating potential designs
-#'  @param legacy.sites a logical value, indicating whether site l
-#'  @return An object of class SpatialStreamNetwork.
+#'  @param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
+#'  @return An object of class SpatialStreamNetwork with its SSNPoints slot updated to reflect the optimal design selected under the given utility function.
 #'  
 applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.parameters, n.draws = 500, extra.arguments){
   
@@ -35,7 +34,7 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
   # Extract K for greedy exchange algorithm
   
   if(is.null(extra.arguments$K)){
-    K <- 3 # replace with James' recommendations
+    K <- 20 
   } else {
     K <- extra.arguments$K
   }
@@ -62,7 +61,6 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
     
     U.all <- c()
     design.all <- list()
-    
     for(k in 1:K){
       
       # Select random subsample of points
@@ -150,7 +148,7 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
           
         }
 
-        cond <- !all(design.now == design.previous)
+        cond <- !all(design.now %in% design.previous)
         #cnt = cnt + 1
       }
      # print(cnt)
@@ -159,7 +157,7 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
       
     }
     
-    ind <- (1:length(U.all))[U.all == max(U.all)]
+    ind <- (1:length(U.all))[U.all == max(U.all)][1]
     final.points[[net]] <- design.all[[ind]]
   }
   
