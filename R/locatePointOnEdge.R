@@ -33,7 +33,8 @@ locatePointOnEdge <- function(ssn, rid, ratio){
   # calc as proportion of total edge length
   lastprop1 <- sumseglengths[last]/edgelength
   # recalculate new proportion, being the proportion of the enclosed segment along which we will place the sampling point
-  newprop <- abs(ratio - lastprop1)
+  if(!is.infinite(last))
+  newprop <- abs(ratio - lastprop1)/(seglengths[last])
   # calculate coordinate on the constrained edge
   newvertex <- lastvertex1 + newprop * (lastvertex2 - lastvertex1)
   # return everything. I AM SO SMORT. SMRT. 

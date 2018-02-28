@@ -20,6 +20,7 @@
 generateSites <- function (
   ssn, 
   edgeweights,
+  edgeafv,
   obsDesign, 
   predDesign = noPoints,
   importToR = FALSE, 
@@ -48,6 +49,13 @@ generateSites <- function (
   setwd(path)
   if(is.character(ssn)){
     ssn <- importStreams(ssn)
+  }
+  if(is.null(edgeweights)){
+    edgeweights <- "shreve"
+    edgeafv <- "addfunccol"
+  }
+  if(is.null(edgeafv) & edgeweights != "shreve"){
+    stop("Please specify an existing column to serve as the set of additive function values on this SSN. Alternatively, leave edgeweights = NULL to generate additive function values based on Shreve's stream order.")
   }
   n_networks <- nnetwork(ssn)
   edges <- vector(mode = "list", length = n_networks)
@@ -104,15 +112,37 @@ generateSites <- function (
     distance_matrices[[netid]] <- distance_matrix + t(distance_matrix)
   }
   dbDisconnect(conn)
+  # derive shreve stream orders if no edgeweights and edgeafv values are provided
+  if(edgeweights == "shreve"){
+    conn <- dbConnect(drvr, paste(ssn@path, "binaryID.db", sep = "/"))
+    for(i in 1:n_networks){
+      bin.id.tab <- dbReadTable(conn, paste0("net", i))
+      if(i == 1){
+        shreve.frame <- calculateShreveStreamOrder(bin.id.tab)
+        mshreve <- max(shreve.frame$shreve)
+        shreve.frame[, edgeafv] <- shreve.frame$shreve/mshreve
+      } else {
+        temp.frame <- calculateShreveStreamOrder(bin.id.tab)
+        mshreve <- max(temp.frame$shreve)
+        temp.frame[, edgeafv] <- temp.frame$shreve/mshreve
+        shreve.frame <- rbind(shreve.frame, temp.frame)
+      }
+    }
+    delete.old.shreve <- grep(edgeweights, names(ssn@data))
+    delete.old.afv <- grep(edgeafv, names(ssn@data))
+    ssn@data <- ssn@data[, -c(delete.old.shreve, delete.old.afv)]
+    ssn@data <- merge(ssn@data, shreve.frame, by = "rid")
+    dbDisconnect(conn)
+  }
   graphinfo <- readshpnw(ssn)
   graphs <- nel2igraph(graphinfo[[2]], graphinfo[[3]], eadf = graphinfo[[5]], Directed = TRUE)
   line_data <- data.frame(
     rid = edge_attr(graphs)["rid"],
     netID = edge_attr(graphs)["netID"],
     weights = edge_attr(graphs)[edgeweights],
-    addfunccol = edge_attr(graphs)[edgeweights]
+    addfunccol = edge_attr(graphs)[edgeafv]
   )
-  names(line_data)[3:4] <- c("weights", "addfunccol")
+  names(line_data)[3:4] <- c(edgeweights, edgeafv)
   for(i in 1:n_networks){
     tree.graphs[[i]] <- subgraph.edges(graphs, which(E(graphs)$netID == i))
     attributes.i <- E(tree.graphs[[i]])
@@ -183,8 +213,7 @@ generateSites <- function (
       obs_location_data_this_network <- t(apply(obs_location_data, 1, f))
       if (length(obs_location_data_this_network) > 0) {
         colnames(obs_location_data_this_network) <- c("NEAR_X","NEAR_Y","upDist")
-      }
-      else {
+      } else {
         obs_location_data_this_network <- matrix(0, 0, 3)
         colnames(obs_location_data_this_network) <- c("NEAR_X","NEAR_Y","upDist")
       }
@@ -215,8 +244,8 @@ generateSites <- function (
       netID = rep(netid, length(obs_pids)),
       rid = obs_location_data[, "rid"], 
       ratio = obs_location_data[, "ratio"], 
-      weights = line_data[match(obs_location_data[, "rid"], line_data[, "rid"]), "weights"], 
-      addfunccol = line_data[match(obs_location_data[, "rid"], line_data[, "rid"]), "addfunccol"], 
+      weights = line_data[match(obs_location_data[, "rid"], line_data[, "rid"]), edgeweights], 
+      addfunccol = line_data[match(obs_location_data[, "rid"], line_data[, "rid"]), edgeafv], 
       stringsAsFactors = FALSE
     )
     if (ncol(obs_sites_this_network) > 3) {
@@ -234,8 +263,8 @@ generateSites <- function (
       netID = rep(netid, length(pred_pids)),
       rid = pred_location_data[, "rid"], 
       ratio = pred_location_data[, "ratio"], 
-      weights = line_data[match(pred_location_data[, "rid"], line_data[, "rid"]), "weights"], 
-      addfunccol = line_data[match(pred_location_data[, "rid"], line_data[, "rid"]), "addfunccol"], stringsAsFactors = FALSE)
+      weights = line_data[match(pred_location_data[, "rid"], line_data[, "rid"]), edgeweights], 
+      addfunccol = line_data[match(pred_location_data[, "rid"], line_data[, "rid"]), edgeafv], stringsAsFactors = FALSE)
     if (ncol(pred_sites_this_network) > 3) {
       pred_data_this_network <- cbind(
         pred_data_this_network,
