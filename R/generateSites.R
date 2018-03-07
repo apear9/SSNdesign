@@ -58,6 +58,9 @@ generateSites <- function (
     stop("Please specify an existing column to serve as the set of additive function values on this SSN. Alternatively, leave edgeweights = NULL to generate additive function values based on Shreve's stream order.")
   }
   n_networks <- nnetwork(ssn)
+  # Reformat netId and networkID columns to be numeric
+  ssn@data$netID <- as.numeric(as.character(ssn@data$netID))
+  ssn@network.line.coords$NetworkID <- as.numeric(as.character(ssn@network.line.coords$NetworkID))
   edges <- vector(mode = "list", length = n_networks)
   tree.graphs <- edges
   locations <- edges
@@ -130,7 +133,10 @@ generateSites <- function (
     }
     delete.old.shreve <- grep(edgeweights, names(ssn@data))
     delete.old.afv <- grep(edgeafv, names(ssn@data))
-    ssn@data <- ssn@data[, -c(delete.old.shreve, delete.old.afv)]
+    delete.old <- c(delete.old.shreve, delete.old.afv)
+    if(length(delete.old) > 0){
+      ssn@data <- ssn@data[, -delete.old] 
+    }
     ssn@data <- merge(ssn@data, shreve.frame, by = "rid")
     dbDisconnect(conn)
   }
@@ -144,6 +150,7 @@ generateSites <- function (
   )
   names(line_data)[3:4] <- c(edgeweights, edgeafv)
   for(i in 1:n_networks){
+   # print(i)
     tree.graphs[[i]] <- subgraph.edges(graphs, which(E(graphs)$netID == i))
     attributes.i <- E(tree.graphs[[i]])
     edge_lengths[[i]] <- attributes.i$Shape_Leng
@@ -152,12 +159,16 @@ generateSites <- function (
     names(edge_updist[[i]]) <- rids[[i]]
     locations[[i]] <- layout.auto(tree.graphs[[i]])
     edges[[i]] <- get.edgelist(tree.graphs[[i]])
+  #  print(rids[[i]])
   }
   ## Using the designs to generate observed and predicted sites
   obs_sites <- obsDesign(tree.graphs, edge_lengths, locations,
-                         edge_updist, distance_matrices)
+                         edge_updist, distance_matrices) 
   pred_sites <- predDesign(tree.graphs, edge_lengths, locations,
                            edge_updist, distance_matrices)
+ # print(obs_sites)
+  # character.order <- as.character(order(as.character(1:n_networks)))
+  # numeric.order <- order(as.numeric(character.order))
   max_observed_locID <- max(unlist(lapply(obs_sites, function(x) max(x$locID))))
   for (i in 1:length(pred_sites)) {
     pred_sites[[i]]$locID <- pred_sites[[i]]$locID + max_observed_locID
@@ -173,7 +184,7 @@ generateSites <- function (
   f <- function(row){
     rid <- as.integer(row[1])
     ratio <- as.numeric(row[2])
-    location <- locatePointOnEdge(ssn, rid, ratio)
+    location <- locatePointOnEdge(ssn, rid, ratio) # break point???
     ret <- c(
       location[1:2], 
       edge_updist_this_network[names(edge_updist_this_network) == as.character(rid)] - location[3]
@@ -188,19 +199,23 @@ generateSites <- function (
     n_locations_this_network <- n_obs_sites[netid] + n_pred_sites[netid]
     rids_this_network <- rids[[netid]]
     pred_sites_this_network <- pred_sites[[netid]]
-    obs_sites_this_network <- obs_sites[[netid]]
+    obs_sites_this_network <- obs_sites[[netid]] 
     obs_location_data <- data.frame(
       rid = obs_sites_this_network$edge,
       ratio = obs_sites_this_network$ratio, 
       locID = obs_sites_this_network$locID,
       stringsAsFactors = FALSE
     )
+    # print(edge_updist_this_network)
+    # print(obs_sites_this_network) ## break point?
+    # print(obs_location_data)      ## break point?
     pred_location_data <- data.frame(
       rid = pred_sites_this_network$edge,
       ratio = pred_sites_this_network$ratio,
       locID = pred_sites_this_network$locID,
       stringsAsFactors = FALSE
     )
+    # print("HERE")
     if (n_locations_this_network > 0) {
       pred_location_data_this_network <- t(apply(pred_location_data, 1, f))
       if (length(pred_location_data_this_network) > 0) {
