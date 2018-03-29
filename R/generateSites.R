@@ -150,7 +150,7 @@ generateSites <- function (
   )
   names(line_data)[3:4] <- c(edgeweights, edgeafv)
   for(i in 1:n_networks){
-   # print(i)
+    # print(i)
     tree.graphs[[i]] <- subgraph.edges(graphs, which(E(graphs)$netID == i))
     attributes.i <- E(tree.graphs[[i]])
     edge_lengths[[i]] <- attributes.i$Shape_Leng
@@ -159,14 +159,14 @@ generateSites <- function (
     names(edge_updist[[i]]) <- rids[[i]]
     locations[[i]] <- layout.auto(tree.graphs[[i]])
     edges[[i]] <- get.edgelist(tree.graphs[[i]])
-  #  print(rids[[i]])
+    #  print(rids[[i]])
   }
   ## Using the designs to generate observed and predicted sites
   obs_sites <- obsDesign(tree.graphs, edge_lengths, locations,
                          edge_updist, distance_matrices) 
   pred_sites <- predDesign(tree.graphs, edge_lengths, locations,
                            edge_updist, distance_matrices)
- # print(obs_sites)
+  # print(obs_sites)
   # character.order <- as.character(order(as.character(1:n_networks)))
   # numeric.order <- order(as.numeric(character.order))
   max_observed_locID <- max(unlist(lapply(obs_sites, function(x) max(x$locID))))
@@ -286,7 +286,7 @@ generateSites <- function (
         pred_sites_this_network[, -match(c("edge", "ratio", "locID"), colnames(pred_sites_this_network)), drop = FALSE]
       )
     }
-    rownames(pred_data_this_network) <- pred_pids
+    rownames(pred_data_this_network) <- pred_pids ## CHECK
     rownames(pred_location_data_this_network) <- pred_pids
     if (n_obs_sites[netid] > 0) {
       sites_data <- rbind(obs_data_this_network[1:n_obs_sites[netid],
@@ -307,13 +307,20 @@ generateSites <- function (
   # Write sites and predictions to file
   if (length(combined_site_location_data) == 0){
     stop("At least one observation site must be present")
-  }
+  } # W
+  sites_data <- sites_data[order(sites_data$pid), ]
+  combined_site_location_data <- combined_site_location_data[order(as.numeric(rownames(combined_site_location_data))), ] 
+  # print(order(sites_data$pid))
+  # print(sites_data$pid)
+  # print(rownames(combined_site_location_data))
+  # print(combined_site_location_data[1:5, ])
+  # print(class(combined_site_location_data))
+  ## CHECK THIS AS BREAK POINT
   sites <- SpatialPointsDataFrame(combined_site_location_data[, c("NEAR_X", "NEAR_Y"), drop = FALSE], sites_data, match.ID = TRUE)
   writeOGR(sites, ".", "sites", verbose = FALSE, driver = "ESRI Shapefile", overwrite_layer = TRUE)
   if (length(combined_pred_location_data) > 0) {
-    preds <- SpatialPointsDataFrame(combined_pred_location_data[,
-                                                                c("NEAR_X", "NEAR_Y"), drop = FALSE], pred_data,
-                                    match.ID = TRUE)
+    combined_pred_location_data <- combined_pred_location_data[order(as.numeric(row.names(combined_pred_location_data))), ]
+    preds <- SpatialPointsDataFrame(combined_pred_location_data[,c("NEAR_X", "NEAR_Y"), drop = FALSE], pred_data, match.ID = TRUE)
     writeOGR(preds, ".", "preds", verbose = FALSE, driver = "ESRI Shapefile", overwrite_layer = TRUE)
   }
   ind1 <- colnames(sites@data) == c("netID")
@@ -331,12 +338,18 @@ generateSites <- function (
   if (is.factor(sites@data$netID)) {
     sites@data$netID <- as.character(sites@data$netID)
   }
-  network.point.coords <- data.frame(sites@data[, "netID"], 
-                                     sites@data[, "rid"], sites@data[, "upDist"])
+  network.point.coords <- data.frame(
+    sites@data[, "netID"], 
+    sites@data[, "rid"], 
+    sites@data[, "upDist"]
+  )
   colnames(network.point.coords) <- c("NetworkID", "SegmentID", "DistanceUpstream")
   network.point.coords <- as.data.frame(network.point.coords)
   row.names(network.point.coords) <- row.names(sites@data)
   attributes(network.point.coords)$locID <- as.numeric(as.character(sites@data$locID))[sites@data$locID]
+  # added
+  network.point.coords <- network.point.coords[order(sites_data$pid), ]
+  ## end addition
   network.point.coords[, 1] <- as.factor(network.point.coords[, 1])
   network.point.coords[, 2] <- as.factor(network.point.coords[, 2])
   network.point.coords[, 3] <- as.numeric(network.point.coords[, 3])
@@ -368,6 +381,7 @@ generateSites <- function (
     ssn@predpoints@ID[[1]] <- "preds"
     rm(preds, pp, network.point.coords)
   }
+  ssn@network.line.coords$NetworkID <- as.factor(ssn@network.line.coords$NetworkID)
   setwd(old_wd)
   if (importToR) {
     if (sum(n_pred_sites) > 0)

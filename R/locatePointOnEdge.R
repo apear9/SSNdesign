@@ -28,15 +28,22 @@ locatePointOnEdge <- function(ssn, rid, ratio){
     last <- 1
   }
   # get coord of last vertex before and after distfromend
-  lastvertex1 <- ssncoords[last, ]
-  lastvertex2 <- ssncoords[last + 1, ]
+  lastvertex <- ssncoords[last, ]
+  nextvertex <- ssncoords[last + 1, ]
   # calc as proportion of total edge length
-  lastprop1 <- sumseglengths[last]/edgelength
+#  lastprop1 <- sumseglengths[last]/edgelength
+  loclength <- ratio * edgelength
+  if(last - 1 != 0){
+    scllength <- (loclength - sumseglengths[last - 1])/seglengths[last]
+  } else {
+    scllength <- loclength/seglengths[last]
+  }
+  
   # recalculate new proportion, being the proportion of the enclosed segment along which we will place the sampling point
-  if(!is.infinite(last))
-  newprop <- abs(ratio - lastprop1)/(seglengths[last])
-  # calculate coordinate on the constrained edge
-  newvertex <- lastvertex1 + newprop * (lastvertex2 - lastvertex1)
-  # return everything. I AM SO SMORT. SMRT. 
-  return(c(newvertex, ratio * edgelength))
+#  if(!is.infinite(last))
+#  newprop <- abs(ratio - lastprop1)/(seglengths[last])
+    # calculate coordinate on the constrained edge
+  newvertex <- lastvertex + scllength * (nextvertex - lastvertex)
+  # return everything.
+  return(c(newvertex, loclength))
 }
