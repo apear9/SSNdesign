@@ -152,8 +152,6 @@ doAdaptiveDesign <- function(
       
       # Iterate through greedy exchange algorithm
       
-      #cnt = 0
-      
       while(cond){
         
         for(i in 1:n.final.this.network){
