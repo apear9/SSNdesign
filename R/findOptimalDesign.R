@@ -3,13 +3,16 @@
 #' \code{findOptimalDesign()} 
 #' 
 #'  @param ssn an object of class SpatialStreamNetwork
+#'  @param glmssn an object of class glmssn
+#'  @param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
 #'  @param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
-#'  @param model either a formula object or a linear model object (of classes lm, glm, etc.) from which a model formula can be extracted.
 #'  @param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
 #'  @param prior.parameters a function to act as a prior for covariance parameter values
 #'  @param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
-#'  @return An object of class SpatialStreamNetwork with its SSNPoints slot updated to reflect the optimal design selected under the given utility function.
+#'  @param extra.arguments a list of any extra parameters (see below) which can be used to control the behaviour of this function or the utility function
+#'  @return An object of class SpatialStreamNetwork with its observed SSNPoints slot updated to reflect the optimal design selected under the given utility function.
 #'  
+#'  @export
 findOptimalDesign <- function(
   ssn, 
   glmssn, 

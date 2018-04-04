@@ -1,16 +1,29 @@
-#' Implement adaptive sampling designs on a SpatialStreamNetwork
+#' A function to solve adaptive / sequential design problems on SpatialStreamNetworks
 #'
-#' \code{applyAdaptiveDesign()} 
+#' \code{doAdaptiveDesign()}
 #' 
 #'  @param ssn an object of class SpatialStreamNetwork
+#'  @param glmssn an object of class glmssn
+#'  @param fixed.pids a numeric or character vector of the sites in the design which must remain fixed
+#'  @param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
 #'  @param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
-#'  @param model either a formula object or a linear model object (of classes lm, glm, etc.) from which a model formula can be extracted.
 #'  @param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
 #'  @param prior.parameters a function to act as a prior for covariance parameter values
 #'  @param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
-#'  @return An object of class SpatialStreamNetwork with its SSNPoints slot updated to reflect the optimal design selected under the given utility function.
+#'  @param extra.arguments a list of any extra parameters (see below) which can be used to control the behaviour of this function or the utility function
+#'  @return An object of class SpatialStreamNetwork with its observed SSNPoints slot updated to reflect the optimal design selected under the given utility function.
 #'  
-applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.parameters, n.draws = 500, extra.arguments){
+#'  @export
+doAdaptiveDesign <- function(
+  ssn,
+  glmssn,
+  fixed.pids,
+  afv.column, 
+  n.points, 
+  utility.function, 
+  prior.parameters, 
+  n.draws = 500, 
+  extra.arguments = NULL){
   
   # Check inputs
   
@@ -30,32 +43,84 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
   if(!is.numeric(n.draws) | n.draws < 1){
     stop("The argument n.draws must have a positive integer value.")
   }
+  if(any(ssn2@data != glmssn$ssn.object@data)){
+    stop("The SpatialStreamNetwork in the input ssn does not match the SpatialStreamNetwork in the object glmssn.")
+  }
   
   # Extract K for greedy exchange algorithm
   
+  if(is.null(extra.arguments)){
+    extra.arguments <- list()
+  }
   if(is.null(extra.arguments$K)){
     K <- 20 
   } else {
     K <- extra.arguments$K
   }
   
-  # Extract distance and connectivity matrices for each network
+  # Extract important matrices for each network
   
-  dc.matrices <- retrieveDistAndConnMat(ssn)
+  dist.junc.obs <- getStreamDistMatInOrder(ssn)
+  if(length(ssn@predpoints@SSNPoints) > 0){
+    dist.junc.prd <- getStreamDistMatInOrder(ssn, "preds")
+    dist.junc.pxo <- getStreamDistMatInOrder.predsxobs(ssn)
+  }
   
   # Initialise for loop
   
-  all.points <- attributes(ssn@obspoints@SSNPoints[[1]]@network.point.coords)$locID
+  all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
+  network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
+  if(length(ssn@predpoints@SSNPoints) > 0){
+    network.each.pred <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
+  }
   final.points <- vector(mode = "list", length = n)
   
   # For each network, find the design which optimises the utility function.
-  
   for(net in 1:n){
+    
+    dist.junc.obs.net <- dist.junc.obs[[net]]
+    
+    if(length(ssn@predpoints@SSNPoints) > 0){
+      dist.junc.prd.net <- dist.junc.prd[[net]]
+      dist.junc.pxo.a.net <- dist.junc.pxo[[ 2 * net - 1 ]]
+      dist.junc.pxo.b.net <- dist.junc.pxo[[ 2 * net ]]
+    }
     
     # vector for holding points in this network (locIDs only)
     
     n.final.this.network <- n.points[net]
     final.points.this.network <- vector(mode = "numeric", length = n.final.this.network)
+    
+    ind1 <- network.each.point == net
+    points.this.network <- all.points[ind1]
+    points.this.network <- as.numeric(points.this.network)
+    ind2 <- !(points.this.network %in% fixed.points)
+    fixed.points.this.network <- points.this.network[!ind2]
+    extra.arguments$fixed <- fixed.points.this.network
+    points.this.network <- points.this.network[ind2]
+    n.points.this.network <- length(points.this.network)
+    
+    ## PULL OUT DISTANCE MATRICES HEERE
+    ## ONLY DO ONCE PER NETWORK
+    
+    extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
+      dist.junc.obs.net, 
+      afv = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column]
+    )
+    
+    if(length(ssn@predpoints@SSNPoints) > 0){
+      indp <- network.each.pred == net
+      extra.arguments$Matrices.prd <- getImportantMatrices.obs(
+        dist.junc.prd.net,
+        afv = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
+      )
+      extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
+        dist.junc.pxo.a.net,
+        dist.junc.pxo.b.net,
+        afv.obs = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column],
+        afv.prd = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
+      )
+    }
     
     # vector and list for holding designs in each of K iterations
     
@@ -64,45 +129,31 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
     for(k in 1:K){
       
       # Select random subsample of points
-      
-      ind1 <- ssn@obspoints@SSNPoints[[1]]@network.point.coords$NetworkID == net
-      points.this.network <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords)[ind1]
-      points.this.network <- as.numeric(points.this.network)
-      n.points.this.network <- length(points.this.network)
       random.sample <- sample(1:n.points.this.network, n.final.this.network, FALSE)
       random.points <- points.this.network[random.sample]
       random.points <- as.character(random.points)
-     # print(random.points)
+      random.and.fixed.points <- c(random.points, as.character(fixed.points.this.network))
       
       # Evaluate utility once to initialise
-      
-      dist.tot <- dc.matrices$Distance[[net]]
-      conn.tot <- dc.matrices$Connectivity[[net]]
-      ind <- row.names(dist.tot) %in% random.points
-      dist.ij <- dist.tot[ind, ind]
-      conn.ij <- conn.tot[ind, ind]
-      design.data <- ssn@obspoints@SSNPoints[[1]]@point.data
-      design.data.ij <- design.data[design.data$locID %in% random.points, ]
-      
       U <- utility.function(
-        formula = model, 
-        design = design.data.ij, 
-        important.matrices = list(Distance = dist.ij, Connectivity = conn.ij), 
-        prior.parameters = prior.parameters, 
-        n.draws = n.draws,
-        extra.arguments = extra.arguments
+        ssn,
+        glmssn,
+        random.and.fixed.points,
+        prior.parameters, 
+        n.draws,
+        extra.arguments
       )
       
       U.ij <- U
-      design.now <- list(random.points)
+      design.now <- list(random.and.fixed.points)
       cond <- max(U.ij) >= U
       last.value <- c()
-      designs <- list(random.points)
+      designs <- list(random.and.fixed.points)
       
       # Iterate through greedy exchange algorithm
       
       #cnt = 0
-
+      
       while(cond){
         
         for(i in 1:n.final.this.network){
@@ -114,21 +165,17 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
           n.j <- length(remaining.values)
           
           for(j in 1:n.j){
-              
-            random.points[i] <- remaining.values[j]
-            designs <- append(designs, list(random.points))
-            ind <- row.names(dist.tot) %in% random.points
-            dist.ij <- dist.tot[ind, ind]
-            conn.ij <- conn.tot[ind, ind]
-            design.data.ij <- design.data[design.data$locID %in% random.points, ]
             
+            random.points[i] <- remaining.values[j]
+            random.and.fixed.points <- c(random.points, as.character(fixed.points.this.network))
+            designs <- append(designs, list(random.and.fixed.points))
             U_ <- utility.function(
-              formula = model, 
-              design = design.data.ij, 
-              important.matrices = list(Distance = dist.ij, Connectivity = conn.ij), 
-              prior.parameters = prior.parameters, 
-              n.draws = n.draws,
-              extra.arguments = extra.arguments
+              ssn,
+              glmssn,
+              random.and.fixed.points,
+              prior.parameters, 
+              n.draws,
+              extra.arguments
             )
             
             U.ij <- append(U.ij, U_)
@@ -147,11 +194,11 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
           random.points <- design.now
           
         }
-
+        
         cond <- !all(design.now %in% design.previous)
         #cnt = cnt + 1
       }
-     # print(cnt)
+      # print(cnt)
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
@@ -183,5 +230,5 @@ applyAdaptiveDesign <- function(ssn, n.points, model, utility.function, prior.pa
   
   # return updated ssn
   return(ssn)
-  
+    
 }
