@@ -42,6 +42,9 @@ findOptimalDesign <- function(
   
   # Extract K for greedy exchange algorithm
   
+  if(is.null(extra.arguments)){
+    extra.arguments <- list()
+  }
   if(is.null(extra.arguments$K)){
     K <- 20 
   } else {

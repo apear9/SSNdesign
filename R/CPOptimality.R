@@ -9,12 +9,12 @@
 #' @return A numeric representing the D-optimal utility of a design estimated by Monte-Carlo integration
 #' 
 #' @export
-FisherInformationMatrix <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
+CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Rely on ordering of output of glmssn to retrieve correct rows in the design matrix
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
   
-  # Get design matrix -- NEEDS COLUMN OF ONES???
+  # Get design matrix
   X <- glmssn$sampinfo$X[ind, ]
   Xt <- t(X)
   cds <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
@@ -53,12 +53,13 @@ FisherInformationMatrix <- function(ssn, glmssn, design.points, prior.parameters
   ## Perform MC simulations
   
   FIM <- vector("numeric", n.draws)
-  h <- 1e-3
+  h <- 1e-5
   for(i in 1:n.draws){
     
     # Get covariance matrix on the data
     
     theta.i <- cvp[i, ]
+    # print(theta.i)
     # print(theta.i)
     V <- SSN:::makeCovMat(
       theta.i, 
@@ -108,18 +109,29 @@ FisherInformationMatrix <- function(ssn, glmssn, design.points, prior.parameters
         re
       )
       ep[[j]] <- (V.j - V)/h
+      # print(V)
+      # print(V.j)
     }
+    # print(ep)
     
     for(j in 1:np){
       for(k in j:np){
          I_REML <- P %*% ep[[j]] %*% P %*% ep[[k]]
-         em[j, k] <- 1/2 * sum(diag(I_REML))
-         em[k, j] <- em[j, k]
+         em[k, j] <- em[j, k] <- 1/2 * sum(diag(I_REML))
       }
     }
-    print(em)
-    iFIM.i <- solve(em)
-    FIM[i] <- det(iFIM.i)
+    # print("Fisher information matrix (REML)")
+    # print(em)
+    # print("Reduced-row echelon form")
+    # print(pracma::rref(em))
+    # print("Eigenvalues")
+    # print(eigen(em)$values)
+    em <- em
+    # print(isSymmetric(em))
+    # print(eigen(em))
+    # print(P)
+    iFIM.i <- stableInverse(em,0)
+    FIM[i] <- -det(iFIM.i)
     
   }
   
