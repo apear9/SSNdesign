@@ -17,7 +17,7 @@
 doAdaptiveDesign <- function(
   ssn,
   glmssn,
-  fixed.pids,
+  fixed.points,
   afv.column, 
   n.points, 
   utility.function, 
