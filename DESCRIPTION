@@ -1,4 +1,4 @@
-Package: adssn
+Package: SSNdesign
 Title: Adaptive Design for Spatial Stream Networks
 Version: 0.0.0.9000
 Authors@R: c(
@@ -9,7 +9,7 @@ Authors@R: c(
   )
 Description: Adaptive sampling design on stream networks.
 Depends: R (>= 3.3.3)
-License: We need to choose a license.
+License: GPL-2
 Imports:
   SSN,
   magrittr,
