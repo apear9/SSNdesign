@@ -14,6 +14,6 @@
 #' @import igraph
 #' @import rgdal
 #' @import RSQLite
-#' @importFrom magrittr %>%
+#' @import stringr
 NULL
 ## NULL

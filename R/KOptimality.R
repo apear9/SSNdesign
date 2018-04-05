@@ -1,3 +1,8 @@
+#' A utility function for prediction with known covariance parameters
+#' 
+#' \code{Koptimality()}
+#' 
+#' @export
 KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Get info for the obs sites  
