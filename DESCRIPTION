@@ -11,9 +11,7 @@ Description: Adaptive sampling design on stream networks.
 Depends: R (>= 3.3.3)
 License: GPL-2
 Imports:
-  SSN,
-  magrittr,
-  purrr
+  SSN
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
