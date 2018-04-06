@@ -1,4 +1,14 @@
 #' A function for fitting SpatialStreamNetwork models inside utility functions
+#' 
+#'@description
+#'
+#'\code{glmssn1_minimal} is a function that fits glmssn objects. It is essentially identical to the one written by Jay ver Hoef in the package SSN. The difference is that in this function, the distance matrices for the observed sites are precomputed and passed as arguments to the function; they are not computed inside this function.
+#'
+#'@usage
+#'
+#'This function is not to be used directly. It is called by the function glmssn_minimal, which in turn is only designed to be called inside of user-defined utility functions which require model-fitting. 
+#'
+#'@export
 glmssn1_minimal <- function(formula, ssn.object,
                     family = "Gaussian",
                     CorModels = c("Exponential.tailup", "Exponential.taildown",

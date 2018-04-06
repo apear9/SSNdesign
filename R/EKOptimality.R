@@ -1,15 +1,25 @@
 #' A dual utility function for optimal designs for prediction with estimated covariance and fixed effects parameters.
 #' 
-#' \code{EKOptimality()}
+#'@description
+#'\code{EKoptimality} is a utility function that can be used with either \code{\link{findOptimalDesign}} or \code{\link{doAdaptiveDesign}}. It is a utility function that minimises the total kriging variance over a set of prediction points given a set of design points.
 #' 
-#' @param ssn An object of class SpatialStreamNetwork
-#' @param glmssn An object of class glm.ssn
-#' @param design.points A numeric vector of pids for sites in a proposed design
-#' @param prior.parameters A list of functions parameterised in terms of n.draws that simulate from probability distributions
-#' @param extra.arguments A list of extra arguments that the utility may rely on
-#' @return A numeric representing the D-optimal utility of a design estimated by Monte-Carlo integration
-#' 
-#' @export
+#'@usage
+#'
+#'\code{EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+#'
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param glmssn An model object of class glmssn.
+#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@return A numeric scalar.
+#'  
+#'@details 
+#'
+#'This function implements the K-optimal design for prediction discussed in Som et al. (2014). This utility assumes the covariance parameters are unknown to the user and must be empirically estimated. The method has been slightly modified to accommodate the Monte Carlo draws which are used to approximate the utility given prior information on the covariance parameters. See \code{\link{KOptimality}} for a modified version of this utility where the covariance parameters are known and need not be estimated from the data. 
+#'  
+#'@export
 EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Check that prediction sites actually exist
