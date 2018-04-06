@@ -1,14 +1,17 @@
 #' Find the number of distinct networks in a SpatialStreamNetwork
+#'
+#'@description
+#'
+#'Calculates the number of networks are present inside of a SpatialStreamNetwork object. 
+#'
+#'@usage
+#'   
+#'\code{nnetwork(ssn)}
+#'
+#'@param ssn an object of class SpatialStreamNetwork
+#'@return a numeric scalar
 #' 
-#' \code{nnetwork()} is a function to find how many separate networks there are in a single SpatialStreamNetwork object.
-#' 
-#' @param ssn an object of class SpatialStreamNetwork
-#' @return a single number
-#' 
-#' @examples
-#' \dontrun{NONE AS YET}
-#' 
-#' @export
+#'@export
 nnetwork <- function(ssn){
   if(class(ssn)[1] != "SpatialStreamNetwork"){
     stop("Please provide an object of Class SpatialStreamNetwork")
