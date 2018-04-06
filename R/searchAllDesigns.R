@@ -1,17 +1,27 @@
 #' Search all possible designs to find one which maximises the utility
 #' 
-#' \code{searchAllDesigns()}
+#'@description
+#'
+#'This function takes all possible combinations of n design points and evaluates a utility function for each combination.
 #' 
-#' @param ssn An object of class SpatialStreamNetwork
-#' @param n.points n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
-#' @param model either a formula object or a linear model object (of classes lm, glm, etc.) from which a model formula can be extracted.
-#' @param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
-#' @param prior.parameters a function to act as a prior for covariance parameter values
-#' @param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
-#' @param extra.arguments a list containing any extra arguments that must be passed to the utility function
-#' @return An object of class SpatialStreamNetwork with its SSNPoints slot updated to reflect the optimal design selected under the given utility function.
+#'@usage 
 #'
+#'\code{searchAllDesigns(ssn, n.points, model, utility.function, prior.parameters, n.draws = 500, extra.arguments)}
+#' 
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param n.points n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
+#'@param model either a formula object or a linear model object (of classes lm, glm, etc.) from which a model formula can be extracted.
+#'@param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
+#'@param prior.parameters a function to act as a prior for covariance parameter values
+#'@param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
+#'@param extra.arguments a list containing any extra arguments that must be passed to the utility function
+#'@return An object of class SpatialStreamNetwork with its SSNPoints slot updated to reflect the optimal design selected under the given utility function.
 #'
+#'@section warning
+#'
+#'This function is incredibly computationally expensive. It is only provided here because users may be interested to compare the design found by using the optimal design function to the actual optimal design found by searching all possible designs. It is only recommended that this be used for very small designs from a relatively small set of potential design points.
+#'
+#'@export
 searchAllDesigns <- function(ssn, n.points, model, utility.function, prior.parameters, n.draws = 500, extra.arguments){
   
   # Check inputs
