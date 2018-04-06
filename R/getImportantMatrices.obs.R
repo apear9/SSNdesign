@@ -1,11 +1,22 @@
 #' Get the matrices required to calculate the covariance matrix on the data
 #' 
-#' \code{getImportantMatrices()}
-#' 
-#' @param d.junc A non-symmetric distance matrix on the design points. See... for more details. 
-#' @param afv The additive function values for each of the design points, in order of their pid.
-#' @return A list of 5 matrices in the order dist.hydro, a.mat, b.mat, conn.mat, and w.mat.
-#' 
+#'@description
+#'
+#'Calculates the distance and related matrices between observed or prediction sites on a SpatialStreamNetwork.
+#'
+#'@usage
+#'
+#'\code{getImportantMatrices(d.junc, afv = NULL)}
+#'    
+#'@param d.junc An asymmetric, square distance matrix on the design points. 
+#'@param afv The additive function values for each of the design points, in order of their pid.
+#'@return A list of 5 matrices in the order dist.hydro, a.mat, b.mat, conn.mat, and w.mat.
+#'
+#'@details
+#'
+#'This function is called internally by \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}. This is done to create the distance and related matrices required to calculate the covariances between observed sites, which is needed for all the utility functions. Note that, although the name of the function suggests this should only work for observed sites, it also works for prediction sites. Therefore, it is also called by \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}} to create the distance and related matrices among the prediction sites.
+#'
+#'@export 
 getImportantMatrices.obs <- function(d.junc, afv = NULL){
   
   # Input checking 

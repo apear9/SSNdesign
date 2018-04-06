@@ -1,3 +1,21 @@
+#' The systematicDesign function from SSN updated to be compatible with functions from SSNDesign
+#' 
+#'@description
+#'
+#'\code{systematicDesign} replaces a function of the same name from the package SSN.
+#' 
+#'@usage
+#'
+#'\code{systematicDesign(...)} 
+#'
+#'@param ... Arguments for the function \code{systematicDesign} as in the package SSN.
+#'@return An object of class data.frame.
+#'
+#'@details
+#'
+#'This function was written to deal with errors resulting in the \code{systematicDesign} function from the package SSN when it was used with SpatialStreamNetworks built from real spatial data. It is back-compatible with the \code{createSSN} function from SSN.
+#' 
+#' @export
 systematicDesign <- function(spacing, replications = 1, rep.variable = "Time", rep.values) {
   if (missing(rep.values)) 
     rep.values <- 1:replications

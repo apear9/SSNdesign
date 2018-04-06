@@ -1,17 +1,19 @@
-#' A design function for adssn
+#' The hardCoreDesign function from SSN updated to be compatible with functions from SSNDesign
 #' 
-#' \code{hardCoreDesign} replaces \code{hardCoreDesign} from the package SSN. It is back-compatible with the \code{createSSN} function from SSN.
+#'@description
+#'
+#'\code{hardCoreDesign} replaces a function of the same name from the package SSN.
 #' 
-#' @param n Something
-#' @param inhibition_region something
-#' @param replications A numeric
-#' @param rep.variable A string.
-#' @param rep.values Something
-#' @return An object of class data.frame.
-#' 
-#' @examples 
-#' 
-#' \dontrun{none as yet}
+#'@usage
+#'
+#'\code{hardCoreDesign(...)} 
+#'
+#'@param ... Arguments for the function \code{\hardCoreDesign} in the package SSN.
+#'@return An object of class data.frame.
+#'
+#'@details
+#'
+#'This function was written to deal with errors resulting in the \code{hardCoreDesign} function from the package SSN when it was used with SpatialStreamNetworks built from real spatial data. It is back-compatible with the \code{createSSN} function from SSN.
 #' 
 #' @export
 hardCoreDesign <- function (n, inhibition_region, replications = 1, rep.variable = "Time", rep.values) 
@@ -99,6 +101,6 @@ hardCoreDesign <- function (n, inhibition_region, replications = 1, rep.variable
     }
     return(final_result)
   }
-  return(replication.function(design.function, replications, 
+  return(SSN:::replication.function(design.function, replications, 
                               rep.variable, rep.values))
 }
