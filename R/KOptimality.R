@@ -1,8 +1,26 @@
 #' A utility function for prediction with known covariance parameters
+#'
+#'@description 
+#'   
+#'\code{Koptimality} is a utility function that can be used with either \code{\link{findOptimalDesign}} or \code{\link{doAdaptiveDesign}}. It is a utility function that minimises the total kriging variance over a set of prediction points given a set of design points.
 #' 
-#' \code{Koptimality()}
-#' 
-#' @export
+#'@usage
+#'
+#'\code{KOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+#'
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param glmssn An model object of class glmssn.
+#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@return A numeric scalar.
+#'  
+#'@details 
+#'
+#'This function implements the K-optimal designs for prediction discussed in Som et al. (2014). This utility assumes the covariance parameters are known to the user and do not have to be empirically estimated. The method has been slightly modified to accommodate the Monte Carlo draws which are used to approximate the utility given prior information on the covariance parameters. See \code{\link{EKOptimality}} for a modified version of this utility where the covariance parameters are unknown and must be estimated from the data. 
+#'  
+#'@export
 KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Get info for the obs sites  

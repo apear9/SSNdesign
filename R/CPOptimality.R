@@ -1,14 +1,26 @@
 #' A utility function for covariance parameter estimation
-#' \code{DOptimality()}
 #' 
-#' @param ssn An object of class SpatialStreamNetwork
-#' @param glmssn An object of class glm.ssn
-#' @param design.points A numeric vector of pids for sites in a proposed design
-#' @param prior.parameters A list of functions parameterised in terms of n.draws that simulate from probability distributions
-#' @param extra.arguments A list of extra arguments that the utility may rely on
-#' @return A numeric representing the D-optimal utility of a design estimated by Monte-Carlo integration
+#'@description
+#'   
+#'\code{CPOptimality} is a utility function that can be used with \code{\link{findOptimalDesign}}. It is a utility function that minimises the determinant of the inverse Fisher information matrix over a set of designs. 
 #' 
-#' @export
+#'@usage
+#'
+#'\code{CPOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+#' 
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param glmssn An model object of class glmssn.
+#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@return A numeric scalar.
+#' 
+#'@details
+#'
+#'\code{CPOptimality} assumes there are no sites which have already been incorporated into a design. It computes the expected Fisher information matrix (Som et al., 2014) for each set of simulated covariance parameters.
+#' 
+#'@export
 CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Rely on ordering of output of glmssn to retrieve correct rows in the design matrix
@@ -59,8 +71,6 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
     # Get covariance matrix on the data
     
     theta.i <- cvp[i, ]
-    # print(theta.i)
-    # print(theta.i)
     V <- SSN:::makeCovMat(
       theta.i, 
       mat$d, 
@@ -109,10 +119,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
         re
       )
       ep[[j]] <- (V.j - V)/h
-      # print(V)
-      # print(V.j)
     }
-    # print(ep)
     
     for(j in 1:np){
       for(k in j:np){
@@ -120,16 +127,6 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
          em[k, j] <- em[j, k] <- 1/2 * sum(diag(I_REML))
       }
     }
-    # print("Fisher information matrix (REML)")
-    # print(em)
-    # print("Reduced-row echelon form")
-    # print(pracma::rref(em))
-    # print("Eigenvalues")
-    # print(eigen(em)$values)
-    em <- em
-    # print(isSymmetric(em))
-    # print(eigen(em))
-    # print(P)
     iFIM.i <- stableInverse(em,0)
     FIM[i] <- -det(iFIM.i)
     

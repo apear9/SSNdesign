@@ -1,24 +1,27 @@
 #' A utility function for optimal designs for the empirical estimation of fixed effects parameters.
 #' 
-#' \code{EDOptimality()}
+#'@description
+#'
+#'\code{EDOoptimality} is a utility function that can be used with \code{\link{findOptimalDesign}}. It is a utility function that minimises the determinant of the variance-covariance matrix of the fixed effects over a set of designs. 
 #' 
-#' @param ssn An object of class SpatialStreamNetwork
-#' @param glmssn An object of class glm.ssn
-#' @param design.points A numeric vector of pids for sites in a proposed design
-#' @param prior.parameters A list of functions parameterised in terms of n.draws that simulate from probability distributions
-#' @param extra.arguments A list of extra arguments that the utility may rely on
-#' @return A numeric representing the D-optimal utility of a design estimated by Monte-Carlo integration
+#'@usage
+#'
+#'\code{EDOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
 #' 
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param glmssn An model object of class glmssn.
+#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@return A numeric scalar.
+#' 
+#'@details
+#'
+#'This utility function is similar to \code{\link{DOptimality}}, except that it does not assume the covariance parameters are known. These are instead estimated from the data associated with a set of design points, while still incorporating prior information about the covariance parameters.  
+#'
 #' @export
 EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  
-  # Check that prediction sites actually exist
-  
-  if(length(ssn@predpoints@SSNPoints) < 1){
-    
-    stop("This SSN is missing prediction points. The utility cannot be evaluated.")
-    
-  }
   
   # Cut down SSN to contain only the design and prediction points
   

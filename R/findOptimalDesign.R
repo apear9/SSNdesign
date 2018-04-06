@@ -1,18 +1,28 @@
 #' Implement optimal designs on a SpatialStreamNetwork
 #'
-#' \code{findOptimalDesign()} 
+#'@description 
+#'
+#' Finds an optimal design consisting of a specified number of points on a SpatialStreamNetwork. 
 #' 
-#'  @param ssn an object of class SpatialStreamNetwork
-#'  @param glmssn an object of class glmssn
-#'  @param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
-#'  @param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
-#'  @param utility.function a function with the signature Utility Function. Built-in functions are Doptimality, FisherInformationMatrix, ... 
-#'  @param prior.parameters a function to act as a prior for covariance parameter values
-#'  @param n.draws a numeric value, being the number of Monte Carlo draws to take when evaluating potential designs
-#'  @param extra.arguments a list of any extra parameters (see below) which can be used to control the behaviour of this function or the utility function
-#'  @return An object of class SpatialStreamNetwork with its observed SSNPoints slot updated to reflect the optimal design selected under the given utility function.
+#'@usage 
+#' 
+#' \code{findOptimalDesign(ssn, glmssn, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
+#' 
+#'@param ssn an object of class SpatialStreamNetwork
+#'@param glmssn an object of class glmssn
+#'@param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
+#'@param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
+#'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions, including \code{\link{DOptimality}}, \code{\link{KOptimality}}, and \code{\link{CPOptimality}}. 
+#'@param prior.parameters a function to act as a prior for covariance parameter values
+#'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs
+#'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
+#'@return An object of class SpatialStreamNetwork. The SSNPoints for the obspoints slot will be updated to reflect the selected design. 
+#'
+#'@details 
+#'
+#'This function implements the greedy exchange algorithm per Falk et al. (2014) to quickly find an optimal design from a set of sites. The algorithm does not always discover the absolute best design; however, even when this occurs, the algorithm will quickly discover a reasonably effective design. 
 #'  
-#'  @export
+#'@export
 findOptimalDesign <- function(
   ssn, 
   glmssn, 
@@ -162,8 +172,6 @@ findOptimalDesign <- function(
       designs <- list(random.points)
       
       # Iterate through greedy exchange algorithm
-      
-      #cnt = 0
       
       while(cond){
         

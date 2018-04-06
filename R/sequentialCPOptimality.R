@@ -1,15 +1,26 @@
 #' A utility function for covariance parameter estimation (sequential)
 #' 
-#' \code{sequentialCPOptimality()}
+#'@description
+#'   
+#'\code{sequentialCPOptimality} is a utility function that can be used with \code{\link{doAdaptiveDesign}}. It is a utility function that minimises the determinant of the variance-covariance matrix of the inverse Fisher information matrix over a set of design points. 
 #' 
-#' @param ssn An object of class SpatialStreamNetwork
-#' @param glmssn An object of class glm.ssn
-#' @param design.points A numeric vector of pids for sites in a proposed design
-#' @param prior.parameters A list of functions parameterised in terms of n.draws that simulate from probability distributions
-#' @param extra.arguments A list of extra arguments that the utility may rely on
-#' @return A numeric representing the sequential CP-optimal utility of a design estimated by Monte-Carlo integration
+#'@usage
+#'
+#'\code{sequentialCPOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
 #' 
-#' @export
+#'@param ssn An object of class SpatialStreamNetwork
+#'@param glmssn An model object of class glmssn.
+#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@return A numeric scalar.
+#' 
+#'@details
+#'
+#'Note that this function operates differently to \code{\link{CPOptimality}}. The function \code{\link{CPOptimality}} assumes there are no sites which have already been incorporated into a design. It computes the expected Fisher information matrix (Som et al., 2014) for each set of simulated covariance parameters. In this sequential form, the observed information matrix is extracted for the sites which are fixed in the design. Then the sites which are not fixed are used to obtain the expected Fisher information. The observed and expected matrices are added, before being reduced to a scalar value to serve as the utility.
+#' 
+#'@export
 sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Extract out the Hessian (observed information) from the glmssn object
