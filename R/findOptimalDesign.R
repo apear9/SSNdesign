@@ -43,11 +43,16 @@ findOptimalDesign <- function(
   if(length(n.points) != 1 & length(n.points) != n){
     stop("n.points must have the same length as the number of networks in ssn, or have a length of 1.")
   }
-  if(!is.numeric(n.points) | n.points < 1){
+  if(!is.numeric(n.points) | any(n.points < 1)){
     stop("The argument n.points must have a positive integer value.")
   }
+  ### PARAMETER TO CONTROL WHETHER DESIGNS ARE FOUND BY NETWORK OR ACROSS NETWORKS
+  do.separately <- TRUE
   if(length(n.points) == 1){
-    n.points <- rep(n.points, n)
+    do.separately <- FALSE
+  }
+  if(do.separately & (length(n.points) != n)){
+    stop(paste("Please provide as many design sizes as there are networks. Note there are", n, "networks"))
   }
   if(!is.numeric(n.draws) | n.draws < 1){
     stop("The argument n.draws must have a positive integer value.")
@@ -75,87 +80,203 @@ findOptimalDesign <- function(
   # Initialise for loop
   
   all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
-  network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
-  if(length(ssn@predpoints@SSNPoints) > 0){
-    network.each.pred <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
-  }
   
-  final.points <- vector(mode = "list", length = n)
+  ### SPLIT FUNCTION HERE INTO TWO CASES:
+  ## CASE 1: EACH NETWORK IS TREATED SEPARATELY
+  ## CASE 2: ALL NETWORKS ARE TREATED TOGETHER
   
-  # For each network, find the design which optimises the utility function.
-  
-  for(net in 1:n){
+  if(do.separately){
     
-    dist.junc.obs.net <- dist.junc.obs[[net]]
-    
+    network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
     if(length(ssn@predpoints@SSNPoints) > 0){
-      dist.junc.prd.net <- dist.junc.prd[[net]]
-      dist.junc.pxo.a.net <- dist.junc.pxo[[ 2 * net - 1 ]]
-      dist.junc.pxo.b.net <- dist.junc.pxo[[ 2 * net ]]
+      network.each.pred <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
     }
     
-    # vector for holding points in this network (locIDs only)
+    final.points <- vector(mode = "list", length = n)
     
-    n.final.this.network <- n.points[net]
-    final.points.this.network <- vector(mode = "numeric", length = n.final.this.network)
+    # For each network, find the design which optimises the utility function.
     
-    ind1 <- network.each.point == net
-    points.this.network <- all.points[ind1]
-    points.this.network <- as.numeric(points.this.network)
-    n.points.this.network <- length(points.this.network)
+    for(net in 1:n){
+      
+      dist.junc.obs.net <- dist.junc.obs[[net]]
+      
+      if(length(ssn@predpoints@SSNPoints) > 0){
+        dist.junc.prd.net <- dist.junc.prd[[net]]
+        dist.junc.pxo.a.net <- dist.junc.pxo[[ 2 * net - 1 ]]
+        dist.junc.pxo.b.net <- dist.junc.pxo[[ 2 * net ]]
+      }
+      
+      # vector for holding points in this network (locIDs only)
+      
+      n.final.this.network <- n.points[net]
+      final.points.this.network <- vector(mode = "numeric", length = n.final.this.network)
+      
+      ind1 <- network.each.point == net
+      points.this.network <- all.points[ind1]
+      points.this.network <- as.numeric(points.this.network)
+      n.points.this.network <- length(points.this.network)
+      
+      ## PULL OUT DISTANCE MATRICES HEERE
+      ## ONLY DO ONCE PER NETWORK
+      
+      extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
+        dist.junc.obs.net, 
+        afv = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column]
+      )
+      extra.arguments$net.zero.obs <- matrix(1, n.points.this.network, n.points.this.network)
+      
+      if(length(ssn@predpoints@SSNPoints) > 0){
+        indp <- network.each.pred == net
+        extra.arguments$Matrices.prd <- getImportantMatrices.obs(
+          dist.junc.prd.net,
+          afv = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
+        )
+        np <- length(ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column])
+        extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
+          dist.junc.pxo.a.net,
+          dist.junc.pxo.b.net,
+          afv.obs = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column],
+          afv.prd = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
+        )
+        extra.arguments$net.zero.prd <- matrix(1, np, np)
+        extra.arguments$net.zero.pxo <- matrix(1, n.points.this.network, np)
+      }
+      
+      # vector and list for holding designs in each of K iterations
+      
+      U.all <- c()
+      design.all <- list()
+      for(k in 1:K){
+        
+        # Select random subsample of points
+        
+        random.sample <- sample(1:n.points.this.network, n.final.this.network, FALSE)
+        random.points <- points.this.network[random.sample]
+        random.points <- as.character(random.points)
+
+        # Evaluate utility once to initialise
+        
+        U <- utility.function(
+          ssn,
+          glmssn,
+          random.points,
+          prior.parameters, 
+          n.draws,
+          extra.arguments
+        )
+        
+        U.ij <- U
+        design.now <- list(random.points)
+        cond <- max(U.ij) >= U
+        last.value <- c()
+        designs <- list(random.points)
+        
+        # Iterate through greedy exchange algorithm
+        
+        while(cond){
+          
+          for(i in 1:n.final.this.network){
+            
+            last.value <- random.points
+            ind.i <- !(points.this.network %in% last.value)
+            remaining.values <- points.this.network[ind.i]
+            remaining.values <- as.character(remaining.values)
+            n.j <- length(remaining.values)
+            
+            for(j in 1:n.j){
+              
+              random.points[i] <- remaining.values[j]
+              designs <- append(designs, list(random.points))
+
+              U_ <- utility.function(
+                ssn,
+                glmssn,
+                random.points,
+                prior.parameters, 
+                n.draws,
+                extra.arguments
+              )
+              
+              U.ij <- append(U.ij, U_)
+              
+            }
+            
+          }
+          
+          design.previous <- design.now
+          if(max(U.ij) >= U){
+            U <- max(U.ij)
+            ind <- U.ij == max(U.ij)
+            ind <- (1:length(U.ij))[ind]
+            #U.ij <- U.ij[-ind]
+            design.now <- designs[[ind]]
+            random.points <- design.now
+            
+          }
+          
+          cond <- !all(design.now %in% design.previous)
+
+        }
+
+        U.all <- append(U.all, U)
+        design.all <- append(design.all, list(design.now))
+        
+      }
+      
+      ind <- (1:length(U.all))[U.all == max(U.all)][1]
+      final.points[[net]] <- design.all[[ind]]
+    }
     
-    ## PULL OUT DISTANCE MATRICES HEERE
-    ## ONLY DO ONCE PER NETWORK
+    final.points <- unlist(final.points) 
+    
+  } else {
+    
+    # Extract out total matrix for the observations
+    
+    total.mats.obs <- constructTotalMatrix(dist.junc.obs)
+    extra.arguments$net.zero.obs <- total.mats.obs$net.zero
+    
+    # Process matrix to obtain important matrices
     
     extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
-      dist.junc.obs.net, 
-      afv = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column]
+      total.mats.obs$d.junc,
+      ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column]
     )
+    rm(total.mats.obs) # remove from memory in case it is very large
     
+    # Do the same for prediction related matrices if needed
     if(length(ssn@predpoints@SSNPoints) > 0){
-      indp <- network.each.pred == net
+      total.mats.prd <- constructTotalMatrix(dist.junc.prd)
+      extra.arguments$net.zero.prd <- total.mats.prd$net.zero
       extra.arguments$Matrices.prd <- getImportantMatrices.obs(
-        dist.junc.prd.net,
-        afv = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
-        )
-      extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
-        dist.junc.pxo.a.net,
-        dist.junc.pxo.b.net,
-        afv.obs = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column],
-        afv.prd = ssn@predpoints@SSNPoints[[1]]@point.data[indp,afv.column]
+        total.mats.prd$d.junc,
+        ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
       )
+      rm(total.mats.prd)
+      total.mats.pxo <- constructTotalMatrix(dist.junc.pxo, TRUE)
+      extra.arguments$net.zero.pxo <- total.mats.pxo$net.zero
+      extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
+        total.mats.pxo$d.junc,
+        t(total.mats.pxo$d.junc),
+        ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column],
+        ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
+      )
+      rm(total.mats.pxo)
     }
     
-    # vector and list for holding designs in each of K iterations
-    
+    # Initialise loop
+
     U.all <- c()
     design.all <- list()
     for(k in 1:K){
       
       # Select random subsample of points
-      
-      ## BREAK POINT -- does not work if pred sites present
-      
-      # ind1 <- ssn@obspoints@SSNPoints[[1]]@network.point.coords$NetworkID == net
-      # points.this.network <- ssn@obspoints@SSNPoints[[1]]@point.data$pid[ind1]
-      # points.this.network <- as.numeric(points.this.network)
-      # n.points.this.network <- length(points.this.network)
-      random.sample <- sample(1:n.points.this.network, n.final.this.network, FALSE)
-      random.points <- points.this.network[random.sample]
+      random.sample <- sample(1:length(all.points), n.points, FALSE)
+      random.points <- all.points[random.sample]
       random.points <- as.character(random.points)
-      # print(random.points)
       
       # Evaluate utility once to initialise
-      # OBSOLETE CODE -- need to define distance matrices differently
-      # dist.tot <- dc.matrices$Distance[[net]]
-      # conn.tot <- dc.matrices$Connectivity[[net]]
-      # ind <- row.names(dist.tot) %in% random.points
-      # dist.ij <- dist.tot[ind, ind]
-      # conn.ij <- conn.tot[ind, ind]
-      # design.data <- ssn@obspoints@SSNPoints[[1]]@point.data
-      # design.data <- design.data[order(design.data$locID), ]
-      # design.data.ij <- design.data[design.data$locID %in% random.points, ]
-      # 
+      
       U <- utility.function(
         ssn,
         glmssn,
@@ -175,11 +296,11 @@ findOptimalDesign <- function(
       
       while(cond){
         
-        for(i in 1:n.final.this.network){
+        for(i in 1:n.points){
           
           last.value <- random.points
-          ind.i <- !(points.this.network %in% last.value)
-          remaining.values <- points.this.network[ind.i]
+          ind.i <- !(all.points %in% last.value)
+          remaining.values <- all.points[ind.i]
           remaining.values <- as.character(remaining.values)
           n.j <- length(remaining.values)
           
@@ -187,11 +308,7 @@ findOptimalDesign <- function(
             
             random.points[i] <- remaining.values[j]
             designs <- append(designs, list(random.points))
-            # ind <- row.names(dist.tot) %in% random.points
-            # dist.ij <- dist.tot[ind, ind]
-            # conn.ij <- conn.tot[ind, ind]
-            # design.data.ij <- design.data[design.data$locID %in% random.points, ]
-            # 
+            
             U_ <- utility.function(
               ssn,
               glmssn,
@@ -212,28 +329,26 @@ findOptimalDesign <- function(
           U <- max(U.ij)
           ind <- U.ij == max(U.ij)
           ind <- (1:length(U.ij))[ind]
-          #U.ij <- U.ij[-ind]
           design.now <- designs[[ind]]
           random.points <- design.now
           
         }
         
         cond <- !all(design.now %in% design.previous)
-        #cnt = cnt + 1
+        
       }
-      # print(cnt)
+      
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
     }
     
-    ind <- (1:length(U.all))[U.all == max(U.all)][1]
-    final.points[[net]] <- design.all[[ind]]
+    ind.max <- U.all == max(U.all)
+    final.points <- unlist(design.all[ind.max])
+    
   }
   
   ## create new SSN containing only the selected points
-  
-  final.points <- unlist(final.points)
   
   # update point coords
   ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
