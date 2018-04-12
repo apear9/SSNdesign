@@ -22,7 +22,7 @@
 #'  
 #'@export
 KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  
+  # t1 <- Sys.time()
   # Get info for the obs sites  
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
   X <- glmssn$sampinfo$X[ind, ]
@@ -39,21 +39,23 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
   extra.arguments$Matrices.Obs <- mat
+  net.zero.obs <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Do the same for the pxo matrix
-  
   mat <- extra.arguments$Matrices.pxo
   mat$d <-  mat$d[ind.mat, ]
   mat$a <-  mat$a[ind.mat, ]
   mat$b <-  mat$b[ind.mat, ] 
   mat$w <-  mat$w[ind.mat, ]
   extra.arguments$Matrices.pxo <- mat
-  
+  net.zero.pxo <- extra.arguments$net.zero.pxo[ind.mat, ]
+    
   # Get info for the pred sites
-  this.net <- ssn@obspoints@SSNPoints[[1]]@point.data$netID[ind][1]
-  ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID == this.net
-  X0 <- t(model.matrix(glmssn$args$formula, ssn@predpoints@SSNPoints[[1]]@point.data[ind,]))
-  cds.prd <- ssn@predpoints@SSNPoints[[1]]@point.coords[ind, ]
+  # this.net <- ssn@obspoints@SSNPoints[[1]]@point.data$netID[ind][1]
+  # ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID == this.net
+  indp <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
+  X0 <- t(model.matrix(glmssn$args$formula, ssn@predpoints@SSNPoints[[1]]@point.data[indp, ]))
+  cds.prd <- ssn@predpoints@SSNPoints[[1]]@point.coords[indp, ]
   colnames(cds.prd) <- c("x", "y")
   # Matrices
   
@@ -96,7 +98,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
       extra.arguments$Matrices.Obs$a, 
       extra.arguments$Matrices.Obs$b, 
       extra.arguments$Matrices.Obs$w, 
-      NULL, 
+      net.zero.obs, 
       cds.obs[, "x"], 
       cds.obs[, "y"], 
       cds.obs[, "x"], 
@@ -117,7 +119,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
       extra.arguments$Matrices.prd$a, 
       extra.arguments$Matrices.prd$b, 
       extra.arguments$Matrices.prd$w, 
-      NULL, 
+      extra.arguments$net.zero.prd, 
       cds.prd[, "x"], 
       cds.prd[, "y"], 
       cds.prd[, "x"], 
@@ -137,7 +139,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
       extra.arguments$Matrices.pxo$a, 
       extra.arguments$Matrices.pxo$b, 
       extra.arguments$Matrices.pxo$w, 
-      NULL, 
+      net.zero.pxo, 
       cds.obs[, "x"], 
       cds.obs[, "y"], 
       cds.prd[, "x"], 
@@ -165,8 +167,8 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
     
   }
   
-  # spit out result
-  
+  # # spit out result
+  # print(Sys.time() - t1)
   return(mean(K_all))
   
 }

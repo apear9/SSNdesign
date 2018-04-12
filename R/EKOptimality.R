@@ -21,15 +21,7 @@
 #'  
 #'@export
 EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  
-  # Check that prediction sites actually exist
-  
-  if(length(ssn@predpoints@SSNPoints) < 1){
-    
-    stop("This SSN is missing prediction points. The utility cannot be evaluated.")
-    
-  }
-  
+  #t1 <- Sys.time()
   # Cut down SSN to contain only the design and prediction points
   
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
@@ -37,18 +29,33 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
   ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind, ]
   
-  current.netID <- as.character(ssn@obspoints@SSNPoints[[1]]@point.data$netID)
-  ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID %in% current.netID
-  ssn@predpoints@SSNPoints[[1]]@network.point.coords <- ssn@predpoints@SSNPoints[[1]]@network.point.coords[ind, ]
-  ssn@predpoints@SSNPoints[[1]]@point.coords <- ssn@predpoints@SSNPoints[[1]]@point.coords[ind, ]
-  ssn@predpoints@SSNPoints[[1]]@point.data <- ssn@predpoints@SSNPoints[[1]]@point.data[ind, ]
+  # Get model matrix anyway
   
-  # Ensure that the only level of the factor netID is the current netID
+  X <- glmssn$sampinfo$X[ind, ]
+  Xt <- t(X)
+  cds.obs <- ssn@obspoints@SSNPoints[[1]]@point.coords
+  colnames(cds.obs) <- c("x", "y")
   
-  ssn@obspoints@SSNPoints[[1]]@point.data$netID <- as.factor(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$netID))
-  ssn@obspoints@SSNPoints[[1]]@network.point.coords$NetworkID <- as.factor(as.character(ssn@obspoints@SSNPoints[[1]]@network.point.coords$NetworkID))
-  ssn@predpoints@SSNPoints[[1]]@point.data$netID <- as.factor(as.character(ssn@predpoints@SSNPoints[[1]]@point.data$netID))
-  ssn@predpoints@SSNPoints[[1]]@network.point.coords$NetworkID <- as.factor(as.character(ssn@predpoints@SSNPoints[[1]]@network.point.coords$NetworkID))
+  # Get info for the pred sites
+  # this.net <- ssn@obspoints@SSNPoints[[1]]@point.data$netID[ind][1]
+  # ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID == this.net
+  
+  indp <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
+  X0 <- t(model.matrix(glmssn$args$formula, ssn@predpoints@SSNPoints[[1]]@point.data[indp, ]))
+  cds.prd <- ssn@predpoints@SSNPoints[[1]]@point.coords[indp, ]
+  colnames(cds.prd) <- c("x", "y")
+  # print(dim(cds.prd))
+  # print(cds.prd[, "x"])
+  # print(dim(extra.arguments$net.zero.prd))
+  # print(dim(extra.arguments$Matrices.prd$d))
+  
+  ## Get other model parameters
+  
+  td <- glmssn$args$useTailDownWeight
+  cm <- glmssn$args$CorModels
+  un <- glmssn$args$use.nugget
+  ua <- glmssn$args$use.anisotropy
+  re <- glmssn$sampInfo$REs
   
   # Cut down matrices involving the observations
   
@@ -59,6 +66,7 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
   extra.arguments$Matrices.obs <- mat
+  net.zero.obs <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Do the same for the pxo matrix
   mat <- extra.arguments$Matrices.pxo
@@ -67,6 +75,7 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   mat$b <-  mat$b[ind.mat, ] 
   mat$w <-  mat$w[ind.mat, ]
   extra.arguments$Matrices.pxo <- mat
+  net.zero.pxo <- extra.arguments$net.zero.pxo[ind.mat, ]
   
   # Simulate parameters as required
   
@@ -94,7 +103,7 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
     
     # Simulate data from simulated FE and CovParms values
     
-    print("here1")
+ #   print("here1")
     
     ssn.i <- SimulateOnSSN_minimal(
       ssn.object = ssn,
@@ -111,13 +120,16 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       useTailDownWeight = glmssn$args$useTailDownWeight,
       family = glmssn$args$family,
       matrices.obs = extra.arguments$Matrices.obs,
+      net.zero.obs = net.zero.obs,
       matrices.preds = extra.arguments$Matrices.prd,
-      matrices.predsxobs = extra.arguments$Matrices.pxo
+      net.zero.preds = extra.arguments$net.zero.prd,
+      matrices.predsxobs = extra.arguments$Matrices.pxo,
+      net.zero.predsxobs = net.zero.pxo
     )$ssn.object
     
     # Fit model to simulated data
     
-    print("here2")
+   # print("here2")
     
     mdl.tmp <- glmssn_minimal(
       formula = glmssn$args$formula,
@@ -132,24 +144,79 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       a = extra.arguments$Matrices.obs$a,
       b = extra.arguments$Matrices.obs$b,
       c = extra.arguments$Matrices.obs$c,
-      w = extra.arguments$Matrices.obs$w
+      w = extra.arguments$Matrices.obs$w,
+      n = net.zero.obs
     )
     
     # Obtain kriging variances at prediction sites from this model
     
-    print("here3")
+    # n.preds.uncertainty <- ncol(glmssn$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 2 # based on behaviour of predict.glmssn
+    # EK.i <- predict.glmssn(mdl.tmp, "preds")$ssn.object@predpoints@SSNPoints[[1]]@point.data[,n.preds.uncertainty]^2
     
-    n.preds.uncertainty <- ncol(glmssn$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 2 # based on behaviour of predict.glmssn
-    EK.i <- predict.glmssn(mdl.tmp, "preds")$ssn.object@predpoints@SSNPoints[[1]]@point.data[,n.preds.uncertainty]^2
+    # get estimated covariance matrix on the data
+    
+    Wi <- mdl.tmp$estimates$Vi
+    
+    # get V
+    
+#    print("here3")
+    
+    V <- SSN:::makeCovMat(
+      as.vector(mdl.tmp$estimates$theta), 
+      extra.arguments$Matrices.prd$d, 
+      extra.arguments$Matrices.prd$a, 
+      extra.arguments$Matrices.prd$b, 
+      extra.arguments$Matrices.prd$w, 
+      extra.arguments$net.zero.prd, 
+      cds.prd[, "x"], 
+      cds.prd[, "y"], 
+      cds.prd[, "x"], 
+      cds.prd[, "y"], 
+      td,
+      cm, 
+      un,
+      ua,
+      re
+    )
+    
+    # get C and tC
+    
+    C <- SSN:::makeCovMat(
+      as.vector(mdl.tmp$estimates$theta), 
+      extra.arguments$Matrices.pxo$d, 
+      extra.arguments$Matrices.pxo$a, 
+      extra.arguments$Matrices.pxo$b, 
+      extra.arguments$Matrices.pxo$w, 
+      net.zero.pxo, 
+      cds.obs[, "x"], 
+      cds.obs[, "y"], 
+      cds.prd[, "x"], 
+      cds.prd[, "y"], 
+      td,
+      cm, 
+      FALSE,
+      ua,
+      re
+    )
+    Ct <- t(C)
+    
+    # get M and Mt
+    
+    M <- (X0 - Xt %*% Wi %*% C)
+    Mt <- t(M)
+    
+    # pred utility
+    
+    EK.i <- V - Ct %*% Wi %*% C + Mt %*% solve(Xt %*% Wi %*% X) %*% M
     
     # Sum, invert
     
-    EK[i] <- 1/sum(EK.i)
+    EK[i] <- 1/sum(diag(EK.i))
     
   }
   
   EK <- mean(EK)
-  
+  #print(t1 - Sys.time()) 50 out of 80 sites, with 500 draws ~~ 12 minutes
   return(EK)
   
 }

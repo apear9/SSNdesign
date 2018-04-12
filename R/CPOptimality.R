@@ -22,7 +22,7 @@
 #' 
 #'@export
 CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  
+  #t1 <- Sys.time()
   # Rely on ordering of output of glmssn to retrieve correct rows in the design matrix
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
   
@@ -77,7 +77,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       mat$a, 
       mat$b, 
       mat$w, 
-      NULL, 
+      extra.arguments$net.zero.obs[ind.mat, ind.mat], 
       cds[, "x"], 
       cds[, "y"], 
       cds[, "x"], 
@@ -107,7 +107,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
         mat$a, 
         mat$b, 
         mat$w, 
-        NULL, 
+        extra.arguments$net.zero.obs[ind.mat, ind.mat], 
         cds[, "x"], 
         cds[, "y"], 
         cds[, "x"], 
@@ -127,11 +127,11 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
          em[k, j] <- em[j, k] <- 1/2 * sum(diag(I_REML))
       }
     }
-    iFIM.i <- stableInverse(em,0)
+    iFIM.i <- stableInverse(em)
     FIM[i] <- -det(iFIM.i)
     
   }
-  
+  #print(Sys.time() - t1)
   return(mean(FIM, na.rm = TRUE))
   
 }

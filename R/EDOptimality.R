@@ -22,7 +22,7 @@
 #'
 #' @export
 EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  
+  t1 <- Sys.time()
   # Cut down SSN to contain only the design and prediction points
   
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
@@ -41,6 +41,7 @@ EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
+  n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Simulate parameters as required
   
@@ -82,7 +83,8 @@ EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       addfunccol = glmssn$args$addfunccol,
       useTailDownWeight = glmssn$args$useTailDownWeight,
       family = glmssn$args$family,
-      matrices.obs = mat
+      matrices.obs = mat,
+      net.zero.obs = n.zero
     )$ssn.object
     
     # Fit model to simulated data
@@ -100,7 +102,8 @@ EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       a = mat$a,
       b = mat$b,
       c = mat$c,
-      w = mat$w
+      w = mat$w,
+      n = n.zero
     )
     
     # Obtain determinant of estimated covariance matrix on the fixed effects
@@ -110,7 +113,7 @@ EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   }
   
   ED <- mean(ED)
-  
+  print(Sys.time() - t1)
   return(ED)
   
 }
