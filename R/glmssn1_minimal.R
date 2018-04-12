@@ -29,7 +29,8 @@ glmssn1_minimal <- function(formula, ssn.object,
                     a.mat.data,
                     b.mat.data,
                     c.mat.data,
-                    w.matrix.data
+                    w.matrix.data,
+                    net.zero.data
 )
 {
   
@@ -127,8 +128,8 @@ glmssn1_minimal <- function(formula, ssn.object,
   #     flow.con.mat*net.zero
   #   w.matrix.data <- w.matrix[ind, ind]
   # }
-  net.zero.data <- net.zero[ind,ind]
-  
+  # net.zero.data <- net.zero[ind,ind]
+  # 
   xcoord <- data[distord,xcol]
   ycoord <- data[distord,ycol]
   xcoord.data <- xcoord#[ind]

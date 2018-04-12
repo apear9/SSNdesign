@@ -10,6 +10,7 @@
 #'
 #'@param ... Arguments for the function \code{glmssn} from the package SSN.
 #'@param d,a,b,c,w Distance matrices (d, a, b), a connectivity matrix (c), and a weights matrix (w).
+#'@param nz A binary matrix which is 1 when the rows and columns belong to points on the same network, and 0 otherwise. 
 #'@return An object of class glmssn, as described for the function \code{glmssn} in the package SSN.
 #'
 #'@details
@@ -38,7 +39,8 @@ glmssn_minimal <- function(formula, ssn.object,
                    a,
                    b,
                    c,
-                   w
+                   w,
+                   n
 )
 {
   
@@ -59,7 +61,8 @@ glmssn_minimal <- function(formula, ssn.object,
                     a.mat.data = a,
                     b.mat.data = b,
                     c.mat.data = c,
-                    w.matrix.data = w
+                    w.matrix.data = w,
+                    net.zero.data = n
   )
   cl = match.call()
   output$args[["call"]] = cl
