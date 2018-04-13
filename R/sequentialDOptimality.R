@@ -46,6 +46,7 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
+  n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   ## Get other model parameters
   td <- glmssn$args$useTailDownWeight
@@ -73,7 +74,7 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
       mat$a, 
       mat$b, 
       mat$w, 
-      NULL, 
+      n.zero, 
       cds[, "x"], 
       cds[, "y"], 
       cds[, "x"], 

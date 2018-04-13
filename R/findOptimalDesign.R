@@ -51,9 +51,6 @@ findOptimalDesign <- function(
   if(length(n.points) == 1){
     do.separately <- FALSE
   }
-  if(do.separately & (length(n.points) != n)){
-    stop(paste("Please provide as many design sizes as there are networks. Note there are", n, "networks"))
-  }
   if(!is.numeric(n.draws) | n.draws < 1){
     stop("The argument n.draws must have a positive integer value.")
   }

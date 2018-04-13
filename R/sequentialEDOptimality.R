@@ -46,6 +46,7 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
+  n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Simulate parameters as required
   cvp.cols <- length(glmssn$estimates$theta)
@@ -81,7 +82,8 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
       addfunccol = glmssn$args$addfunccol,
       useTailDownWeight = glmssn$args$useTailDownWeight,
       family = glmssn$args$family,
-      matrices.obs = mat
+      matrices.obs = mat,
+      net.zero.obs = n.zero
     )$ssn.object
     
     # Fit model to simulated data
@@ -98,7 +100,8 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
       a = mat$a,
       b = mat$b,
       c = mat$c,
-      w = mat$w
+      w = mat$w,
+      n = n.zero
     )
     
     # Obtain determinant of estimated covariance matrix on the fixed effects

@@ -49,6 +49,7 @@ sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
+  n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   ## Simulate covariance parameters
   
@@ -83,7 +84,7 @@ sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters,
       mat$a, 
       mat$b, 
       mat$w, 
-      NULL, 
+      n.zero, 
       cds[, "x"], 
       cds[, "y"], 
       cds[, "x"], 
@@ -113,7 +114,7 @@ sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters,
         mat$a, 
         mat$b, 
         mat$w, 
-        NULL, 
+        n.zero, 
         cds[, "x"], 
         cds[, "y"], 
         cds[, "x"], 
