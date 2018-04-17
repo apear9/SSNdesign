@@ -27,18 +27,17 @@ nppoints <- function(ssn){
   
   nets.u <- unique(nets)
   nets.u <- nets.u[order(nets.u)]
-  n <- length(nets.u)
   
   ## Find number of points
   
-  ndp <- vapply(nets, function(x){sum(nets == x)}, vector("numeric", n))
+  npp <- vapply(nets.u, function(x){sum(nets == x)}, vector("numeric", 1))
   names(ndp) <- paste("Net", nets.u)
   
   ## Return
   
   return(list(
-    byNetwork = ndp,
-    inTotal = sum(ndp)
+    byNetwork = npp,
+    inTotal = sum(npp)
   )
   )
   
