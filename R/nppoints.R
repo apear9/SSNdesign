@@ -31,7 +31,7 @@ nppoints <- function(ssn){
   ## Find number of points
   
   npp <- vapply(nets.u, function(x){sum(nets == x)}, vector("numeric", 1))
-  names(ndp) <- paste("Net", nets.u)
+  names(npp) <- paste("Net", nets.u)
   
   ## Return
   
