@@ -8,6 +8,7 @@
 #'\code{doAdaptiveDesign(ssn, glmssn, fixed.points, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
 #' 
 #'@param ssn an object of class SpatialStreamNetwork
+#'@param new.ssn.path a character string specifying the ssn folder in which to store the output
 #'@param glmssn an object of class glmssn
 #'@param fixed.points a numeric vector of the pids for sites which must remain fixed in the design
 #'@param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
@@ -25,6 +26,7 @@
 #'@export
 doAdaptiveDesign <- function(
   ssn,
+  new.ssn.path,
   glmssn,
   fixed.points,
   afv.column, 
@@ -346,23 +348,31 @@ doAdaptiveDesign <- function(
     
   }
   
-  # update point coords
-  ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
-  ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.point.coords, ]
+  # # update point coords
+  # ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
+  # ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.point.coords, ]
+  # 
+  # # update network point coords
+  # ind.network.point.coords <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% final.points
+  # ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.network.point.coords, ]
+  # 
+  # # update point data
+  # ind.point.data <- row.names(ssn@obspoints@SSNPoints[[1]]@point.data) %in% final.points
+  # ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.point.data, ]
+  # 
+  # # update bbox
+  # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
+  # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
   
-  # update network point coords
-  ind.network.point.coords <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% final.points
-  ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.network.point.coords, ]
-  
-  # update point data
-  ind.point.data <- row.names(ssn@obspoints@SSNPoints[[1]]@point.data) %in% final.points
-  ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.point.data, ]
-  
-  # update bbox
-  new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
-  ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
+  subsetSSN(ssn, new.ssn.path, pid %in% final.points)
+  preds <- NULL
+  if(length(ssn@predpoints@SSNPoints) > 0){
+    preds <- "preds"
+  }
+  ssn.new <- importSSN(new.ssn.path, preds)
+  createDistMat(ssn.new, preds, TRUE, TRUE)
   
   # return updated ssn
-  return(ssn)
+  return(ssn.new)
   
 }
