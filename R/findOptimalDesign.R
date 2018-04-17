@@ -364,14 +364,15 @@ findOptimalDesign <- function(
   # # update bbox
   # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
   # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
-  
-  subsetSSN(ssn, new.ssn.path, pid %in% final.points)
+  final.points <<- final.points
+  subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points)
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"
   }
   ssn.new <- importSSN(new.ssn.path, preds)
   createDistMat(ssn.new, preds, TRUE, TRUE)
+  rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
   return(ssn.new)
