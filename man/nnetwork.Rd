@@ -4,18 +4,14 @@
 \alias{nnetwork}
 \title{Find the number of distinct networks in a SpatialStreamNetwork}
 \usage{
-nnetwork(ssn)
+\code{nnetwork(ssn)}
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}
 }
 \value{
-a single number
+a numeric scalar
 }
 \description{
-\code{nnetwork()} is a function to find how many separate networks there are in a single SpatialStreamNetwork object.
-}
-\examples{
-\dontrun{NONE AS YET}
-
+Calculates the number of networks are present inside of a SpatialStreamNetwork object.
 }

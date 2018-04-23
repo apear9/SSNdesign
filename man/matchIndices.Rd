@@ -4,7 +4,10 @@
 \alias{matchIndices}
 \title{Get row or element numbers for matches between two vectors}
 \usage{
-matchIndices(match.from, match.to)
+\code{matchIndices} is a function that returns row or element numbers where a set of values from one object occur in another. 
+\code{matchIndices(match.from, match.to)}. 
+
+Note, this function is only intended to be used internally by \code{generateSites}.
 }
 \arguments{
 \item{match.from}{a numeric or character vector}
@@ -15,10 +18,5 @@ matchIndices(match.from, match.to)
 A numeric vector containing the row indices of every match, in the order that they appear in match.from
 }
 \description{
-\code{matchIndices} is a function that returns row or element numbers where a set of values from one object occur in another.
+Get the positions in a vector corresponding to a match between vectors.
 }
-\section{Warning}{
-
-This function is not intended for direct use.
-}
-
