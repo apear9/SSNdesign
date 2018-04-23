@@ -18,9 +18,9 @@
 #'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
 #'@return An object of class SpatialStreamNetwork. The SSNPoints for the obspoints slot will be updated to reflect the selected design. 
 #'
-#'@section warning
+#'@details
 #'
-#'This function is incredibly computationally expensive. It is only provided here because users may be interested to compare the design found by using the optimal design function to the actual optimal design found by searching all possible designs. It is only recommended that this be used for very small designs from a relatively small set of potential design points.
+#'This is very computationally expensive. Only use this function for small examples or to benchmark the performance of the greedy exchange algorithm.
 #'
 #'@export
 searchAllDesigns <- function(ssn, n.points, model, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL){

@@ -65,6 +65,10 @@ doAdaptiveDesign <- function(
     K <- extra.arguments$K
   }
   
+  # Overwrite model matrix in the model with the fuller model matrix for the SSN (necessary for utility functions)
+  
+  glmssn$sampinfo$X <- model.matrix(glmssn$args$formula, data = ssn@obspoints@SSNPoints[[1]]@point.data)
+  
   # Extract important matrices for each network
   
   dist.junc.obs <- getStreamDistMatInOrder(ssn)
@@ -112,6 +116,10 @@ doAdaptiveDesign <- function(
       points.this.network <- points.this.network[ind2]
       n.points.this.network <- length(points.this.network)
       
+      # Create net.zero.obs matrix, with as many rows and columns as sites in the SSN object for the ith network
+      nrows <- sum(ind1)
+      extra.arguments$net.zero.obs <- matrix(1, nrows, nrows)
+      
       ## PULL OUT DISTANCE MATRICES HEERE
       ## ONLY DO ONCE PER NETWORK
       
@@ -119,7 +127,6 @@ doAdaptiveDesign <- function(
         dist.junc.obs.net, 
         afv = ssn@obspoints@SSNPoints[[1]]@point.data[ind1,afv.column]
       )
-      extra.arguments$net.zero.obs <- matrix(1, n.points.this.network, n.points.this.network)
       
       if(length(ssn@predpoints@SSNPoints) > 0){
         indp <- network.each.pred == net
@@ -364,7 +371,7 @@ doAdaptiveDesign <- function(
   # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
   # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
   final.points <<- final.points
-  subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points)
+  suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"

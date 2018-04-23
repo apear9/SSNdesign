@@ -28,13 +28,16 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
   
   # Exclude the fixed points from the set of design points
   ind <- !(design.points %in% extra.arguments$fixed)
+  # print(sum(ind))
   design.points <- design.points[ind]
   
   # Retrieve relevant design matirx
   ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
   X <- glmssn$sampinfo$X[ind, ]
   Xt <- t(X)
-  
+  # print(ind)
+  # print(length(ind))
+  # print(sum(ind))
   # Retrieve coordinates of sampling points
   cds <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
   colnames(cds) <- c("x", "y")
@@ -42,12 +45,15 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
   # Cut down distance matrices, etc.
   mat <- extra.arguments$Matrices.Obs
   ind.mat <- row.names(mat$d) %in% design.points
+  # print(ind.mat)
+  # print(length(ind.mat))
+  # print(sum(ind.mat))
   mat$d <-  mat$d[ind.mat, ind.mat]
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
-  
+  # print(dim(n.zero))
   ## Get other model parameters
   td <- glmssn$args$useTailDownWeight
   cm <- glmssn$args$CorModels

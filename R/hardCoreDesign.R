@@ -8,8 +8,8 @@
 #'
 #'\code{hardCoreDesign(...)} 
 #'
-#'@param ... Arguments for the function \code{\hardCoreDesign} in the package SSN.
-#'@return An object of class data.frame.
+#'@param ... Arguments for the function \code{hardCoreDesign} in the package SSN.
+#'@return An object of class data.frame
 #'
 #'@details
 #'

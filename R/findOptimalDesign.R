@@ -365,7 +365,7 @@ findOptimalDesign <- function(
   # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
   # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
   final.points <<- final.points
-  subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points)
+  suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"
