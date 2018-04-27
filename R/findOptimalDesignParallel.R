@@ -6,7 +6,7 @@
 #' 
 #'@usage 
 #' 
-#' \code{findOptimalDesign(ssn, glmssn, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
+#' \code{findOptimalDesignParallel(ssn, glmssn, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, n.cores = 2, extra.arguments = NULL)}
 #' 
 #'@param ssn an object of class SpatialStreamNetwork
 #'@param new.ssn.path a character string specifying the ssn folder in which to store the output
