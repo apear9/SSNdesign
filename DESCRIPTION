@@ -1,5 +1,5 @@
 Package: SSNdesign
-Title: Adaptive Design for Spatial Stream Networks
+Title: Optimal and adaptive design for Spatial Stream Networks
 Version: 0.0.0.9000
 Authors@R: c(
   person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut", "cre")),
@@ -8,10 +8,11 @@ Authors@R: c(
   person("Benjamin R", "Fitzpatrick", email = "b1.fitzpatrick@qut.edu.au", role = c("aut"))
   )
 Description: Adaptive sampling design on stream networks.
-Depends: R (>= 3.3.3)
+Depends: R (>= 3.3.3), SSN, doParallel
 License: GPL-2
 Imports:
   SSN
+  doParallel
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
