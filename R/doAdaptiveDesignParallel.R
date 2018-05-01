@@ -217,7 +217,8 @@ doAdaptiveDesignParallel <- function(
             d.iter <- isplitVector(d.list, chunks = n.cores)
             rm(d.list)
             Uij <- foreach(
-              d.i = d.iter
+              d.i = d.iter,
+              .packages = c("SSN", "SSNDesign")
             ) %dopar% {
               lapply(
                 d.i, 
@@ -369,7 +370,8 @@ doAdaptiveDesignParallel <- function(
           d.iter <- isplitVector(d.list, chunks = n.cores)
           rm(d.list)
           Uij <- foreach(
-            d.i = d.iter
+            d.i = d.iter,
+            .packages = c("SSN", "SSNDesign")
           ) %dopar% {
             lapply(
               d.i, 

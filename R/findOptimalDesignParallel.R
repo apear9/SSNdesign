@@ -220,8 +220,8 @@ findOptimalDesignParallel <- function(
             # cl <- makeCluster(n.cores)
             # registerDoParallel(cl)
             Uij <- foreach(
-              d.i = d.iter#, 
-              #.packages("SSN", "itertools"),
+              d.i = d.iter, 
+              .packages = c("SSN", "SSNDesign")
             ) %dopar% {
               lapply(
                 d.i, 
@@ -378,8 +378,8 @@ findOptimalDesignParallel <- function(
           # cl <- makeCluster(n.cores)
           # registerDoParallel(cl)
           Uij <- foreach(
-            d.i = d.iter#, 
-            #.packages("SSN", "itertools"),
+            d.i = d.iter, 
+            .packages = c("SSN", "SSNDesign")
           ) %dopar% {
             lapply(
               d.i, 
