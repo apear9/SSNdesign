@@ -43,30 +43,9 @@ glmssn1_minimal <- function(formula, ssn.object,
   if(!"max.range.factor" %in% names(control)) control$max.range.factor <- 4
   if(!"maxiter.pseudo" %in% names(control)) control$maxiter.pseudo <- 20
   
-  # Obsolete -- no need to create matrices; this causes a crash. 
-  # nIDs <- sort(as.integer(as.character(unique(data[,"netID"]))))
-  # dist.junc <- matrix(0, nrow = length(data[,1]), ncol = length(data[,1]))
   net.zero <-  matrix(1, nrow = length(data[,1]), ncol = length(data[,1]))
-  # nsofar <- 0
   distord <- order(data[,"pid"])
   names(distord) <- rownames(data)[distord]
-  # for(i in nIDs) {
-  #   workspace.name <- paste("dist.net", i, ".RData", sep = "")
-  #   path <- file.path(ssn.object@path, "distance", "obs",
-  #                     workspace.name)
-  #   if(!file.exists(path)) {
-  #     stop("Unable to locate required distance matrix")
-  #   }
-  #   file_handle <- file(path, open="rb")
-  #   distmat <- unserialize(file_handle)
-  #   ordpi <- order(as.numeric(rownames(distmat)))
-  #   close(file_handle)
-  #   ni <- length(distmat[1,])
-  #   dist.junc[(nsofar + 1):(nsofar + ni),(nsofar + 1):
-  #               (nsofar + ni)] <- distmat[ordpi, ordpi, drop = F]
-  #   net.zero[(nsofar + 1):(nsofar + ni),(nsofar + 1):(nsofar + ni)] <- 1
-  #   nsofar <- nsofar + ni
-  # }
   
   ## Check all arguments have correct form
   Err <- SSN:::arg.error.check.multi(CorModels = CorModels,
@@ -90,46 +69,7 @@ glmssn1_minimal <- function(formula, ssn.object,
   REs <- dataXY.out$REs
   REmodelmatrices <- dataXY.out$REmodelmatrices
   n.all <- dataXY.out$sampsizes$n.all
-  # OBSOLETE -- NO NEED TO CREATE MATRICES
-  # a.mat <- NULL
-  # b.mat <- NULL
-  # a.mat.data <- NULL
-  # b.mat.data <- NULL
-  # dist.hydro <- NULL
-  # dist.hydro.data <- NULL
-  # w.matrix.data <- NULL
   ind <- dataXY.out$indvecs$ind.allxy
-
-  # OBSOLETE -- NO NEED TO CREATE MATRICES  
-  # ## create any necessary matrices from distance and flow matrices
-  # if(!is.null(dist.junc) ) {
-  #   ## maximum distance to common junction between two sites
-  #   a.mat <- pmax(dist.junc,t(dist.junc))
-  #   a.mat.data <- a.mat[ind,ind]
-  #   ## minimum distance to common junction between two sites
-  #   b.mat <- pmin(dist.junc,t(dist.junc))
-  #   b.mat.data <- b.mat[ind,ind]
-  #   ## hydrological distance
-  #   dist.hydro <- as.matrix(dist.junc + t(dist.junc))
-  #   ## subset stream distance to observed locations only
-  #   dist.hydro.data <- dist.hydro[ind, ind]
-  # }
-  # if(length(grep("tailup",CorModels)) | useTailDownWeight == TRUE) {
-  #   if(missing(addfunccol) || is.null(addfunccol) ||
-  #      length(addfunccol) == 0 || !(addfunccol %in% colnames(data)))
-  #     stop("The specified value for addfunccol was invalid")
-  #   flow.con.mat <- 1 - (b.mat > 0)*1
-  #   
-  #   w.matrix <- sqrt(pmin(outer(data[distord,addfunccol],
-  #                               rep(1, times = n.all)),
-  #                         t(outer(data[distord,addfunccol],rep(1, times = n.all)))) /
-  #                      pmax(outer(data[distord,addfunccol],rep(1, times = n.all)),
-  #                           t(outer(data[distord,addfunccol],rep(1, times = n.all)))))*
-  #     flow.con.mat*net.zero
-  #   w.matrix.data <- w.matrix[ind, ind]
-  # }
-  # net.zero.data <- net.zero[ind,ind]
-  # 
   xcoord <- data[distord,xcol]
   ycoord <- data[distord,ycol]
   xcoord.data <- xcoord#[ind]
@@ -271,23 +211,24 @@ glmssn1_minimal <- function(formula, ssn.object,
       }
       
       if(length(theta) > 1) {
-        if(iter == 0) {
-          ## try Nelder-Mead
-          parmest1.out <- optim(theta, SSN:::m2LL.stream, m2LLdata = zt,
-                                X = X2, dist.hydro = dist.hydro.data, weight =
-                                  w.matrix.data, net.zero = net.zero.data,
-                                a.mat = a.mat.data, b.mat = b.mat.data,
-                                x.dat = xcoord.data, y.dat = ycoord.data,
-                                Del.i = Del.i, A.5 = A.5,
-                                CorModels = CorModels, useTailDownWeight = useTailDownWeight,
-                                use.nugget = use.nugget, use.anisotropy = use.anisotropy,
-                                EstMeth = EstMeth,
-                                method = "BFGS",loglik.environment=
-                                  loglik.environment, REs = REs, scale = TH.scale,
-                                maxrang = maxrang)
-        }
+        # if(iter == 0) {
+        #   ## try Nelder-Mead
+        #   parmest1.out <- optim(theta, SSN:::m2LL.stream, m2LLdata = zt,
+        #                         X = X2, dist.hydro = dist.hydro.data, weight =
+        #                           w.matrix.data, net.zero = net.zero.data,
+        #                         a.mat = a.mat.data, b.mat = b.mat.data,
+        #                         x.dat = xcoord.data, y.dat = ycoord.data,
+        #                         Del.i = Del.i, A.5 = A.5,
+        #                         CorModels = CorModels, useTailDownWeight = useTailDownWeight,
+        #                         use.nugget = use.nugget, use.anisotropy = use.anisotropy,
+        #                         EstMeth = EstMeth,
+        #                         method = "BFGS",loglik.environment=
+        #                           loglik.environment, REs = REs, scale = TH.scale,
+        #                         maxrang = maxrang)
+        # }
         ## try BFGS
-        parmest2.out <- optim(theta, SSN:::m2LL.stream, m2LLdata = zt, X = X2,
+        # used to be parmest2.out
+        parmest.out <- optim(theta, SSN:::m2LL.stream, m2LLdata = zt, X = X2,
                               dist.hydro = dist.hydro.data, weight = w.matrix.data,
                               net.zero = net.zero.data,
                               a.mat = a.mat.data, b.mat = b.mat.data,
@@ -298,9 +239,9 @@ glmssn1_minimal <- function(formula, ssn.object,
                               EstMeth = EstMeth, method = "Nelder-Mead",loglik.environment=
                                 loglik.environment,hessian=TRUE, scale = TH.scale,
                               REs = REs, maxrang = maxrang)
-        if(iter == 0 & parmest1.out$value <
-           parmest2.out$value) parmest.out <- parmest1.out
-        else parmest.out <- parmest2.out
+        # if(iter == 0 & parmest1.out$value <
+        #    parmest2.out$value) parmest.out <- parmest1.out
+        # else parmest.out <- parmest2.out
         theta <- parmest.out$par
         m2LL <- parmest.out$value
       }

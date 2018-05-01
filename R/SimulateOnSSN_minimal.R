@@ -6,7 +6,7 @@
 #'
 #'@usage
 #'
-#'\code{SimulateOnSSN_minimal(..., d, a, b, c, w)}
+#'\code{SimulateOnSSN_minimal(..., matrices.obs, net.zero.obs, matrices.preds, net.zero.preds = NULL, matrices.predsxobs = NULL, net.zero.predsxobs = NULL)}
 #'
 #'@param ... Arguments for the function \code{SimulateOnSSN} from the package SSN.
 #'@param d,a,b,c,w Distance matrices (d, a, b), a connectivity matrix (c), and a weights matrix (w).
