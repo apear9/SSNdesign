@@ -33,8 +33,11 @@ SimulateOnSSN_minimal <- function(ssn.object,
                           family = "Gaussian",
                           mean.only = FALSE,
                           matrices.obs,
-                          matrices.preds,
-                          matrices.predsxobs
+                          net.zero.obs,
+                          matrices.preds = NULL,
+                          net.zero.preds = NULL,
+                          matrices.predsxobs = NULL,
+                          net.zero.predsxobs = NULL
 )
 {
   
@@ -129,6 +132,7 @@ SimulateOnSSN_minimal <- function(ssn.object,
   dist.hydro <- matrices.obs$d
   w.matrix <- matrices.obs$w
   flow.con.mat <- matrices.obs$c
+  net.zero <- net.zero.obs
   
   ## NEED OBS COORDS
   
@@ -319,6 +323,7 @@ SimulateOnSSN_minimal <- function(ssn.object,
     dist.hydro <- matrices.predsxobs$d
     w.matrix <- matrices.predsxobs$w
     flow.con.mat <- matrices.predsxobs$c
+    net.zero <- net.zero.predsxobs
     
     ## NEED PRED AND OBS COORDS
     
@@ -458,6 +463,7 @@ SimulateOnSSN_minimal <- function(ssn.object,
     dist.hydro <- matrices.preds$d
     w.matrix <- matrices.preds$w
     flow.con.mat <- matrices.preds$c
+    net.zero <- net.zero.preds
     
     ## NEED PRED COORDS
     
