@@ -4,7 +4,7 @@
 \alias{SimulateOnSSN_minimal}
 \title{A function to do simulate on SSN on a single network with pre-defined matrices}
 \usage{
-\code{SimulateOnSSN_minimal(..., d, a, b, c, w)}
+\code{SimulateOnSSN_minimal(..., matrices.obs, net.zero.obs, matrices.preds, net.zero.preds = NULL, matrices.predsxobs = NULL, net.zero.predsxobs = NULL)}
 }
 \arguments{
 \item{...}{Arguments for the function \code{SimulateOnSSN} from the package SSN.}
