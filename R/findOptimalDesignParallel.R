@@ -85,13 +85,19 @@ findOptimalDesignParallel <- function(
   # Register cluster and do heavy lifting in parallel
   cl <- makeCluster(n.cores)
   registerDoParallel(cl)
-  on.exit(stopCluster(cl))
+  on.exit(stopCluster(cl)) # Kill cluster on exit, even (ESPECIALLY) when due to error.
   
   ### SPLIT FUNCTION HERE INTO TWO CASES:
   ## CASE 1: EACH NETWORK IS TREATED SEPARATELY
   ## CASE 2: ALL NETWORKS ARE TREATED TOGETHER
   
   if(do.separately){
+    
+    # Create an empty list to store diagnostics
+    
+    diagnostics <- vector("list", n)
+    
+    # Prepare to split things by network
     
     network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
     if(length(ssn@predpoints@SSNPoints) > 0){
@@ -148,6 +154,10 @@ findOptimalDesignParallel <- function(
         extra.arguments$net.zero.pxo <- matrix(1, n.points.this.network, np)
       }
       
+      # List for diagnostics
+      
+      diagnostics[[net]] <- vector("list", K)
+      
       # vector and list for holding designs in each of K iterations
       
       U.all <- c()
@@ -189,25 +199,8 @@ findOptimalDesignParallel <- function(
             remaining.values <- points.this.network[ind.i]
             remaining.values <- as.character(remaining.values)
             n.j <- length(remaining.values)
+            remaining.values <- sample(remaining.values, n.j, FALSE)
             
-            ##### NOW PARALLELISED
-            # for(j in 1:n.j){ #### ADJUST HERE TO FOREACH %dopar% LOOP
-            #   
-            #   random.points[i] <- remaining.values[j]
-            #   designs <- append(designs, list(random.points))
-            # 
-            #   U_ <- utility.function(
-            #     ssn,
-            #     glmssn,
-            #     random.points,
-            #     prior.parameters, 
-            #     n.draws,
-            #     extra.arguments
-            #   )
-            #   
-            #   U.ij <- append(U.ij, U_)
-            #   
-            # }
             ## Precompute the designs to evaluate
             d.list <- vector("list", n.j)
             for(j in 1:n.j){
@@ -217,8 +210,6 @@ findOptimalDesignParallel <- function(
             designs <- append(designs, d.list)
             d.iter <- isplitVector(d.list, chunks = n.cores)
             rm(d.list)
-            # cl <- makeCluster(n.cores)
-            # registerDoParallel(cl)
             Uij <- foreach(
               d.i = d.iter, 
               .packages = c("SSN", "SSNDesign")
@@ -237,9 +228,11 @@ findOptimalDesignParallel <- function(
                 } 
               )
             }
-            # stopCluster(cl)
             U.ij <- c(U.ij, unlist(Uij))
           }
+          
+          # Pump utility values into the list element for this network
+          
           design.previous <- design.now
           if(max(U.ij) >= U){
             U <- max(U.ij)
@@ -255,6 +248,12 @@ findOptimalDesignParallel <- function(
           
         }
         
+        ## Store utility values
+        
+        diagnostics[[net]][[k]] <- U.ij
+        
+        ## Store max and associated design
+        
         U.all <- append(U.all, U)
         design.all <- append(design.all, list(design.now))
         
@@ -263,13 +262,15 @@ findOptimalDesignParallel <- function(
       ind <- (1:length(U.all))[U.all == max(U.all)][1]
       final.points[[net]] <- design.all[[ind]]
     }
-    ## Kill the parallel cluster
-    # stopCluster(cl)
     
     ## Get the final set of design points
     final.points <- unlist(final.points) 
     
   } else {
+    
+    ## One set of diagnostics for each of K hyper-iterations
+    
+    diagnostics <- vector("list", K)
     
     # Extract out total matrix for the observations
     
@@ -332,13 +333,6 @@ findOptimalDesignParallel <- function(
       last.value <- c()
       designs <- list(random.points)
       
-      ## Create cluster for parallel processing
-      
-      # cl <- makeCluster(n.cores)
-      # registerDoParallel(cl)
-      # on.exit(stopCluster(cl))
-      # Iterate through greedy exchange algorithm
-      
       while(cond){
         
         for(i in 1:n.points){
@@ -349,23 +343,6 @@ findOptimalDesignParallel <- function(
           remaining.values <- as.character(remaining.values)
           n.j <- length(remaining.values)
           
-          # for(j in 1:n.j){ #### FOR EACH %dopar% LOOP
-          #   
-          #   random.points[i] <- remaining.values[j]
-          #   designs <- append(designs, list(random.points))
-          #   
-          #   U_ <- utility.function(
-          #     ssn,
-          #     glmssn,
-          #     random.points,
-          #     prior.parameters, 
-          #     n.draws,
-          #     extra.arguments
-          #   )
-          #   
-          #   U.ij <- append(U.ij, U_)
-          #   
-          # }
           ## Precompute the designs to evaluate
           d.list <- vector("list", n.j)
           for(j in 1:n.j){
@@ -375,8 +352,6 @@ findOptimalDesignParallel <- function(
           designs <- append(designs, d.list)
           d.iter <- isplitVector(d.list, chunks = n.cores)
           rm(d.list)
-          # cl <- makeCluster(n.cores)
-          # registerDoParallel(cl)
           Uij <- foreach(
             d.i = d.iter, 
             .packages = c("SSN", "SSNDesign")
@@ -395,7 +370,6 @@ findOptimalDesignParallel <- function(
               } 
             )
           }
-          # stopCluster(cl)
           U.ij <- c(U.ij, unlist(Uij))
           
         }
@@ -414,6 +388,12 @@ findOptimalDesignParallel <- function(
         
       }
       
+      # Store diagnostics
+      
+      diagnostics[[k]] <- U.ij
+      
+      # Store max and associated design
+      
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
@@ -422,34 +402,9 @@ findOptimalDesignParallel <- function(
     ind.max <- U.all == max(U.all)
     final.points <- unlist(design.all[ind.max])
     
-    ## Kill the cluster
-    
-    # stopCluster(cl)
-    
   }
   
   ## create new SSN containing only the selected points
-  
-  # # update point coords
-  # ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.point.coords, ]
-  # 
-  # # update network point coords
-  # ind.network.point.coords <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.network.point.coords, ]
-  # 
-  # # update point data
-  # ind.point.data <- row.names(ssn@obspoints@SSNPoints[[1]]@point.data) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.point.data, ]
-  # 
-  # # update bbox
-  # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
-  # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
-  # 
-  # # return updated ssn
-  # return(ssn)
-  # Kill cluster
-  # stopCluster(cl)
   
   final.points <<- final.points
   suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
@@ -461,6 +416,13 @@ findOptimalDesignParallel <- function(
   createDistMat(ssn.new, preds, TRUE, TRUE)
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
-  # return updated ssn
-  return(ssn.new)
+  # return updated ssn with other info
+  return(
+    list(
+      ssn.object = ssn.new, 
+      final.design = final.points,
+      utility.values = diagnostics
+    )
+  )
+  
 }

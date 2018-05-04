@@ -36,7 +36,8 @@ doAdaptiveDesignParallel <- function(
   prior.parameters, 
   n.draws = 500, 
   n.cores = 2,
-  extra.arguments = NULL){
+  extra.arguments = NULL
+){
   
   # Check inputs
   
@@ -91,6 +92,12 @@ doAdaptiveDesignParallel <- function(
   #### SPLIT HERE TO EITHER RUN EACH NETWORK SEPARATELY OR RUN ALL SITES TOGETHER
   
   if(do.separately){
+    
+    # Create an empty list to store diagnostics
+    
+    diagnostics <- vector("list", n)
+    
+    # Prepare to split stuff by network
     
     network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
     if(length(ssn@predpoints@SSNPoints) > 0){
@@ -152,6 +159,10 @@ doAdaptiveDesignParallel <- function(
         extra.arguments$net.zero.pxo <- matrix(1, n.points.this.network, np)
       }
       
+      # List for diagnostics
+      
+      diagnostics[[net]] <- vector("list", K)
+      
       # vector and list for holding designs in each of K iterations
       
       U.all <- c()
@@ -191,22 +202,7 @@ doAdaptiveDesignParallel <- function(
             remaining.values <- points.this.network[ind.i]
             remaining.values <- as.character(remaining.values)
             n.j <- length(remaining.values)
-            
-            # for(j in 1:n.j){
-            #   
-            #   random.points[i] <- remaining.values[j]
-            #   random.and.fixed.points <- c(random.points, as.character(fixed.points.this.network))
-            #   designs <- append(designs, list(random.and.fixed.points))
-            #   U_ <- utility.function(
-            #     ssn,
-            #     glmssn,
-            #     random.and.fixed.points,
-            #     prior.parameters, 
-            #     n.draws,
-            #     extra.arguments
-            #   )
-            #   
-            #   U.ij <- append(U.ij, U_)
+
             d.list <- vector("list", n.j)
             for(j in 1:n.j){
               random.points[i] <- remaining.values[j]
@@ -242,7 +238,6 @@ doAdaptiveDesignParallel <- function(
             U <- max(U.ij)
             ind <- U.ij == max(U.ij)
             ind <- (1:length(U.ij))[ind]
-            #U.ij <- U.ij[-ind]
             design.now <- designs[[ind]]
             random.points <- design.now
             
@@ -251,7 +246,13 @@ doAdaptiveDesignParallel <- function(
           cond <- !all(design.now %in% design.previous)
           #cnt = cnt + 1
         }
-        # print(cnt)
+        
+        ## Store utility values
+        
+        diagnostics[[net]][[k]] <- U.ij
+        
+        ## Store max and associated design
+        
         U.all <- append(U.all, U)
         design.all <- append(design.all, list(design.now))
         
@@ -266,6 +267,12 @@ doAdaptiveDesignParallel <- function(
     final.points <- unlist(final.points)
     
   } else {
+    
+    ## Define one set of diagnostics for each of K hyper-iterations
+    
+    diagnostics <- vector("list", K)
+    
+    # Set fixed points. This is placed inside extra.arguments because this is where the utility function extracts the values from
     
     extra.arguments$fixed <- fixed.points
     
@@ -343,23 +350,6 @@ doAdaptiveDesignParallel <- function(
           remaining.values <- as.character(remaining.values)
           n.j <- length(remaining.values)
           
-          # for(j in 1:n.j){
-          #   
-          #   random.points[i] <- remaining.values[j]
-          #   random.and.fixed.points <- c(random.points, as.character(fixed.points))
-          #   designs <- append(designs, list(random.and.fixed.points))
-          #   U_ <- utility.function(
-          #     ssn,
-          #     glmssn,
-          #     random.and.fixed.points,
-          #     prior.parameters, 
-          #     n.draws,
-          #     extra.arguments
-          #   )
-          #   
-          #   U.ij <- append(U.ij, U_)
-          #   
-          # }
           d.list <- vector("list", n.j)
           for(j in 1:n.j){
             random.points[i] <- remaining.values[j]
@@ -405,6 +395,12 @@ doAdaptiveDesignParallel <- function(
         
       }
       
+      # Store diagnostics
+      
+      diagnostics[[k]] <- U.ij
+      
+      # Store max and associated design
+      
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
@@ -416,7 +412,8 @@ doAdaptiveDesignParallel <- function(
   }
   
   # Update SSN object
-  final.points <<- final.points
+  
+  final.points <<- unique(final.points)
   suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
@@ -427,6 +424,12 @@ doAdaptiveDesignParallel <- function(
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
-  return(ssn.new)
+  return(
+    list(
+      ssn.object = ssn.new, 
+      final.design = final.points,
+      utility.values = diagnostics
+    )
+  )
   
 }
