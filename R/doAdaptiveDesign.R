@@ -85,6 +85,12 @@ doAdaptiveDesign <- function(
   
   if(do.separately){
     
+    # Create an empty list to store diagnostics
+    
+    diagnostics <- vector("list", n)
+    
+    # Prepare to split by network
+    
     network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
     if(length(ssn@predpoints@SSNPoints) > 0){
       network.each.pred <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
@@ -144,6 +150,10 @@ doAdaptiveDesign <- function(
         extra.arguments$net.zero.prd <- matrix(1, np, np)
         extra.arguments$net.zero.pxo <- matrix(1, n.points.this.network, np)
       }
+      
+      # List for diagnostics; a sublist of K elements for each network
+      
+      diagnostics[[net]] <- vector("list", K)
       
       # vector and list for holding designs in each of K iterations
       
@@ -217,9 +227,15 @@ doAdaptiveDesign <- function(
           }
           
           cond <- !all(design.now %in% design.previous)
-          #cnt = cnt + 1
+          
         }
-        # print(cnt)
+        
+        ## Store utility values
+        
+        diagnostics[[net]][[k]] <- U.ij
+        
+        # Store max and associated design
+        
         U.all <- append(U.all, U)
         design.all <- append(design.all, list(design.now))
         
@@ -234,6 +250,12 @@ doAdaptiveDesign <- function(
     final.points <- unlist(final.points)
     
   } else {
+    
+    ## One set of diagnostics for each of K hyper-iterations
+    
+    diagnostics <- vector("list", K)
+    
+    # Set fixed points inside extra.arguments for utility functions to retrieve if necessary
     
     extra.arguments$fixed <- fixed.points
     
@@ -345,6 +367,12 @@ doAdaptiveDesign <- function(
         
       }
       
+      # Store diagnostics
+      
+      diagnostics[[k]] <- U.ij
+      
+      # Store max and associated design
+      
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
@@ -355,22 +383,8 @@ doAdaptiveDesign <- function(
     
   }
   
-  # # update point coords
-  # ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.point.coords, ]
-  # 
-  # # update network point coords
-  # ind.network.point.coords <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.network.point.coords, ]
-  # 
-  # # update point data
-  # ind.point.data <- row.names(ssn@obspoints@SSNPoints[[1]]@point.data) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.point.data, ]
-  # 
-  # # update bbox
-  # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
-  # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
-  final.points <<- final.points
+  # Create new ssn object that contains only the selected design points
+  final.points <<- unique(final.points)
   suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
@@ -381,6 +395,12 @@ doAdaptiveDesign <- function(
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
-  return(ssn.new)
+  return(
+    list(
+      ssn.object = ssn.new, 
+      final.design = final.points,
+      utility.values = diagnostics
+    )
+  )
   
 }

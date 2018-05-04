@@ -86,6 +86,12 @@ findOptimalDesign <- function(
   
   if(do.separately){
     
+    # Create an empty list to store diagnostics
+    
+    diagnostics <- vector("list", n)
+    
+    # Prepare to split by network
+    
     network.each.point <- ssn@obspoints@SSNPoints[[1]]@point.data$netID
     if(length(ssn@predpoints@SSNPoints) > 0){
       network.each.pred <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
@@ -140,6 +146,10 @@ findOptimalDesign <- function(
         extra.arguments$net.zero.prd <- matrix(1, np, np)
         extra.arguments$net.zero.pxo <- matrix(1, n.points.this.network, np)
       }
+      
+      # List for diagnostics
+      
+      diagnostics[[net]] <- vector("list", K)
       
       # vector and list for holding designs in each of K iterations
       
@@ -216,6 +226,12 @@ findOptimalDesign <- function(
           cond <- !all(design.now %in% design.previous)
 
         }
+        
+        ## Store utility values
+        
+        diagnostics[[net]][[k]] <- U.ij
+        
+        ## Store max and associated design
 
         U.all <- append(U.all, U)
         design.all <- append(design.all, list(design.now))
@@ -229,6 +245,10 @@ findOptimalDesign <- function(
     final.points <- unlist(final.points) 
     
   } else {
+    
+    ## One set of diagnostics for each of K hyper-iterations
+    
+    diagnostics <- vector("list", K)
     
     # Extract out total matrix for the observations
     
@@ -337,6 +357,12 @@ findOptimalDesign <- function(
         
       }
       
+      # Store diagnostics
+      
+      diagnostics[[k]] <- U.ij
+      
+      # Store max and associated design
+      
       U.all <- append(U.all, U)
       design.all <- append(design.all, list(design.now))
       
@@ -349,21 +375,6 @@ findOptimalDesign <- function(
   
   ## create new SSN containing only the selected points
   
-  # # update point coords
-  # ind.point.coords <- attributes(ssn@obspoints@SSNPoints[[1]]@point.coords)$dimnames[[1]] %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.point.coords, ]
-  # 
-  # # update network point coords
-  # ind.network.point.coords <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.network.point.coords, ]
-  # 
-  # # update point data
-  # ind.point.data <- row.names(ssn@obspoints@SSNPoints[[1]]@point.data) %in% final.points
-  # ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.point.data, ]
-  # 
-  # # update bbox
-  # new.bbox <- sp::bbox(ssn@obspoints@SSNPoints[[1]]@point.coords)
-  # ssn@obspoints@SSNPoints[[1]]@points.bbox <- new.bbox
   final.points <<- final.points
   suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
   preds <- NULL
@@ -375,6 +386,12 @@ findOptimalDesign <- function(
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
-  return(ssn.new)
+  return(
+    list(
+      ssn.object = ssn.new, 
+      final.design = final.points,
+      utility.values = diagnostics
+    )
+  )
   
 }
