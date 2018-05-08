@@ -48,6 +48,12 @@ findOptimalDesign <- function(
   if(!is.numeric(n.points) | any(n.points < 1)){
     stop("The argument n.points must have a positive integer value.")
   }
+  if(!is.numeric(n.draws) | n.draws != floor(n.draws)){
+    stop("The argument n.draws must be a whole-numbered numeric value.")
+  }
+  if(n.draws < 2){
+    stop("Please choose a sensible number of draws for n.draws. Recommended values are 100 or more.")
+  }
   ### PARAMETER TO CONTROL WHETHER DESIGNS ARE FOUND BY NETWORK OR ACROSS NETWORKS
   do.separately <- TRUE
   if(length(n.points) == 1){
@@ -388,7 +394,9 @@ findOptimalDesign <- function(
   # return updated ssn
   return(
     list(
-      ssn.object = ssn.new, 
+      ssn.object.old = ssn,
+      ssn.object.new = ssn.new, 
+      networks.separate = do.separately,
       final.design = final.points,
       utility.values = diagnostics
     )
