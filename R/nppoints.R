@@ -18,6 +18,13 @@
 #'@export
 nppoints <- function(ssn){
   
+  ## Check whether prediction points exist
+  preds.exist <- length(ssn@predpoints@SSNPoints) > 0
+  if(!preds.exist){
+    warning("There are no prediction points in this SpatialStreamNetwork object.")
+    return(0)
+  }
+  
   ## Get vector of networks
   
   nets <- ssn@predpoints@SSNPoints[[1]]@point.data$netID
