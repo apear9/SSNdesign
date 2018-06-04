@@ -9,7 +9,8 @@
 #'\code{calculateShreveStreamOrderAndAFVs(ssn)}
 #' 
 #'@param ssn an object of class SpatialStreamNetwork
-#'@return An object of class SpatialStreamNetwork. The SSNPoints for the obspoints slot will be updated to reflect the selected design. 
+#'@param BID.tables optionally provide pre-computed binary ID tables. This can be beneficial if the stream network is large or if the binary ID tables have already been computed for another purpose.
+#'@return An object of class SpatialStreamNetwork. 
 #'
 #'@details 
 #'
@@ -39,13 +40,13 @@ calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
       print("Large spatial stream network detected. Reading in the binary ID tables may take several minutes.")
     }
   }
-  print("Hi")
+
   # Calculate Shreve stream order per network
   shreve.orders <- vector("list", nn)
   for(i in 1:nn){
     shreve.orders[[i]] <- calculateShreveStreamOrder(BID.tables[[i]])
   }
-  print("Hi again")
+ 
   # Calculate additive function values
   afv.networks <- lapply(
     shreve.orders, 
@@ -59,7 +60,7 @@ calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
       )
     }
   )
-  print("Hi lmao")
+
   # Join each to a part of the ssn@data table
   ssn@data$shreve <- 0
   ssn@data$afv <- 0
@@ -69,6 +70,9 @@ calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
     ssn@data$shreve[ind] <- tmp$shreve
     ssn@data$afv[ind] <- tmp$afv
   }
+  
+  # Extract shreve and additive function value columns to the obspoints and predpoints frames
+  ssn <- extractShreveAndAFVs(ssn, afv.networks)
 
   # Return output
   return(ssn)
