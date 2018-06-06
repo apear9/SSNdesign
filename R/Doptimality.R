@@ -24,17 +24,17 @@
 DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   # t1 <- Sys.time()
   ## Get data for design points
-
   # Rely on ordering of output of glmssn to retrieve correct rows in the design matrix
-  ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
+  ind <- row.names(glmssn$sampinfo$X) %in% design.points
   X <- glmssn$sampinfo$X[ind, ]
   Xt <- t(X)
-  cds <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
+  
+  ind.cds <- row.names(ssn@obspoints@SSNPoints[[1]]@point.coords) %in% design.points
+  cds <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.cds, ]
   colnames(cds) <- c("x", "y")
   
   ## Get distance matrices, etc.
   
-  #dist.junc.obs <- SSN:::getStreamDistMatInt(ssn, design.points, "obs")
   mat <- extra.arguments$Matrices.Obs
   ind.mat <- row.names(mat$d) %in% design.points
   mat$d <-  mat$d[ind.mat, ind.mat]
@@ -91,11 +91,14 @@ DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
     )
     
     covbi <- t(X) %*% solve(V) %*% X
+    # print(covbi)
+    # stop("Not an error (2)")
     covb <- solve(covbi)
     D[i] <- -log(det(covb))
+    #D[i] <- log(det(covbi))
     
   }
-  # print(Sys.time() - t1)
+  
   return(mean(D, na.rm = TRUE))
   
 }

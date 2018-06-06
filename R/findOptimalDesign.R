@@ -51,6 +51,9 @@ findOptimalDesign <- function(
   if(!is.numeric(n.draws) | n.draws != floor(n.draws)){
     stop("The argument n.draws must be a whole-numbered numeric value.")
   }
+  if(!is.numeric(n.draws) | n.draws < 1){
+    stop("The argument n.draws must have a positive integer value.")
+  }
   if(n.draws < 2){
     stop("Please choose a sensible number of draws for n.draws. Recommended values are 100 or more.")
   }
@@ -59,9 +62,18 @@ findOptimalDesign <- function(
   if(length(n.points) == 1){
     do.separately <- FALSE
   }
-  if(!is.numeric(n.draws) | n.draws < 1){
-    stop("The argument n.draws must have a positive integer value.")
-  }
+  
+  ### Code to detect whether there are replicates on sites
+  n.pids <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$pid
+    )
+  )
+  n.locIDs <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$locID
+    )
+  )
   
   # Extract K for greedy exchange algorithm
   
@@ -82,9 +94,22 @@ findOptimalDesign <- function(
     dist.junc.pxo <- getStreamDistMatInOrder.predsxobs(ssn)
   }
   
-  # Initialise for loop
-  
-  all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
+  # Initialise loops by creating a list of potential sites to choose from
+  is.replicated <- n.pids != n.locIDs
+  if(is.replicated){
+    print("Replicates found. Mapping PIDs to locIDs...")
+    all.points <- unique(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    # Create mapping from locID to pid
+    all.locIDs <- as.numeric(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    unique.locIDs <- unique(all.locIDs)
+    locID.to.pid <- vector("list", n.locIDs)
+    for(i in 1:n.locIDs){
+      locID.i <- all.locIDs == i
+      locID.to.pid[[i]] <- ssn@obspoints@SSNPoints[[1]]@point.data$pid[locID.i]
+    }
+  } else {
+    all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
+  }
   
   ### SPLIT FUNCTION HERE INTO TWO CASES:
   ## CASE 1: EACH NETWORK IS TREATED SEPARATELY
@@ -171,10 +196,22 @@ findOptimalDesign <- function(
 
         # Evaluate utility once to initialise
         
+        if(is.replicated){
+          random.points.to.eval <- c()
+          for(i in 1:n.final.this.network){
+            locID.ind <- which(all.locIDs == random.points[i])
+            random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+            check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+            random.points.to.eval <- random.points.to.eval[check.ind]
+          }
+        } else {
+          random.points.to.eval <- random.points
+        }
+        
         U <- utility.function(
           ssn,
           glmssn,
-          random.points,
+          random.points.to.eval,
           prior.parameters, 
           n.draws,
           extra.arguments
@@ -203,10 +240,22 @@ findOptimalDesign <- function(
               random.points[i] <- remaining.values[j]
               designs <- append(designs, list(random.points))
 
+              if(is.replicated){
+                random.points.to.eval <- c()
+                for(l in 1:n.final.this.network){
+                  locID.ind <- which(all.locIDs == random.points[l])
+                  random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[l]])
+                  check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+                  random.points.to.eval <- random.points.to.eval[check.ind]
+                }
+              } else {
+                random.points.to.eval <- random.points
+              }
+              
               U_ <- utility.function(
                 ssn,
                 glmssn,
-                random.points,
+                random.points.to.eval,
                 prior.parameters, 
                 n.draws,
                 extra.arguments
@@ -302,10 +351,22 @@ findOptimalDesign <- function(
       
       # Evaluate utility once to initialise
       
+      if(is.replicated){
+        random.points.to.eval <- c()
+        for(i in 1:n.points){
+          locID.ind <- which(all.locIDs == random.points[i])
+          random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+        }
+        check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+        random.points.to.eval <- random.points.to.eval[check.ind]
+      } else {
+        random.points.to.eval <- random.points
+      }
+      
       U <- utility.function(
         ssn,
         glmssn,
-        random.points,
+        random.points.to.eval,
         prior.parameters, 
         n.draws,
         extra.arguments
@@ -334,10 +395,22 @@ findOptimalDesign <- function(
             random.points[i] <- remaining.values[j]
             designs <- append(designs, list(random.points))
             
+            if(is.replicated){
+              random.points.to.eval <- c()
+              for(l in 1:n.points){
+                locID.ind <- which(all.locIDs == random.points[l])
+                random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[l]])
+              }
+              check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+              random.points.to.eval <- random.points.to.eval[check.ind]
+            } else {
+              random.points.to.eval <- random.points
+            }
+            
             U_ <- utility.function(
               ssn,
               glmssn,
-              random.points,
+              random.points.to.eval,
               prior.parameters, 
               n.draws,
               extra.arguments
@@ -381,14 +454,21 @@ findOptimalDesign <- function(
   
   ## create new SSN containing only the selected points
   
-  final.points <<- final.points
-  suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  final.points <<- final.points # This needs to be in the global environment for subsetSSN to work? It's really strange.
+  if(is.replicated){
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, as.character(locID) %in% final.points))
+  } else {
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  }
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"
+    ssn.new <- importSSN(new.ssn.path, preds)
+    createDistMat(ssn.new, preds, TRUE, TRUE)
+  } else{
+    ssn.new <- importSSN(new.ssn.path, NULL)
+    createDistMat(ssn.new, NULL, FALSE, FALSE)
   }
-  ssn.new <- importSSN(new.ssn.path, preds)
-  createDistMat(ssn.new, preds, TRUE, TRUE)
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
