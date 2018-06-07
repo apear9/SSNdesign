@@ -45,8 +45,8 @@ findOptimalDesign <- function(
   if(length(n.points) != 1 & length(n.points) != n){
     stop("n.points must have the same length as the number of networks in ssn, or have a length of 1.")
   }
-  if(!is.numeric(n.points) | any(n.points < 1)){
-    stop("The argument n.points must have a positive integer value.")
+  if(!is.numeric(n.points) | all(n.points < 1)){
+    stop("The argument n.points must have a positive integer value. Please make sure n.points has a value of at least 1 for at least 1 network.")
   }
   if(!is.numeric(n.draws) | n.draws != floor(n.draws)){
     stop("The argument n.draws must be a whole-numbered numeric value.")
@@ -134,6 +134,12 @@ findOptimalDesign <- function(
     
     for(net in 1:n){
       
+      ## Check if the number of points to select in this network is 0
+      ## Skip if this is the case
+      if(n.points[net] == 0){
+        next # Skips entirely
+      }
+      
       dist.junc.obs.net <- dist.junc.obs[[net]]
       
       if(length(ssn@predpoints@SSNPoints) > 0){
@@ -151,6 +157,14 @@ findOptimalDesign <- function(
       points.this.network <- all.points[ind1]
       points.this.network <- as.numeric(points.this.network)
       n.points.this.network <- length(points.this.network)
+      
+      ## Check if the network has only one point and only one point is requested.
+      ## If true, skip this iteration of the loop
+      
+      if(n.final.this.network == 1 & n.points.this.network == 1){
+        final.points[[net]] <- points.this.network
+        next # Keep the single point and skip loop iteration
+      }
       
       ## PULL OUT DISTANCE MATRICES HEERE
       ## ONLY DO ONCE PER NETWORK
@@ -467,7 +481,7 @@ findOptimalDesign <- function(
     createDistMat(ssn.new, preds, TRUE, TRUE)
   } else{
     ssn.new <- importSSN(new.ssn.path, NULL)
-    createDistMat(ssn.new, NULL, FALSE, FALSE)
+    createDistMat(ssn.new, NULL, TRUE, FALSE)
   }
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   

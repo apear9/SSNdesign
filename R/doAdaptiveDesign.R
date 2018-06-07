@@ -60,6 +60,18 @@ doAdaptiveDesign <- function(
     do.separately <- FALSE
   }
   
+  ### Code to detect whether there are replicates on sites
+  n.pids <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$pid
+    )
+  )
+  n.locIDs <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$locID
+    )
+  )
+  
   # Extract K for greedy exchange algorithm
   
   if(is.null(extra.arguments)){
@@ -75,17 +87,22 @@ doAdaptiveDesign <- function(
   
   glmssn$sampinfo$X <- model.matrix(glmssn$args$formula, data = ssn@obspoints@SSNPoints[[1]]@point.data)
   
-  # Extract important matrices for each network
-  
-  dist.junc.obs <- getStreamDistMatInOrder(ssn)
-  if(length(ssn@predpoints@SSNPoints) > 0){
-    dist.junc.prd <- getStreamDistMatInOrder(ssn, "preds")
-    dist.junc.pxo <- getStreamDistMatInOrder.predsxobs(ssn)
+  # Initialise loops by creating a list of potential sites to choose from
+  is.replicated <- n.pids != n.locIDs
+  if(is.replicated){
+    print("Replicates found. Mapping PIDs to locIDs...")
+    all.points <- unique(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    # Create mapping from locID to pid
+    all.locIDs <- as.numeric(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    unique.locIDs <- unique(all.locIDs)
+    locID.to.pid <- vector("list", n.locIDs)
+    for(i in 1:n.locIDs){
+      locID.i <- all.locIDs == i
+      locID.to.pid[[i]] <- ssn@obspoints@SSNPoints[[1]]@point.data$pid[locID.i]
+    }
+  } else {
+    all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
   }
-  
-  # Initialise for loop
-  
-  all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
   
   #### SPLIT HERE TO EITHER RUN EACH NETWORK SEPARATELY OR RUN ALL SITES TOGETHER
   
@@ -124,15 +141,37 @@ doAdaptiveDesign <- function(
       points.this.network <- as.numeric(points.this.network)
       ind2 <- !(points.this.network %in% fixed.points)
       fixed.points.this.network <- points.this.network[!ind2]
-      extra.arguments$fixed <- fixed.points.this.network
+      if(is.replicated){
+        # Map fixed points locIDs to pids
+        fixed.points.to.eval <- c()
+        for(i in 1:length(fixed.points.this.network)){
+          locID.ind <- which(all.locIDs == fixed.points.this.network[i])
+          fixed.points.to.eval <- c(fixed.points.to.eval, locID.to.pid[[i]])
+          extra.arguments$fixed <- fixed.points.to.eval
+        }
+      } else {
+        extra.arguments$fixed <- fixed.points.this.network
+      }
       points.this.network <- points.this.network[ind2]
       n.points.this.network <- length(points.this.network)
+      
+      ## Check if the number of points to select in this network is 0
+      ## Skip if this is the case
+      if(n.points[net] == 0){
+        final.points[[net]] <-  fixed.points.this.network
+        next # Skips after keeping any fixed points specified by the user
+      }
+      
+      if(n.final.this.network == 1 & n.points.this.network == 1){
+        final.points[[net]] <- c(points.this.network, fixed.points.this.network)
+        next # Keep the single point and skip loop iteration
+      }
       
       # Create net.zero.obs matrix, with as many rows and columns as sites in the SSN object for the ith network
       nrows <- sum(ind1)
       extra.arguments$net.zero.obs <- matrix(1, nrows, nrows)
       
-      ## PULL OUT DISTANCE MATRICES HEERE
+      ## PULL OUT DISTANCE MATRICES HERE
       ## ONLY DO ONCE PER NETWORK
       
       extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
@@ -171,13 +210,26 @@ doAdaptiveDesign <- function(
         random.sample <- sample(1:n.points.this.network, n.final.this.network, FALSE)
         random.points <- points.this.network[random.sample]
         random.points <- as.character(random.points)
+        # Join locIDs back to PIDs if req'd
+        if(is.replicated){
+          random.points.to.eval <- c()
+          for(i in 1:n.final.this.network){
+            locID.ind <- which(all.locIDs == random.points[i])
+            random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+          }
+          check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+          random.points.to.eval <- random.points.to.eval[check.ind]
+        } else {
+          random.points.to.eval <- random.points
+        }
         random.and.fixed.points <- c(random.points, as.character(fixed.points.this.network))
+        random.and.fixed.points.to.eval <- c(random.points.to.eval, extra.arguments$fixed)
         
         # Evaluate utility once to initialise
         U <- utility.function(
           ssn,
           glmssn,
-          random.and.fixed.points,
+          random.and.fixed.points.to.eval,
           prior.parameters, 
           n.draws,
           extra.arguments
@@ -204,12 +256,25 @@ doAdaptiveDesign <- function(
             for(j in 1:n.j){
               
               random.points[i] <- remaining.values[j]
+              if(is.replicated){
+                random.points.to.eval <- c()
+                for(i in 1:n.final.this.network){
+                  locID.ind <- which(all.locIDs == random.points[i])
+                  random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+                }
+                check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+                random.points.to.eval <- random.points.to.eval[check.ind]
+              } else {
+                random.points.to.eval <- random.points
+              }
               random.and.fixed.points <- c(random.points, as.character(fixed.points.this.network))
+              random.and.fixed.points.to.eval <- c(random.points.to.eval, extra.arguments$fixed)
               designs <- append(designs, list(random.and.fixed.points))
+              
               U_ <- utility.function(
                 ssn,
                 glmssn,
-                random.and.fixed.points,
+                random.and.fixed.points.to.eval,
                 prior.parameters, 
                 n.draws,
                 extra.arguments
@@ -263,7 +328,17 @@ doAdaptiveDesign <- function(
     
     # Set fixed points inside extra.arguments for utility functions to retrieve if necessary
     
-    extra.arguments$fixed <- fixed.points
+    if(is.replicated){
+      # Map fixed points locIDs to pids
+      fixed.points.to.eval <- c()
+      for(i in 1:length(fixed.points)){
+        locID.ind <- which(all.locIDs == fixed.points[i])
+        fixed.points.to.eval <- c(fixed.points.to.eval, locID.to.pid[[i]])
+        extra.arguments$fixed <- fixed.points <- fixed.points.to.eval
+      }
+    } else {
+      extra.arguments$fixed <- fixed.points
+    }
     
     # Extract out total matrix for the observations
     
@@ -307,15 +382,30 @@ doAdaptiveDesign <- function(
       # Select random subsample of points
       random.sample <- sample(1:length(all.points), n.points, FALSE)
       random.points <- all.points[random.sample]
-      random.and.fixed.points <- c(random.points, fixed.points)
-      random.and.fixed.points <- as.character(random.and.fixed.points)
+      # Join locIDs back to PIDs if req'd
+      if(is.replicated){
+        random.points.to.eval <- c()
+        for(i in 1:n.points){
+          locID.ind <- which(all.locIDs == random.points[i])
+          random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+        }
+        check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+        random.points.to.eval <- random.points.to.eval[check.ind]
+      } else {
+        random.points.to.eval <- random.points
+      }
+      random.and.fixed.points <- c(random.points, as.character(fixed.points))
+      random.and.fixed.points.to.eval <- c(random.points.to.eval, extra.arguments$fixed)
+      # 
+      # random.and.fixed.points <- c(random.points, fixed.points)
+      # random.and.fixed.points <- as.character(random.and.fixed.points)
       
       # Evaluate utility once to initialise
       
       U <- utility.function(
         ssn,
         glmssn,
-        random.and.fixed.points,
+        random.and.fixed.points.to.eval,
         prior.parameters, 
         n.draws,
         extra.arguments
@@ -342,12 +432,25 @@ doAdaptiveDesign <- function(
           for(j in 1:n.j){
             
             random.points[i] <- remaining.values[j]
+            # Join locIDs back to PIDs if req'd
+            if(is.replicated){
+              random.points.to.eval <- c()
+              for(i in 1:n.points){
+                locID.ind <- which(all.locIDs == random.points[i])
+                random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+              }
+              check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+              random.points.to.eval <- random.points.to.eval[check.ind]
+            } else {
+              random.points.to.eval <- random.points
+            }
             random.and.fixed.points <- c(random.points, as.character(fixed.points))
+            random.and.fixed.points.to.eval <- c(random.points.to.eval, extra.arguments$fixed)
             designs <- append(designs, list(random.and.fixed.points))
             U_ <- utility.function(
               ssn,
               glmssn,
-              random.and.fixed.points,
+              random.and.fixed.points.to.eval,
               prior.parameters, 
               n.draws,
               extra.arguments
@@ -391,13 +494,20 @@ doAdaptiveDesign <- function(
   
   # Create new ssn object that contains only the selected design points
   final.points <<- unique(final.points)
-  suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  if(is.replicated){
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, as.character(locID) %in% final.points))
+  } else {
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  }
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"
+    ssn.new <- importSSN(new.ssn.path, preds)
+    createDistMat(ssn.new, preds, TRUE, TRUE)
+  } else{
+    ssn.new <- importSSN(new.ssn.path, NULL)
+    createDistMat(ssn.new, NULL, FALSE, FALSE)
   }
-  ssn.new <- importSSN(new.ssn.path, preds)
-  createDistMat(ssn.new, preds, TRUE, TRUE)
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn
