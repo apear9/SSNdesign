@@ -72,7 +72,7 @@ calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
   }
   
   # Extract shreve and additive function value columns to the obspoints and predpoints frames
-  ssn <- extractShreveAndAFVs(ssn)
+  ssn <- extractStreamEdgeCovariates(ssn, c("shreve", "afv"))
 
   # Return output
   return(ssn)
