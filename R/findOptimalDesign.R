@@ -213,8 +213,8 @@ findOptimalDesign <- function(
         if(is.replicated){
           random.points.to.eval <- c()
           for(i in 1:n.final.this.network){
-            locID.ind <- which(all.locIDs == random.points[i])
-            random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+            locID.ind <- which(unique.locIDs == random.points[i])
+            random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]])
             check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
             random.points.to.eval <- random.points.to.eval[check.ind]
           }
@@ -257,8 +257,8 @@ findOptimalDesign <- function(
               if(is.replicated){
                 random.points.to.eval <- c()
                 for(l in 1:n.final.this.network){
-                  locID.ind <- which(all.locIDs == random.points[l])
-                  random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[l]])
+                  locID.ind <- which(unique.locIDs == random.points[l])
+                  random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]])
                   check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
                   random.points.to.eval <- random.points.to.eval[check.ind]
                 }
@@ -368,8 +368,8 @@ findOptimalDesign <- function(
       if(is.replicated){
         random.points.to.eval <- c()
         for(i in 1:n.points){
-          locID.ind <- which(all.locIDs == random.points[i])
-          random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[i]])
+          locID.ind <- which(unique.locIDs == random.points[i])
+          random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]])
         }
         check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
         random.points.to.eval <- random.points.to.eval[check.ind]
@@ -412,8 +412,8 @@ findOptimalDesign <- function(
             if(is.replicated){
               random.points.to.eval <- c()
               for(l in 1:n.points){
-                locID.ind <- which(all.locIDs == random.points[l])
-                random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[l]])
+                locID.ind <- which(unique.locIDs == random.points[l])
+                random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]])
               }
               check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
               random.points.to.eval <- random.points.to.eval[check.ind]
