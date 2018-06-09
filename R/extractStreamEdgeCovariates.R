@@ -54,14 +54,14 @@ extractStreamEdgeCovariates <- function(ssn, columns){
     pred.unique.rids.ind <- match(pred.unique.rids, ssn@data$rid)
     col.list <- vector("list", nc)
     for(i in 1:nc){
-      col.list[[i]] <- ssn@data[preds.unique.rids.ind, columns[i]]
+      col.list[[i]] <- ssn@data[pred.unique.rids.ind, columns[i]]
     }
     names(col.list) <- columns
-    n.unique.rids <- length(preds.unique.rids)
+    n.unique.rids <- length(pred.unique.rids)
     for(i in 1:n.unique.rids){
       for(j in 1:nc){
-        ind <- which(ssn@predspoints@SSNPoints[[1]]@point.data$rid == preds.unique.rids[i])
-        ssn@predspoints@SSNPoints[[1]]@point.data[ind, columns[[j]]] <- col.list[[j]][i]
+        ind <- which(ssn@predpoints@SSNPoints[[1]]@point.data$rid == pred.unique.rids[i])
+        ssn@predpoints@SSNPoints[[1]]@point.data[ind, columns[[j]]] <- col.list[[j]][i]
       }
     }
   }

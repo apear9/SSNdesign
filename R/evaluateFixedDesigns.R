@@ -54,6 +54,7 @@ evaluateFixedDesigns <- function(
   
   ## Find the length of each design
   ndp <- lapply(list.designs, length)
+  size.offsets <- rep(0, nd)
   
   ### Code to detect whether there are replicates on sites
   n.pids <- length(
@@ -132,6 +133,7 @@ evaluateFixedDesigns <- function(
       for(j in 1:ndp.i){
         ind <- which(unique.locIDs == list.designs[[i]][j])
         if(length(ind) < 1){
+          size.offsets[i] <- size.offsets[i] + 1
           next
         }
         design.to.eval <- c(design.to.eval, locID.to.pid[[ind]])
@@ -146,7 +148,7 @@ evaluateFixedDesigns <- function(
     ncol = 3  # ID, Size, and Utility 
   ) 
   m[, 1] <- 1:nd 
-  m[, 2] <- unlist(ndp)
+  m[, 2] <- unlist(ndp) - size.offsets # sometimes sites in the designs aren't actually present among the locIDs...
   
   ## Evaluate all designs
   for(i in 1:nd){
