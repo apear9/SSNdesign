@@ -22,7 +22,7 @@
 #'
 #' @export
 DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-
+  #t1 <- Sys.time()
   ## Get data for design points
   # Rely on ordering of output of glmssn to retrieve correct rows in the design matrix
   ind <- row.names(glmssn$sampinfo$X) %in% design.points
@@ -95,7 +95,7 @@ DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
     D[i] <- -log(det(covb))
     
   }
-  
+  #print(Sys.time() - t1)
   return(mean(D, na.rm = TRUE))
   
 }

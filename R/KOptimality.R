@@ -22,12 +22,14 @@
 #'  
 #'@export
 KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  # t1 <- Sys.time()
+  #t1 <- Sys.time()
   # Get info for the obs sites  
-  ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
+  ind <- row.names(glmssn$sampinfo$X) %in% design.points
   X <- glmssn$sampinfo$X[ind, ]
   Xt <- t(X)
-  cds.obs <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
+  # Coordinates
+  ind.cds <- row.names(ssn@obspoints@SSNPoints[[1]]@point.coords) %in% design.points
+  cds.obs <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.cds, ]
   colnames(cds.obs) <- c("x", "y")
   
   # Cut down matrices involving the observations
@@ -168,7 +170,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   }
   
   # # spit out result
-  # print(Sys.time() - t1)
+  #print(Sys.time() - t1)
   return(mean(K_all))
   
 }
