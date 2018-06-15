@@ -89,13 +89,24 @@ DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
       ua,
       re
     )
+    covbi <- Xt %*% solve(V) %*% X
     
-    covbi <- t(X) %*% solve(V) %*% X
-    covb <- solve(covbi)
-    D[i] <- -log(det(covb))
+    # covb <- solve(covbi)
+    D[i] <- tryCatch(
+      -log(
+        det(
+          solve(
+            covbi
+          )
+        )
+      ),
+      error = function(e) return(-1e9)#, 
+      #finally = return(-1e9)
+    )
     
   }
   #print(Sys.time() - t1)
+  #print(mean(D, na.rm = TRUE))
   return(mean(D, na.rm = TRUE))
   
 }
