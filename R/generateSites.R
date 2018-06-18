@@ -77,7 +77,7 @@ generateSites <- function (
   line_data <- data.frame()
   # empty dist matrix, list to contain n_network matrices
   drvr <- dbDriver("SQLite")
-  conn <- dbConnect(drvr, paste(ssn@path, "binaryID.db", sep = "/"))
+  conn <- dbConnect(drvr, "binaryID.db")
   distance_matrices <- list()
   # for loop over each network
   for (netid in 1:n_networks) {
@@ -124,7 +124,7 @@ generateSites <- function (
   dbDisconnect(conn)
   # derive shreve stream orders if no edgeweights and edgeafv values are provided
   if(edgeweights == "shreve"){
-    conn <- dbConnect(drvr, paste(ssn@path, "binaryID.db", sep = "/"))
+    conn <- dbConnect(drvr, "binaryID.db")
     for(i in 1:n_networks){
       bin.id.tab <- dbReadTable(conn, paste0("net", i))
       if(i == 1){
