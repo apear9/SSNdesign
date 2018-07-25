@@ -6,7 +6,7 @@
 #' 
 #'@usage 
 #'    
-#'\code{Stream.Network.Samples(ssn.list, sample.method, sample.size,cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...){} 
+#'\code{Stream.Network.Samples(ssn.list, sample.method, sample.size,cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...)} 
 #' 
 #'@param ssn.list an object of class list that contains one item names "ssn.object" which is a SpatialStreamNetwork and another item named "bin.table" which is the binaryID table for the assoicated SpatialStreamNetwork
 #'@param sample.method a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"

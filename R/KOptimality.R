@@ -56,7 +56,9 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   # this.net <- ssn@obspoints@SSNPoints[[1]]@point.data$netID[ind][1]
   # ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID == this.net
   indp <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
-  X0 <- t(model.matrix(glmssn$args$formula, ssn@predpoints@SSNPoints[[1]]@point.data[indp, ]))
+  mm.char <- as.character(glmssn$args$formula)
+  mm.form <- as.formula(paste(mm.char[1], mm.char[3]))
+  X0 <- t(model.matrix(mm.form, ssn@predpoints@SSNPoints[[1]]@point.data[indp, ]))
   cds.prd <- ssn@predpoints@SSNPoints[[1]]@point.coords[indp, ]
   colnames(cds.prd) <- c("x", "y")
   # Matrices
@@ -85,7 +87,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   # initialise empty vector to store results
   
   K_all <- vector("numeric", n.draws)
-
+  
   for(i in 1:n.draws){
     
     # get simulated covariance parameters
@@ -161,7 +163,7 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
     
     # pred utility
     
-    K <- V - Ct %*% Wi %*% C + Mt %*% solve(Xt %*% Wi %*% X) %*% M
+    K <- tryCatch(V - Ct %*% Wi %*% C + Mt %*% solve(Xt %*% Wi %*% X) %*% M, error = function(e) return(matrix(c(-1e9,0,0,0), nrow = 2)))
     
     # get the trace of the matrix at the observed sites
     
@@ -171,6 +173,11 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   
   # # spit out result
   #print(Sys.time() - t1)
-  return(mean(K_all))
-  
+  Ud <- mean(K_all)
+  if(Ud <= 0){
+    return(-1e9)
+  } else {
+    return(Ud)
+  } 
+
 }

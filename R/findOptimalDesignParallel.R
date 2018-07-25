@@ -65,6 +65,18 @@ findOptimalDesignParallel <- function(
     stop("The argument n.draws must have a positive integer value.")
   }
   
+  ### Code to detect whether there are replicates on sites
+  n.pids <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$pid
+    )
+  )
+  n.locIDs <- length(
+    unique(
+      ssn@obspoints@SSNPoints[[1]]@point.data$locID
+    )
+  )
+  
   # Extract K for greedy exchange algorithm
   
   if(is.null(extra.arguments)){
@@ -84,9 +96,23 @@ findOptimalDesignParallel <- function(
     dist.junc.pxo <- getStreamDistMatInOrder.predsxobs(ssn)
   }
   
-  # Initialise for loop
+  # Initialise loops by creating a list of potential sites to choose from
+  is.replicated <- n.pids != n.locIDs
+  if(is.replicated){
+    print("Replicates found. Mapping PIDs to locIDs...")
+    all.points <- unique(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    # Create mapping from locID to pid
+    all.locIDs <- as.numeric(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
+    unique.locIDs <- unique(all.locIDs)
+    locID.to.pid <- vector("list", n.locIDs)
+    for(i in 1:n.locIDs){
+      locID.i <- all.locIDs == i
+      locID.to.pid[[i]] <- ssn@obspoints@SSNPoints[[1]]@point.data$pid[locID.i]
+    }
+  } else {
+    all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
+  }
   
-  all.points <- ssn@obspoints@SSNPoints[[1]]@point.data$pid
   
   # Register cluster and do heavy lifting in parallel
   cl <- makeCluster(n.cores)
@@ -171,18 +197,34 @@ findOptimalDesignParallel <- function(
       
       for(k in 1:K){
         
+        # Print progress to user
+        msg <- paste("Now on hyper-iteration", k, "out of", K)
+        print(msg)
+        
         # Select random subsample of points
         
         random.sample <- sample(1:n.points.this.network, n.final.this.network, FALSE)
         random.points <- points.this.network[random.sample]
         random.points <- as.character(random.points)
         
+        if(is.replicated){
+          random.points.to.eval <- c()
+          for(i in 1:n.final.this.network){
+            locID.ind <- which(unique.locIDs == random.points[i])
+            random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]])
+            check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+            random.points.to.eval <- random.points.to.eval[check.ind]
+          }
+        } else {
+          random.points.to.eval <- random.points
+        }
+        
         # Evaluate utility once to initialise
         
         U <- utility.function(
           ssn,
           glmssn,
-          random.points,
+          random.points.to.eval,
           prior.parameters, 
           n.draws,
           extra.arguments
@@ -208,13 +250,27 @@ findOptimalDesignParallel <- function(
             remaining.values <- sample(remaining.values, n.j, FALSE)
             
             ## Precompute the designs to evaluate
-            d.list <- vector("list", n.j)
+            d.list.to.eval <- d.list <- vector("list", n.j)
             for(j in 1:n.j){
               random.points[i] <- remaining.values[j]
-              d.list[[j]] <- random.points
+              ## Map pids to locIDs if there are temporal replicates
+              if(is.replicated){
+                random.points.to.eval <- c()
+                for(l in 1:n.final.this.network){
+                  locID.ind <- which(unique.locIDs == random.points[l])
+                  random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]]) # problem
+                  check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+                  random.points.to.eval <- random.points.to.eval[check.ind]
+                  d.list.to.eval[[j]] <- random.points.to.eval
+                  d.list[[j]] <- random.points
+                }
+              } else {
+                d.list.to.eval[[j]] <- d.list[[j]] <- random.points
+              }
             }
+            
             designs <- append(designs, d.list)
-            d.iter <- isplitVector(d.list, chunks = n.cores)
+            d.iter <- isplitVector(d.list.to.eval, chunks = n.cores)
             rm(d.list)
             Uij <- foreach(
               d.i = d.iter, 
@@ -245,7 +301,13 @@ findOptimalDesignParallel <- function(
             ind <- U.ij == max(U.ij)
             ind <- (1:length(U.ij))[ind]
             #U.ij <- U.ij[-ind]
-            design.now <- designs[[ind]]
+            design.now <- tryCatch(
+              designs[[ind]], 
+              error = function(e){
+                warning("Design is not optimal; selected because computation of all utilities failed.")
+                return(designs[[2]])
+              }
+            )
             random.points <- design.now
             
           }
@@ -253,6 +315,10 @@ findOptimalDesignParallel <- function(
           cond <- !all(design.now %in% design.previous)
           
         }
+        
+        # Print progress to user
+        msg <- paste("The best design in this iteration had a utility value of", U)
+        print(msg)
         
         ## Store utility values
         
@@ -317,6 +383,10 @@ findOptimalDesignParallel <- function(
     design.all <- list()
     for(k in 1:K){
       
+      # Print progress to user
+      msg <- paste("Now on hyper-iteration", k, "out of", K)
+      print(msg)
+      
       # Select random subsample of points
       random.sample <- sample(1:length(all.points), n.points, FALSE)
       random.points <- all.points[random.sample]
@@ -350,13 +420,26 @@ findOptimalDesignParallel <- function(
           n.j <- length(remaining.values)
           
           ## Precompute the designs to evaluate
-          d.list <- vector("list", n.j)
+          d.list.to.eval <- d.list <- vector("list", n.j)
           for(j in 1:n.j){
             random.points[i] <- remaining.values[j]
-            d.list[[j]] <- random.points
+            ## Map pids to locIDs if there are temporal replicates
+            if(is.replicated){
+              random.points.to.eval <- c()
+              for(l in 1:n.points){
+                locID.ind <- which(unique.locIDs == random.points[l])
+                random.points.to.eval <- c(random.points.to.eval, locID.to.pid[[locID.ind]]) # problem
+                check.ind <- random.points.to.eval %in% row.names(glmssn$sampinfo$X)
+                random.points.to.eval <- random.points.to.eval[check.ind]
+                d.list.to.eval[[j]] <- random.points.to.eval
+                d.list[[j]] <- random.points
+              }
+            } else {
+              d.list.to.eval[[j]] <- d.list[[j]] <- random.points
+            }
           }
           designs <- append(designs, d.list)
-          d.iter <- isplitVector(d.list, chunks = n.cores)
+          d.iter <- isplitVector(d.list.to.eval, chunks = n.cores)
           rm(d.list)
           Uij <- foreach(
             d.i = d.iter, 
@@ -385,7 +468,13 @@ findOptimalDesignParallel <- function(
           U <- max(U.ij)
           ind <- U.ij == max(U.ij)
           ind <- (1:length(U.ij))[ind]
-          design.now <- designs[[ind]]
+          design.now <- tryCatch(
+            designs[[ind]], 
+            error = function(e){
+              warning("Design is not optimal; selected because computation of all utilities failed.")
+              return(designs[[2]])
+            }
+          )
           random.points <- design.now
           
         }
@@ -393,6 +482,9 @@ findOptimalDesignParallel <- function(
         cond <- !all(design.now %in% design.previous)
         
       }
+      
+      msg <- paste("The best design in this iteration had a utility value of", U)
+      print(msg)
       
       # Store diagnostics
       
@@ -412,14 +504,21 @@ findOptimalDesignParallel <- function(
   
   ## create new SSN containing only the selected points
   
-  final.points <<- final.points
-  suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  final.points <<- final.points # This needs to be in the global environment for subsetSSN to work? It's really strange.
+  if(is.replicated){
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, as.character(locID) %in% final.points))
+  } else {
+    suppressWarnings(subsetSSN(ssn = ssn, filename = new.ssn.path, pid %in% final.points))
+  }
   preds <- NULL
   if(length(ssn@predpoints@SSNPoints) > 0){
     preds <- "preds"
+    ssn.new <- importSSN(new.ssn.path, preds)
+    createDistMat(ssn.new, preds, TRUE, TRUE)
+  } else{
+    ssn.new <- importSSN(new.ssn.path, NULL)
+    createDistMat(ssn.new, NULL, TRUE, FALSE)
   }
-  ssn.new <- importSSN(new.ssn.path, preds)
-  createDistMat(ssn.new, preds, TRUE, TRUE)
   rm(final.points, pos = 1) # For some reason, the subsetSSN doesn't work unless final.points is in the global scope. Removing it here.
   
   # return updated ssn with other info
@@ -432,5 +531,5 @@ findOptimalDesignParallel <- function(
       utility.values = diagnostics
     )
   )
-  
+
 }
