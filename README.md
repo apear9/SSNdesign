@@ -1,8 +1,8 @@
-## Adaptive Design for Spatial Stream Networks
+## Optimal and adaptive experimental designs for stream networks
 
 ### Installation:
 
-Install `adssn` directly from GitHub with `devtools`
+Install `SSNdesign` directly from GitHub with `devtools`
 
-```devtools::install_github(repo = 'apear9/adssn')```
+```devtools::install_github(repo = 'apear9/SSNdesign')```
 
