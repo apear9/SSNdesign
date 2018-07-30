@@ -53,7 +53,7 @@ simulateFromSSNM <- function(ssn, glmssn, fixed.effects = NULL, covariance.type 
   
   # Get dataframes from the SSN
   o.df <- getSSNdata.frame(ssn)
-  if(length(ssn@predpoints@SSNPoints) > 0){
+  if(anyPreds(ssn)){
     p.df <- getSSNdata.frame(ssn, "preds")
     preds <- "preds"
   } else {
