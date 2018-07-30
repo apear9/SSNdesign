@@ -21,7 +21,6 @@ subsetPreds <- function(ssn, subset){
   if (pred.len > 0) {
     for (i in 1:pred.len) {
       pred.name <- ssn@predpoints@ID[[i]]
-      
       ind.preds <- eval(substitute(subset), ssn@predpoints@SSNPoints[[i]]@point.data)
       ind.na <- is.na(ind.preds)
       ind.preds[ind.na] <- FALSE

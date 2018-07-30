@@ -30,6 +30,12 @@ subsetByID <- function(ssn, new.ssn.path, obs, preds, locID = FALSE){
     stop("The argument locID must be logical. Set TRUE to use locIDs for the subsets.")
   }
   
+  # put stuff in global env
+  obs <<- obs
+  if(!missing(preds)){
+    preds <<- preds
+  }
+  
   # Split by case
   if(locID){
     result <- subsetByLOCID(ssn, new.ssn.path, obs, preds)
@@ -38,7 +44,11 @@ subsetByID <- function(ssn, new.ssn.path, obs, preds, locID = FALSE){
   }
   
   # Re-import just to be sure that everything is coded correctly
-  result <- suppressMessages(importSSN(new.ssn.path, preds))
+  if(missing(preds)){
+    result <- importSSN(new.ssn.path)
+  } else {
+    result <- importSSN(new.ssn.path, "preds")
+  }
   
   # Spit out result
   return(result)
