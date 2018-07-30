@@ -17,7 +17,7 @@
 #'To find the number of design points on a SpatialStreamNetwork object, use \code{\link{ndpoints}}.
 #' 
 #'@export
-nppoints <- function(ssn){
+nppoints <- function(ssn, use = "pids"){
   
   ## Check whether prediction points exist
   preds.exist <- length(ssn@predpoints@SSNPoints) > 0
