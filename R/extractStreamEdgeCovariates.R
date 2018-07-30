@@ -30,8 +30,6 @@ extractStreamEdgeCovariates <- function(ssn, columns){
   # Check whether prediction sites exist
   preds.exist <- length(ssn@predpoints@SSNPoints) > 0
   # Add columns to observed +/- pred points and join
-  ssn@obspoints@SSNPoints[[1]]@point.data$shreve <- 0
-  ssn@obspoints@SSNPoints[[1]]@point.data$afv <- 0
   obs.unique.rids <- unique(ssn@obspoints@SSNPoints[[1]]@point.data$rid)
   obs.unique.rids.ind <- match(obs.unique.rids, ssn@data$rid)
   # Get a list of values in each column
@@ -48,8 +46,6 @@ extractStreamEdgeCovariates <- function(ssn, columns){
     }
   }
   if(preds.exist){
-    ssn@predpoints@SSNPoints[[1]]@point.data$shreve <- 0
-    ssn@predpoints@SSNPoints[[1]]@point.data$afv <- 0
     pred.unique.rids <- unique(ssn@predpoints@SSNPoints[[1]]@point.data$rid)
     pred.unique.rids.ind <- match(pred.unique.rids, ssn@data$rid)
     col.list <- vector("list", nc)
