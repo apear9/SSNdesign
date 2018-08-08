@@ -82,6 +82,31 @@ simulateFromSSNM <- function(ssn, glmssn, fixed.effects = NULL, covariance.type 
     FALSE
   )$ssn.object
   
+  ssn.new@obspoints@SSNPoints[[1]]@point.data$locID <- as.character(
+    ssn.new@obspoints@SSNPoints[[1]]@point.data$locID
+  )
+  ssn.new@obspoints@SSNPoints[[1]]@point.data$locID <- gsub(
+    "o",
+    "",
+    ssn.new@obspoints@SSNPoints[[1]]@point.data$locID
+  )
+  ssn.new@obspoints@SSNPoints[[1]]@point.data$locID <- anum(
+    ssn.new@obspoints@SSNPoints[[1]]@point.data$locID
+  )
+  if(!is.null(preds)){
+    ssn.new@predpoints@SSNPoints[[1]]@point.data$locID <- as.character(
+      ssn.new@predpoints@SSNPoints[[1]]@point.data$locID
+    )
+    ssn.new@predpoints@SSNPoints[[1]]@point.data$locID <- gsub(
+      "p",
+      "",
+      ssn.new@predpoints@SSNPoints[[1]]@point.data$locID
+    )
+    ssn.new@predpoints@SSNPoints[[1]]@point.data$locID <- anum(
+      ssn.new@predpoints@SSNPoints[[1]]@point.data$locID
+    )
+  }
+  
   # Return result
   return(ssn.new)
   
