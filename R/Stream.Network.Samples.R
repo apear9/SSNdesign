@@ -116,7 +116,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
         ## get the segments from these samples
         Grids <- unique(cdat$rid[cdat$pid %in% Grts2$id])
         ## Get the clusters
-        cdat<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.list=Grids, 
+        cdat<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vector=Grids, 
                                          max.dist=NA, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
         
         PID.selected<-c(PID.selected, cdat$pid[cdat$Selected.Sample==1])
@@ -140,7 +140,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
         ## get the segments from these cluster samples
         Grids <- unique(cdat$rid[cdat$pid %in% forclust])
         ## Get the clusters
-        cdat2<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.list=Grids, 
+        cdat2<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vector=Grids, 
                                           max.dist=NA, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
         chosen.pid2 <- cdat2$pid[cdat2$Selected.Sample==1]
         chosen <- c(chosen.pid, chosen.pid2)
@@ -174,7 +174,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
       
       Clusters <-c(MouthSeg, extreme.clusters)
       
-      ClustSamps<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.list=Clusters, 
+      ClustSamps<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vectort=Clusters, 
                                              max.dist=NA, cluster.size=2, start.point.method="random", bin.table=bin.table)
       chosen.Clust.samps <- ClustSamps$pid[ClustSamps$Selected.Sample ==1]
       
@@ -183,7 +183,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
       ## Need to draw samples, one from all available Extreme segments
       ExtSegsLeft <- ExtSegs[-which(ExtSegs %in% extreme.clusters)]
       Ext.Segs.choose <- sample(ExtSegsLeft, How.many.samples.left, replace=F)
-      ExtSamps <- OneSampPerSeg(ssn.obj2, segment.list = Ext.Segs.choose)
+      ExtSamps <- OneSampPerSeg(ssn.obj2, segment.vector = Ext.Segs.choose)
       
       TotalSamps <- c(chosen.Clust.samps, ExtSamps)
       
@@ -244,7 +244,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
       ## Randomly pick samples.left number of extreme segments
       Ext.SingleSamp.Segs <- sample(ExtSegs2, samples.left)
       
-      Ext.SingleSamps <- OneSampPerSeg(ssn.obj2, segment.list = Ext.SingleSamp.Segs)
+      Ext.SingleSamps <- OneSampPerSeg(ssn.obj2, segment.vector = Ext.SingleSamp.Segs)
       
       TotalSamps <- c(PID.here, Ext.SingleSamps)
       
@@ -306,7 +306,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
       ## Randomly pick samples.left number of extreme segments
       Ext.SingleSamp.Segs <- sample(ExtSegs2, samples.left)
       
-      Ext.SingleSamps <- OneSampPerSeg(ssn.obj2, segment.list = Ext.SingleSamp.Segs)
+      Ext.SingleSamps <- OneSampPerSeg(ssn.obj2, segment.vector = Ext.SingleSamp.Segs)
       
       TotalSamps <- c(PID.here, Ext.SingleSamps)
       
