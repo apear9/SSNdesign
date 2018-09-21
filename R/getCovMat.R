@@ -27,7 +27,7 @@ getCovMat <- function(ssn, glmssn, addfunccol, ...){
   n.zero <- total.matrix$net.zero
   d.junc <- total.matrix$d.junc
   # Construct covariance matrix
-  if(is.missing(glmssn)){
+  if(missing(glmssn)){
     i.m <- getImportantMatrices.obs(d.junc, ssn@obspoints@SSNPoints[[1]]@point.data[, addfunccol])
     cov.mat <- SSN:::makeCovMat(dist.hydro = i.m$d, a.mat = i.m$a, b.mat = i.m$b, w.matrix = i.m$w, net.zero = n.zero, x.row = x, y.row = y, x.col = x, y.col = y, ...)
   }else{
