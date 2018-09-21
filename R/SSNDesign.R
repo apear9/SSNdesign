@@ -1,9 +1,9 @@
-#' SSNDesign: Optimal and adaptive design for Spatial Stream Networks
+#' SSNdesign: An R package for optimal and adaptive sampling designs on stream networks
 #'
-#' The adssn package builds on the SSN package to provide a framework for solving design problems on SpatialStreamNetwork objects.
+#' The SSNdesign package builds on the SSN package to provide a framework for solving design problems on SpatialStreamNetwork objects.
 #'
-#' @section SSNDesign functions:
-#' the SSNDesign package contains the following functions:
+#' @section SSNdesign functions:
+#' the SSNdesign package contains the following functions:
 #' - constructTotalMatrix
 #' - CPOptimality
 #' - doAdaptiveDesign
@@ -35,7 +35,7 @@
 #' - systematicDesign
 #'
 #' @docType package
-#' @name SSNDesign
+#' @name SSNdesign
 #' @import foreach
 #' @import iterators
 #' @import itertools

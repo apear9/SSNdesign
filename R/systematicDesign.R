@@ -82,6 +82,6 @@ systematicDesign <- function(spacing, replications = 1, rep.variable = "Time", r
     }
     return(result)
   }
-  return(replication.function(design.function, replications, 
+  return(SSN:::replication.function(design.function, replications, 
                               rep.variable, rep.values))
 }
