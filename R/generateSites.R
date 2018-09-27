@@ -30,8 +30,7 @@ generateSites <- function (
   edgeweights,
   edgeafv,
   obsDesign, 
-  predDesign = noPoints,
-  importToR = FALSE
+  predDesign = noPoints
 ){
   path = ssn@path
   if (missing(obsDesign)) 
@@ -123,7 +122,7 @@ generateSites <- function (
   }
   dbDisconnect(conn)
   # derive shreve stream orders if no edgeweights and edgeafv values are provided
-  if(edgeweights == "shreve"){
+  if(missing(edgeweights) | missing(edgeafv) | is.null(edgeweights) | is.null(edgeafv)){
     conn <- dbConnect(drvr, "binaryID.db")
     for(i in 1:n_networks){
       bin.id.tab <- dbReadTable(conn, paste0("net", i))
@@ -390,10 +389,7 @@ generateSites <- function (
   }
   ssn@network.line.coords$NetworkID <- as.factor(ssn@network.line.coords$NetworkID)
   setwd(old_wd)
-  if (importToR) {
-    if (sum(n_pred_sites) > 0)
+  if (sum(n_pred_sites) > 0)
       return(importSSN(path, predpts = "preds", o.write = TRUE))
     else return(importSSN(path, o.write = TRUE))
-  }
-  else return(ssn)
 }

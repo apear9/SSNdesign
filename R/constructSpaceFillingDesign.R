@@ -164,6 +164,7 @@ constructSpaceFillingDesign <- function(ssn, new.ssn.path, n.points, n.optim = 3
           u.star <- max(u.this.run)[1]
           ind <- which(u.this.run == u.star)
           d.star <- designs[[ind[1]]]
+          r.point <- d.star
         } 
         
       }
