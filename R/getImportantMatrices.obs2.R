@@ -1,4 +1,4 @@
-getImportantMatrices.obs <- function(d.junc, afv = NULL){
+getImportantMatrices.obs2 <- function(d.junc, afv = NULL){
   
   # Input checking 
   if(!is.matrix(d.junc)){
@@ -18,18 +18,6 @@ getImportantMatrices.obs <- function(d.junc, afv = NULL){
 
   # Create weights matrix
   n.mat <- nrow(d.hydro)
-  # print(c.mat)
-  # print(n.mat == ncol(d.hydro))
-  # print(sqrt(
-  #   pmin(
-  #     outer(afv,rep(1, times = n.mat)), 
-  #     t(outer(afv,rep(1, times = n.mat)))
-  #   ) /
-  #     pmax(
-  #       outer(afv,rep(1, times = n.mat)),
-  #       t(outer(afv,rep(1, times = n.mat)))
-  #     )
-  # ))
   w.mat <- c.mat * sqrt(
     pmin(
       outer(afv,rep(1, times = n.mat)), 

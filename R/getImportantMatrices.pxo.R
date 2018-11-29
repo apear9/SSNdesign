@@ -1,24 +1,3 @@
-#' Get the matrices required to calculate the covariance matrix on the data
-#' 
-#'@description
-#'
-#'Calculates the distance and related matrices between observed and prediction sites on a SpatialStreamNetwork.
-#' 
-#'@usage
-#' 
-#'\code{getImportantMatrices(d.junc.a, d.junc.b, afv.obs = NULL, afv.prd = NULL)}
-#' 
-#'@param d.junc.a A rectangular distance matrix with the observed sites in the rows and prediction sites in the columns.
-#'@param d.junc.b The transpose matrix of the above.
-#'@param afv.obs The additive function values for each of the observed points, in order of their pid.
-#'@param afv.prd The additive function values for each of the prediction points, in order of their pid.
-#'@return A list of 5 matrices in the order dist.hydro, a.mat, b.mat, conn.mat, and w.mat.
-#'
-#'@details
-#'
-#'This is the function called internally by \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}} to create the matrices required for the evaluation of utility functions that involve the prediction sites.
-#'
-#'@export
 getImportantMatrices.pxo <- function(d.junc.a, d.junc.b, afv.obs = NULL, afv.prd = NULL){
   
   # Input checking 
