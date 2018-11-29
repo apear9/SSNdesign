@@ -2,7 +2,7 @@
 #' 
 #'@description
 #'   
-#'\code{spaceFillingMorrisMitchell} is a utility function that can be used with \code{\link{findOptimalDesign}}. It is a utility function that maximises the minimum interpoint distance between a set of design points.  
+#'\code{spaceFillingMorrisMitchell} is a utility function used by the function \code{\link{constructSpaceFillingDesign}}. It can also be used with \code{\link{optimiseSSNDesign}}. It is a utility function that maximises the minimum interpoint distance between a set of design points.  
 #' 
 #'@usage
 #'
@@ -13,7 +13,7 @@
 #'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
 #'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
 #'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. Ignored in this function but this argument is present so this function is consistent with all other utility functions.
-#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}}.
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.
 #'@return A numeric scalar.
 #' 
 #'@details
