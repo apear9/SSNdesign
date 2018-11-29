@@ -65,7 +65,7 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
   n.n <- nnetwork(ssn)
   
   # Initialise empty lists for everything to store info needed to create sites
-  edges <<- tree.graphs <<- locations <<- rids <<- edge.lengths <<- edge.updist <<- dist.mats <<- vector("list", n.n)
+  edges <- tree.graphs <- locations <- rids <- edge.lengths <- edge.updist <- dist.mats <- vector("list", n.n)
   
   # Establish SQL connections to the binaryid.db 
   drvr <- dbDriver("SQLite")
@@ -115,28 +115,28 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
   
   # Turn the SSN into a graph so that the SSN design functions can operate on them
   graph.info <- readshpnw(ssn)
-  graphs <<- nel2igraph(graph.info[[2]], graph.info[[3]], eadf = graph.info[[5]], Directed = TRUE)
+  graphs <- nel2igraph(graph.info[[2]], graph.info[[3]], eadf = graph.info[[5]], Directed = TRUE)
   # Construct corresponding data frame
-  # line.data <<- data.frame(
+  # line.data <- data.frame(
   #   rid = edge_attr(graphs)["rid"],
   #   netID = edge_attr(graphs)["netID"]
   # ) # PROBLEM HERE
-  # line.data <<- dplyr::arrange(line.data, netID, rid)
+  # line.data <- dplyr::arrange(line.data, netID, rid)
   
   # Extract information from graphs to make the design functions usable
   for(i in 1:n.n){
-    tree.graphs[[i]] <<- subgraph.edges(graphs, which(E(graphs)$netID == i))
-    attributes.i <<- E(tree.graphs[[i]])
-    edge.lengths[[i]] <<- attributes.i$Length # MAY NOT WORK FOR REAL SHAPEFILES ... NEED A SOLUTION
-    rids[[i]] <<- attributes.i$rid
-    edge.updist[[i]] <<- attributes.i$upDist
-    names(edge.updist[[i]]) <<- rids[[i]]
-    locations[[i]] <<- layout.auto(tree.graphs[[i]])
-    edges[[i]] <<- get.edgelist(tree.graphs[[i]])
+    tree.graphs[[i]] <- subgraph.edges(graphs, which(E(graphs)$netID == i))
+    attributes.i <- E(tree.graphs[[i]])
+    edge.lengths[[i]] <- attributes.i$Length # MAY NOT WORK FOR REAL SHAPEFILES ... NEED A SOLUTION
+    rids[[i]] <- attributes.i$rid
+    edge.updist[[i]] <- attributes.i$upDist
+    names(edge.updist[[i]]) <- rids[[i]]
+    locations[[i]] <- layout.auto(tree.graphs[[i]])
+    edges[[i]] <- get.edgelist(tree.graphs[[i]])
   }
   
   # Use the design functions to generate observed and predicted sites
-  obs.sites <<- obsDesign(tree.graphs, edge.lengths, locations,
+  obs.sites <- obsDesign(tree.graphs, edge.lengths, locations,
                           edge.updist, dist.mats) 
   pred.sites <- predDesign(tree.graphs, edge.lengths, locations,
                            edge.updist, dist.mats)
@@ -166,7 +166,7 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
     rids.net <- rids[[netid]]
     preds.net <- pred.sites[[netid]]
     obs.net <- obs.sites[[netid]] 
-    obs.location.data <<- data.frame(
+    obs.location.data <- data.frame(
       rid = obs.net$edge,
       ratio = obs.net$ratio, 
       locID = obs.net$locID,
@@ -200,6 +200,13 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
           ratio = obs.location.data[,"ratio"],
           stringsAsFactors = FALSE
         )
+        if(ncol(obs.net) > 3){
+          obs.data.net <- cbind(
+            obs.data.net,
+            obs.net[, 4]
+          )
+          names(obs.data.net)[7] <- names(obs.net)[4]
+        }
         row.names(obs.data.net) <- row.names(obs.location.data.net) <- obs.pid
         obs.site.data <- rbind(obs.site.data, obs.data.net)
         obs.loc.data <- rbind(obs.loc.data, obs.location.data.net)
@@ -212,16 +219,23 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
           upDist = pred.location.data.net[,"upDist"],
           pid = pred.pid,
           netID = rep(netid, nrow(pred.location.data.net)),
-          ratio = pred.location.data[,"rid"],
+          rid = pred.location.data[,"rid"],
           ratio = pred.location.data[,"ratio"],
           stringsAsFactors = FALSE
         )
+        if(ncol(preds.net) > 3){
+          pred.data.net <- cbind(
+            pred.data.net,
+            preds.net[, 4]
+          )
+          names(pred.data.net)[7] <- names(preds.net)[4]
+        }
         row.names(pred.data.net) <- row.names(pred.location.data.net) <- pred.pid
         pred.site.data <- rbind(pred.site.data, pred.data.net)
         pred.loc.data <- rbind(pred.loc.data, pred.location.data.net)
       }
     }
-    cum.pids <- cum.pids + n.locations.net
+    cum.pids <- cum.pids + n.locations.net - n.pred.sites[netid]
   }
   
   # Count number of observed and prediction sites
@@ -232,11 +246,15 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
   if(total.obs < 1){
     stop("There must be at least one observed site.")
   }
+  if(total.pred > 0){
+    pred.site.data$pid <- max(obs.site.data$pid) + pred.site.data$pid
+    row.names(pred.site.data) <- row.names(pred.loc.data) <- pred.site.data$pid
+  }
   
   # Deal with observed sites first since these will always exist
-  ind.order.obs <<- order(as.numeric(row.names(obs.site.data)))
-  obs.site.data <<- obs.site.data#[ind.order.obs, ]
-  obs.loc.data <<- obs.loc.data#[ind.order.obs, ]
+  ind.order.obs <- order(as.numeric(row.names(obs.site.data)))
+  obs.site.data <- obs.site.data[ind.order.obs, ]
+  obs.loc.data <- obs.loc.data[ind.order.obs, ]
   sites.shp <- SpatialPointsDataFrame(
     obs.loc.data[, c("NEAR_X", "NEAR_Y")],
     obs.site.data,
