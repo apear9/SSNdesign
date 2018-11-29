@@ -1,30 +1,3 @@
-#' A function to solve adaptive / sequential design problems on SpatialStreamNetworks
-#'@description 
-#'
-#'Finds an optimal design consisting of a specified number of points on a SpatialStreamNetwork, given a set of sites that must remain fixed. 
-#' 
-#'@usage 
-#' 
-#'\code{doAdaptiveDesignParallel(ssn, glmssn, fixed.points, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, n.cores = 2, extra.arguments = NULL)}
-#' 
-#'@param ssn an object of class SpatialStreamNetwork
-#'@param new.ssn.path a character string specifying the ssn folder in which to store the output
-#'@param glmssn an object of class glmssn
-#'@param fixed.points a numeric vector of the pids for sites which must remain fixed in the design
-#'@param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
-#'@param n.points the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn. 
-#'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions, including \code{\link{sequentialDOptimality}}, \code{\link{KOptimality}}, and \code{\link{sequentialCPOptimality}}. 
-#'@param prior.parameters a function to act as a prior for covariance parameter values
-#'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs
-#'@param n.cores a numeric value indicating the number of cores on which to parallelise the process.
-#'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
-#'@return An object of class SpatialStreamNetwork. The SSNPoints for the obspoints slot will be updated to reflect the selected design. 
-#'
-#'@details 
-#'
-#'This function implements the greedy exchange algorithm per Falk et al. (2014) to quickly find an optimal design from a set of sites. The algorithm does not always discover the absolute best design; however, even when this occurs, the algorithm will quickly discover a reasonably effective design. 
-#'  
-#'@export
 doAdaptiveDesignParallel_HPC <- function(
   ssn,
   new.ssn.path,
