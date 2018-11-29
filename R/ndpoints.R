@@ -2,11 +2,11 @@
 #'
 #'@description
 #'   
-#'\code{ndpoints()} is a function that returns the number of design points on a SpatialStreamNetwork object, both in total and by network.
+#'\code{ndpoints(ssn, use = "pids")} is a function that returns the number of design points on a SpatialStreamNetwork object, both in total and by network.
 #'
 #'@usage
 #'
-#'\code{ndpoints(ssn, use = "pids")}
+#'\code{ndpoints(ssn, use = c("pids", "locIDs"))}
 #'
 #'@param ssn An object of class SpatialStreamNetwork
 #'@param use A string indicating whether pids or locIDs should be used to count sites.
@@ -16,6 +16,17 @@
 #'
 #'To find the number of prediction points on a SpatialStreamNetwork object, use \code{\link{nppoints}}.
 #' 
+#'@examples
+#'
+#'set.seed(1)
+#'
+#'s1 <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s1_no_reps.ssn", sep = "/"), importToR = TRUE)
+#'ndpoints(s1)
+#'
+#'s2 <- createSSN(10, binomialDesign(10, 2, "Time"), path = paste(tempdir(), "s2_reps.ssn", sep = "/"), importToR = TRUE)  
+#'ndpoints(s2) # total number of observations
+#'ndpoints(s2, "locIDs") # total number of sites
+#'  
 #'@export
 ndpoints <- function(ssn, use = "pids"){
   
