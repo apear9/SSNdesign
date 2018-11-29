@@ -2,19 +2,25 @@
 #' 
 #'@description 
 #'
-#' This function is designed to get covariates associated with the data slot of the SSN obejct and join them to the point.data slot of the observed and/or predicted sites slot.
+#' This function transfers specified variables recorded on the edges of a SpatialStreamNetwork object to the observed (and possibly prediction) sites in that SpatialStreamNetwork object. 
 #' 
 #'@usage 
 #' 
-#'\code{extractStreamEdgeCovariates(ssn)}
+#'\code{extractStreamEdgeCovariates(ssn, columns)}
 #' 
 #'@param ssn an object of class SpatialStreamNetwork
 #'@param columns a vector of column names that should be extracted from the data slot of the SpatialStreamNetwork object
 #'@return An object of class SpatialStreamNetwork. 
 #'
-#'@details
+#'@examples
 #'
-#'This function can be useful when the stream edges contain data that you want to associate with the sites for modelling or prediction purposes. An example is watershed attributes for the stream segments.
+#'set.seed(1)
+#'
+#'# Create an SSN
+#'s <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+#'
+#'# Extract stream edge covariates
+#'s <- extractStreamEdgeCovariates(ssn, "Length")
 #'
 #'@export
 extractStreamEdgeCovariates <- function(ssn, columns){
