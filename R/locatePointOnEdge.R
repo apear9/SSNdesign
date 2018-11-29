@@ -1,22 +1,8 @@
-#' Place a point at some distance along a stream edge
-#'
-#'@description 
-#'   
-#'\code{locatePointOnEdge()} returns the coordinates of a point along a line, as well as the distance from the first vertex to the point along the line.
-#'
-#'@usage 
-#'
-#'This function is not intended for direct use. It is called inside \code{\link{generateSites}} to ensure that the placement of simulated sites in geographical space is correct. 
-#'   
-#'@param ssn an object of class SpatialStreamNetwork
-#'@param rid the unique identifier for an edge in a SpatialStreamNetwork
-#'@param ratio the proportion of the total length of the stream edge where the point should be located
-#'@return a vector containing the xy coordinates of the point, and its distance from the first point on the stream edge
-#'
-#'@export
 locatePointOnEdge <- function(ssn, rid, ratio){
+  # match rid to fid (since lines + coordinates ordered by fid)
+  fid <- (0:(nrow(ssn@data) - 1))[which(ssn@data$rid == rid)]
   # get line segments according to criteria
-  ssncoords <- ssn@lines[[rid + 1]]@Lines[[1]]@coords
+  ssncoords <- ssn@lines[[fid + 1]]@Lines[[1]]@coords
   nsegments <- nrow(ssncoords) - 1
   # get lengths of every segment
   seglengths <- rep(NA, nsegments)
