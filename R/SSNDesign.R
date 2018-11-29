@@ -48,7 +48,6 @@
 #' @import rgdal
 #' @import RSQLite
 #' @import stringr
-#' @import ggplot2
-#' @import dplyr
+#' @import doRNG
 NULL
 ## NULL
