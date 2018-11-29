@@ -9,7 +9,7 @@
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
 
-\item{glmssn}{An model object of class glmssn.}
+\item{glmssn}{A fitted model object of class glmssn.}
 
 \item{design.points}{A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.}
 
@@ -17,14 +17,43 @@
 
 \item{n.draws}{A numeric scalar for the number of Monte Carlo draws to use when approximating the utility.}
 
-\item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.}
+\item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.}
 }
 \value{
-A numeric scalar.
+A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-\code{Koptimality} is a utility function that can be used with either \code{\link{findOptimalDesign}} or \code{\link{doAdaptiveDesign}}. It is a utility function that minimises the total kriging variance over a set of prediction points given a set of design points.
+The function \code{KOptimality} implements the K-optimal utility function from Falk et al. (2014).
 }
 \details{
-This function implements the K-optimal designs for prediction discussed in Som et al. (2014). This utility assumes the covariance parameters are known to the user and do not have to be empirically estimated. The method has been slightly modified to accommodate the Monte Carlo draws which are used to approximate the utility given prior information on the covariance parameters. See \code{\link{EKOptimality}} for a modified version of this utility where the covariance parameters are unknown and must be estimated from the data.
+The utility function is
+
+\deqn{U(d,\theta) = \left(\sum_{i = 1}^n Var(\hat{y}_i)\right)^{-1}}{U(d,\theta)= (\sum_{i = 1}^n Var(\hat{y}_i))^{-1}}
+That is, it is the inverse sum of the estimated kriging variances for a set of prediction sites with indices \eqn{i = 1, 2, ..., n}. 
+
+One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
+}
+\examples{
+ 
+\dontrun{
+# Create stream network
+s <- createSSN(100, systematicDesign(0.25), systematicDesign(0.25), paste(tempdir(), "s.ssn", sep = "/"), TRUE)
+createDistMat(s, "preds", TRUE, TRUE)
+
+# Simulate data on network
+s <- SimulateOnSSN(s, getSSNdata.frame(s), getSSNdata.frame(s, "preds"), "preds", formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+
+# Fit a model to the simulated data
+m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
+
+# Define the priors on the covariance parameters
+p <- constructLogNormalCovPriors(m)
+
+# Find the optimal design using D-optimality as the utility function
+r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = KOptimality, prior.parameters = p)
+
+# Plot result to check
+plot(r$ssn.new, "Sim_Values")
+}
+     
 }

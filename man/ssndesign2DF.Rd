@@ -4,7 +4,7 @@
 \alias{ssndesign2DF}
 \title{Pull the design diagnostics into a dataframe.}
 \usage{
-\code{ssndesign2DF(ssndesign)}
+\code{ssndesign2DF(ssndesign, summarise = TRUE)}
 }
 \arguments{
 \item{ssndesign}{The list object output by one of the main design functions.}

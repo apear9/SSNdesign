@@ -15,3 +15,9 @@ a numeric scalar
 \description{
 Calculates the number of networks are present inside of a SpatialStreamNetwork object.
 }
+\examples{
+
+s <- createSSN(c(10, 10), binomialDesign(c(2, 2)), path = paste(tempdir(), "tmp.ssn", sep = "/"), importToR = TRUE)
+nnetwork(s) # reports 2
+     
+}

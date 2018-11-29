@@ -9,7 +9,7 @@
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
 
-\item{glmssn}{An model object of class glmssn.}
+\item{glmssn}{A fitted model object of class glmssn.}
 
 \item{design.points}{A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.}
 
@@ -17,14 +17,44 @@
 
 \item{n.draws}{A numeric scalar for the number of Monte Carlo draws to use when approximating the utility.}
 
-\item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.}
+\item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.}
 }
 \value{
-A numeric scalar.
+A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-\code{CPOptimality} is a utility function that can be used with \code{\link{findOptimalDesign}}. It is a utility function that minimises the determinant of the inverse Fisher information matrix over a set of designs.
+The function \code{CPOptimality} implements the CP-optimal utility function from Falk et al. (2014).
 }
 \details{
-\code{CPOptimality} assumes there are no sites which have already been incorporated into a design. It computes the expected Fisher information matrix (Som et al., 2014) for each set of simulated covariance parameters.
+The utility function is
+
+\deqn{U(d,\theta) = \log \det \left(I(\theta)\right)}{U(d, \theta) = log(det(I(\theta)))}
+
+where \eqn{I(\theta)} is the expected Fisher information matrix for the covariance parameters \eqn{\theta}.
+
+One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
+}
+\examples{
+
+\dontrun{
+# Create stream network
+s <- createSSN(100, systematicDesign(0.25), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+createDistMat(s)
+
+# Simulate data on network
+s <- SimulateOnSSN(s, getSSNdata.frame(s),formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+
+# Fit a model to the simulated data
+m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
+
+# Define the priors on the covariance parameters
+p <- constructLogNormalCovPriors(m)
+
+# Find the optimal design using D-optimality as the utility function
+r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = CPOptimality, prior.parameters = p)
+
+# Plot result to check
+plot(r$ssn.new, "Sim_Values")
+}
+
 }

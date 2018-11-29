@@ -4,17 +4,28 @@
 \alias{nppoints}
 \title{Calculate the number of prediction points on a network}
 \usage{
-\code{nppoints(ssn)}
+\code{nppoints(ssn, use = "pids")}
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
+
+\item{use}{A string indicating whether the pids or locIDs should be counted.}
 }
 \value{
 A list with two elements: a vector of prediction points by network, and a scalar being the total number of prediction points in the SpatialStreamNetwork object.
 }
 \description{
-\code{nppoints()} is a function that returns the number of prediction points on a SpatialStreamNetwork object, both in total and by network.
+The function \code{nppoints} returns the number of prediction points on a SpatialStreamNetwork object, both in total and by network.
 }
 \details{
 To find the number of design points on a SpatialStreamNetwork object, use \code{\link{ndpoints}}.
+
+set.seed(1)
+
+s1 <- createSSN(10, binomialDesign(10),binomialDesign(10), path = paste(tempdir(), "s1_no_reps_preds.ssn", sep = "/"), importToR = TRUE)
+nppoints(s1)
+
+s2 <- createSSN(10, binomialDesign(10, 2, "Time"), binomialDesign(10, 2, "Time"), path = paste(tempdir(), "s2_reps_preds.ssn", sep = "/"), importToR = TRUE)  
+nppoints(s2) # total number of observations
+nppoints(s2, "locIDs") # total number of sites
 }

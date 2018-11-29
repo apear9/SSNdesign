@@ -4,17 +4,31 @@
 \alias{ndpoints}
 \title{Calculate the number of design points on a network}
 \usage{
-\code{ndpoints(ssn)}
+\code{ndpoints(ssn, use = c("pids", "locIDs"))}
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
+
+\item{use}{A string indicating whether pids or locIDs should be used to count sites.}
 }
 \value{
 A list with two elements: a vector of design points by network, and a scalar being the total number of design points in the SpatialStreamNetwork object.
 }
 \description{
-\code{ndpoints()} is a function that returns the number of design points on a SpatialStreamNetwork object, both in total and by network.
+\code{ndpoints(ssn, use = "pids")} is a function that returns the number of design points on a SpatialStreamNetwork object, both in total and by network.
 }
 \details{
 To find the number of prediction points on a SpatialStreamNetwork object, use \code{\link{nppoints}}.
+}
+\examples{
+
+set.seed(1)
+
+s1 <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s1_no_reps.ssn", sep = "/"), importToR = TRUE)
+ndpoints(s1)
+
+s2 <- createSSN(10, binomialDesign(10, 2, "Time"), path = paste(tempdir(), "s2_reps.ssn", sep = "/"), importToR = TRUE)  
+ndpoints(s2) # total number of observations
+ndpoints(s2, "locIDs") # total number of sites
+ 
 }

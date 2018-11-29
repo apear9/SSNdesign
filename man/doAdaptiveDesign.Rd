@@ -2,37 +2,44 @@
 % Please edit documentation in R/doAdaptiveDesign.R
 \name{doAdaptiveDesign}
 \alias{doAdaptiveDesign}
-\title{A function to solve adaptive / sequential design problems on SpatialStreamNetworks}
+\title{A function to solve adaptive design problems.}
 \usage{
-\code{doAdaptiveDesign(ssn, glmssn, fixed.points, afv.column, n.points, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
+doAdaptiveDesign(ssn, new.path, n.points.per.step, legacy.sites.step, fixed.once.chosen = TRUE, utility.function, prior.parameters, ...)
 }
 \arguments{
-\item{ssn}{an object of class SpatialStreamNetwork}
+\item{ssn}{An object of class SpatialStreamNetwork. This network must have proposed sites for several time steps.}
 
-\item{new.ssn.path}{a character string specifying the ssn folder in which to store the output}
+\item{new.path}{A path to a folder where new SpatialStreamNetwork objects and intermediate results will be stored. Note that this folder should be a .ssn directory. See Details for more information about how files will be stored in this folder.}
 
-\item{glmssn}{an object of class glmssn}
+\item{n.points.per.step}{A list of vectors, which all resemble the \code{n.points} argument required by \code{\link{optimiseSSNDesign}}.}
 
-\item{fixed.points}{a numeric vector of the pids for sites which must remain fixed in the design}
+\item{legacy.sites.step}{A list of vectors, which all resemble the \code{legacy.sites} argument in \code{\link{optimiseSSNDesign}}.}
 
-\item{afv.column}{the name of the column in the SpatialStreamNetwork object that contains the additive function values}
+\item{fixed.once.chosen}{A logical. Defaults to \code{TRUE}.}
 
-\item{n.points}{the number of points to be included in the final design. This can be a single number, in which case all networks will have the same number of points. This can also be a vector with the same length as the number of networks in ssn.}
+\item{utility.function}{The utility function which should be used to select the design at each step. Only one utility function can be specified.}
 
-\item{utility.function}{a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions, including \code{\link{sequentialDOptimality}}, \code{\link{KOptimality}}, and \code{\link{sequentialCPOptimality}}.}
+\item{prior.parameters}{A list of}
 
-\item{prior.parameters}{a function to act as a prior for covariance parameter values}
+\item{...}{Additional arguments to \code{\link{optimiseSSNDesign}}.}
 
-\item{n.draws}{a numeric value for the number of Monte Carlo draws to take when evaluating potential designs}
-
-\item{extra.arguments}{a list of any extra parameters which can be used to control the behaviour of this function or the utility function}
+\item{glmssn}{An object of class \code{glmssn}. This must be the 'true' model that will be used in all adaptive design steps.}
 }
 \value{
-An object of class SpatialStreamNetwork. The SSNPoints for the obspoints slot will be updated to reflect the selected design.
+A list of SSNdesign lists, which are the outputs of \code{\link{optimiseSSNDesign}}. There will be ... Any files will also remain in the folder specified by \code{new.path}.  
+
+ @details 
+ 
+ Something which is no doubt very important.
+ 
+ @examples 
+ 
+ \dontrun{#CODE}
+ 
+ @export
 }
 \description{
-Finds an optimal design consisting of a specified number of points on a SpatialStreamNetwork, given a set of sites that must remain fixed.
-}
-\details{
-This function implements the greedy exchange algorithm per Falk et al. (2014) to quickly find an optimal design from a set of sites. The algorithm does not always discover the absolute best design; however, even when this occurs, the algorithm will quickly discover a reasonably effective design.
+This function is a wrapper for \code{\link{optimiseSSNDesign}}, \code{\link{splitSSNSites}} and \code{\link{spliceSSNSites}}. It uses these functions in a way that automates the adaptive design process.
+
+The adaptive design process used in this function is called myopic design ().
 }
