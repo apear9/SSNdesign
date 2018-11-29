@@ -1,5 +1,5 @@
 Package: SSNdesign
-Title: An R package for optimal and adaptive sampling designs for stream networks
+Title: An R package for optimal and adaptive sampling designs on stream networks
 Version: 0.0.0.9000
 Authors@R: c(
   person("Alan", "Pearse", email = "ar.pearse@qut.edu.au", role = c("aut", "cre")),
@@ -7,16 +7,15 @@ Authors@R: c(
   person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut")),
   person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut"))
   )
-Description: Adaptive sampling design on stream networks.
-Depends: R (>= 3.4.2), SSN, doParallel, spsurvey
+Description: Pseudo-Bayesian optimal and adaptive sampling design on stream networks.
+Depends: R (>= 3.4.2), SSN, doParallel, doRNG, spsurvey, shp2graph
 License: GPL-2
 Imports:
   SSN,
   doParallel,
-  dplyr,
-  ggplot2, 
   rgdal,
-  igraph
+  igraph,
+  doRNG
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
