@@ -1,53 +1,76 @@
 #' A dual utility function for optimal designs for prediction with estimated covariance and fixed effects parameters.
 #' 
 #'@description
-#'\code{EKoptimality} is a utility function that can be used with either \code{\link{findOptimalDesign}} or \code{\link{doAdaptiveDesign}}. It is a utility function that minimises the total kriging variance over a set of prediction points given a set of design points.
+#'
+#' The function \code{EKoptimality} implements the EK-optimal utility function from Falk et al. (2014). This is appropriate for both optimal and adaptive design problems.
+#' 
+#' This function can be used with \code{\link{optimiseSSNDesign}}.
 #' 
 #'@usage
 #'
 #'\code{EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
 #'
-#'@param ssn An object of class SpatialStreamNetwork
-#'@param glmssn An model object of class glmssn.
-#'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
-#'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
-#'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
-#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
-#'@return A numeric scalar.
-#'  
+#' @param ssn An object of class SpatialStreamNetwork
+#' @param glmssn A fitted model object of class glmssn.
+#' @param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
+#' @param prior.parameters A list of random functions that are parameterised in terms of n.draws.
+#' @param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
+#' @param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.
+#' @return A single number representing the expected utility for the design specified by \code{design.points}.
+#' 
 #'@details 
 #'
-#'This function implements the K-optimal design for prediction discussed in Som et al. (2014). This utility assumes the covariance parameters are unknown to the user and must be empirically estimated. The method has been slightly modified to accommodate the Monte Carlo draws which are used to approximate the utility given prior information on the covariance parameters. See \code{\link{KOptimality}} for a modified version of this utility where the covariance parameters are known and need not be estimated from the data. 
+#' The utility function is
+#' 
+#' \deqn{U(d, \theta, y) = (\sum_{i = 1}^n Var(\hat{y}_i))^{-1}}{U(d, \theta, y) = SUM(VAR(\hat{Y}_i))}
 #'  
+#' That is, it is the inverse sum of the estimated kriging variances for a set of prediction sites with indices \eqn{i = 1, 2, ..., n}. 
+#' 
+#' One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
+#'
+#'@examples
+#'
+#'\dontrun{
+#' # Create stream network
+#' s <- createSSN(100, systematicDesign(0.25), systematicDesign(0.25), paste(tempdir(), "s.ssn", sep = "/"), TRUE)
+#' createDistMat(s, "preds", TRUE, TRUE)
+#' 
+#' # Simulate data on network
+#' s <- SimulateOnSSN(s, getSSNdata.frame(s), getSSNdata.frame(s, "preds"), "preds", formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+#' 
+#' # Fit a model to the simulated data
+#' m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
+#' 
+#' # Define the priors on the covariance parameters
+#' p <- constructLogNormalCovPriors(m)
+#' 
+#' # Find the optimal design using D-optimality as the utility function
+#' r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = EKOptimality, prior.parameters = p)
+#' 
+#' # Plot result to check
+#' plot(r$ssn.new, "Sim_Values")
+#' }
 #'@export
 EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  # t1 <- Sys.time()
+  
+  # Copy ssn
+  ssn2 <- ssn
+
   # Cut down SSN to contain only the design and prediction points
+  ind.x <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
+  ind.c <- row.names(ssn@obspoints@SSNPoints[[1]]@point.coords) %in% design.points
+  ind.n <- row.names(ssn@obspoints@SSNPoints[[1]]@network.point.coords) %in% design.points
+  ssn2@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind.n, ]
+  ssn2@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind.c, ]
+  ssn2@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.x, ] 
   
-  ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
-  ssn@obspoints@SSNPoints[[1]]@network.point.coords <- ssn@obspoints@SSNPoints[[1]]@network.point.coords[ind, ]
-  ssn@obspoints@SSNPoints[[1]]@point.coords <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
-  ssn@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind, ]
-  
-  # Get model matrix anyway
-  
-  ind <- row.names(glmssn$sampinfo$X) %in% design.points
-  X <- glmssn$sampinfo$X[ind, ]
-  Xt <- t(X)
-  cds.obs <- ssn@obspoints@SSNPoints[[1]]@point.coords
-  colnames(cds.obs) <- c("x", "y")
-  
-  # Get info for the pred sites
-  # this.net <- ssn@obspoints@SSNPoints[[1]]@point.data$netID[ind][1]
-  # ind <- ssn@predpoints@SSNPoints[[1]]@point.data$netID == this.net
-  
-  indp <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
-  # X0 <- t(model.matrix(glmssn$args$formula, ssn@predpoints@SSNPoints[[1]]@point.data[indp, ]))
-  cds.prd <- ssn@predpoints@SSNPoints[[1]]@point.coords[indp, ]
+  # Cut down SSN pred points similarly
+  #indp.x <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
+  indp.c <- row.names(ssn@predpoints@SSNPoints[[1]]@point.coords) %in% row.names(extra.arguments$Matrices.prd$d)
+  cds.prd <- ssn2@predpoints@SSNPoints[[1]]@point.coords[indp.c, ]
   colnames(cds.prd) <- c("x", "y")
   
-  ## Get other model parameters
-  
+  # Get other model parameters
   td <- glmssn$args$useTailDownWeight
   cm <- glmssn$args$CorModels
   un <- glmssn$args$use.nugget
@@ -55,7 +78,6 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   re <- glmssn$sampInfo$REs
   
   # Cut down matrices involving the observations
-  
   mat <- extra.arguments$Matrices.Obs
   ind.mat <- row.names(mat$d) %in% design.points
   mat$d <-  mat$d[ind.mat, ind.mat]
@@ -75,36 +97,24 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   net.zero.pxo <- extra.arguments$net.zero.pxo[ind.mat, ]
   
   # Simulate parameters as required
-  
   cvp.cols <- length(glmssn$estimates$theta)
   cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  
   for(i in 1:cvp.cols){
-    
     cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
-    
   }
-  
   fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
   fep <- unname(fep)
   
   # Estimate utility
-  
   EK <- vector("numeric", n.draws)
-  
   mod.formula <- as.character(glmssn$args$formula)
   nterms <- length(mod.formula)
   mod.formula <- as.formula(mod.formula[c(1, 3:nterms)])
-  
   for(i in 1:n.draws){
-    
     # Simulate data from simulated FE and CovParms values
-    
- #   print("here1")
-    
     ssn.i <- SimulateOnSSN_minimal(
-      ssn.object = ssn,
-      ObsSimDF = ssn@obspoints@SSNPoints[[1]]@point.data,
+      ssn.object = ssn2,
+      ObsSimDF = ssn2@obspoints@SSNPoints[[1]]@point.data,
       PredSimDF = NULL,
       PredID = NULL,
       formula = mod.formula,
@@ -123,11 +133,7 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       matrices.predsxobs = extra.arguments$Matrices.pxo,
       net.zero.predsxobs = net.zero.pxo
     )$ssn.object
-    
     # Fit model to simulated data
-    
-   # print("here2")
-    
     mdl.tmp <- glmssn_minimal(
       formula = glmssn$args$formula,
       ssn.object = ssn.i,
@@ -144,75 +150,12 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       w = extra.arguments$Matrices.obs$w,
       n = net.zero.obs
     )
-    
     # Obtain kriging variances at prediction sites from this model
-    
-    n.preds.uncertainty <- ncol(glmssn$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 2 # based on behaviour of predict.glmssn
+    n.preds.uncertainty <- ncol(mdl.tmp$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 2 # based on behaviour of predict.glmssn
     EK.i <- predict.glmssn(mdl.tmp, "preds")$ssn.object@predpoints@SSNPoints[[1]]@point.data[,n.preds.uncertainty]^2
-    # # get estimated covariance matrix on the data
-    # 
-    # Wi <- mdl.tmp$estimates$Vi
-    
-    # get V
-    
-#    print("here3")
-    
-    # V <- SSN:::makeCovMat(
-    #   as.vector(mdl.tmp$estimates$theta), 
-    #   extra.arguments$Matrices.prd$d, 
-    #   extra.arguments$Matrices.prd$a, 
-    #   extra.arguments$Matrices.prd$b, 
-    #   extra.arguments$Matrices.prd$w, 
-    #   extra.arguments$net.zero.prd, 
-    #   cds.prd[, "x"], 
-    #   cds.prd[, "y"], 
-    #   cds.prd[, "x"], 
-    #   cds.prd[, "y"], 
-    #   td,
-    #   cm, 
-    #   un,
-    #   ua,
-    #   re
-    # )
-    # 
-    # # get C and tC
-    # 
-    # C <- SSN:::makeCovMat(
-    #   as.vector(mdl.tmp$estimates$theta), 
-    #   extra.arguments$Matrices.pxo$d, 
-    #   extra.arguments$Matrices.pxo$a, 
-    #   extra.arguments$Matrices.pxo$b, 
-    #   extra.arguments$Matrices.pxo$w, 
-    #   net.zero.pxo, 
-    #   cds.obs[, "x"], 
-    #   cds.obs[, "y"], 
-    #   cds.prd[, "x"], 
-    #   cds.prd[, "y"], 
-    #   td,
-    #   cm, 
-    #   FALSE,
-    #   ua,
-    #   re
-    # )
-    # Ct <- t(C)
-    # 
-    # # get M and Mt
-    # 
-    # M <- (X0 - Xt %*% Wi %*% C)
-    # Mt <- t(M)
-    # 
-    # # pred utility
-    # 
-    # EK.i <- V - Ct %*% Wi %*% C + Mt %*% solve(Xt %*% Wi %*% X) %*% M
-    
     # Sum, invert
-    
     EK[i] <- 1/sum(EK.i)
-    
   }
-  
   EK <- mean(EK)
-  #print(t1 - Sys.time()) #50 out of 80 sites, with 500 draws ~~ 12 minutes
   return(EK)
-  
 }

@@ -13,47 +13,36 @@
 #'@param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
 #'@param prior.parameters A list of random functions that are parameterised in terms of n.draws.
 #'@param n.draws A numeric scalar for the number of Monte Carlo draws to use when approximating the utility. 
-#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
+#'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.
 #'@return A numeric scalar.
 #' 
 #'@details
 #'
-#'Note that this function operates differently to \code{\link{DOptimality}}. The functions \code{\link{DOptimality}} and \code{\link{EDOptimality}} assume there are no sites which have already been incorporated into a design. They compute the variance-covariance matrix on the fixed effects (Som et al., 2014) for each set of simulated or esimated covariance parameters, respectively. In this sequential form, the observed variance-covariance matrix is extracted for the sites which are fixed in the design. Then the sites which are not fixed are used to estimate the expected variance-covariance matrix. The observed and expected matrices are added, before being reduced to a scalar value to serve as the utility.
+#'Note that this function operates differently to \code{DOptimality}. The functions \code{DOptimality} and \code{EDOptimality} assume there are no sites which have already been incorporated into a design. They compute the variance-covariance matrix on the fixed effects (Som et al., 2014) for each set of simulated or esimated covariance parameters, respectively. In this sequential form, the observed variance-covariance matrix is extracted for the sites which are fixed in the design. Then the sites which are not fixed are used to estimate the expected variance-covariance matrix. The observed and expected matrices are added, before being reduced to a scalar value to serve as the utility.
 #' 
 #'@export
-sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
+sequentialDOptimality_v2 <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
   # Extract out the variance-covariance matrix for the fixed effects from the glmssn object
-  obs.covb <- glmssn$estimates$covb
-  
-  # Exclude the fixed points from the set of design points
-  ind <- !(design.points %in% extra.arguments$fixed)
-  # print(sum(ind))
-  design.points <- design.points[ind]
+  old.covbi <- glmssn$estimates$covbi
   
   # Retrieve relevant design matirx
-  ind <- ssn@obspoints@SSNPoints[[1]]@point.data$pid %in% design.points
-  X <- glmssn$sampinfo$X[ind, ]
+  ind <- row.names(extra.arguments$obs.X) %in% design.points
+  X <- extra.arguments$obs.X[ind,]
   Xt <- t(X)
-  # print(ind)
-  # print(length(ind))
-  # print(sum(ind))
+  
   # Retrieve coordinates of sampling points
-  cds <- ssn@obspoints@SSNPoints[[1]]@point.coords[ind, ]
-  colnames(cds) <- c("x", "y")
+  ind <- row.names(extra.arguments$obs.C) %in% design.points
+  cds <- extra.arguments$obs.C[ind,]
   
   # Cut down distance matrices, etc.
   mat <- extra.arguments$Matrices.Obs
   ind.mat <- row.names(mat$d) %in% design.points
-  # print(ind.mat)
-  # print(length(ind.mat))
-  # print(sum(ind.mat))
   mat$d <-  mat$d[ind.mat, ind.mat]
   mat$a <-  mat$a[ind.mat, ind.mat]
   mat$b <-  mat$b[ind.mat, ind.mat] 
   mat$w <-  mat$w[ind.mat, ind.mat]
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
-  # print(dim(n.zero))
   ## Get other model parameters
   td <- glmssn$args$useTailDownWeight
   cm <- glmssn$args$CorModels
@@ -93,8 +82,8 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
     )
     
     covbi <- t(X) %*% solve(V) %*% X
-    covb <- solve(covbi)
-    D[i] <- -log(det(covb + obs.covb))
+  #  covb <- solve(covbi)
+    D[i] <- log(det(covbi + old.covbi))
     
   }
   
