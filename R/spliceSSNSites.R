@@ -2,7 +2,7 @@
 #' 
 #'@description 
 #' 
-#' This function does the reverse of \code{splitSSNSites}. Instead of separating a SpatialStreamNetwork object into different shapefiles, this function combines a set of observed points from a shapefile with an existing SSN object.
+#' This function does the reverse of \code{\link{splitSSNSites}}. Instead of separating a \code{SpatialStreamNetwork} object into different shapefiles, this function combines a set of observed points from a shapefile with an existing SSN object.
 #' 
 #'@usage 
 #' 
@@ -16,8 +16,12 @@
 #' 
 #'@details 
 #' 
-#' Good stuff. Intended for use in a workflow involving the doAdaptiveDesign function for progressively building up a design.
-#' 
+#' As for \code{splitSSNSites}, this function is wrapped by \code{\link{doAdaptiveDesign}}. While \code{doAdaptiveDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.  
+#'  
+#'@examples
+#'
+#'\dontrun{#code}
+#'  
 #'@export
 spliceSSNSites <- function(
   ssn, 
