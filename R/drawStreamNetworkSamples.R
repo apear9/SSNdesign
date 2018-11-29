@@ -1,4 +1,4 @@
-#' Construct probability-based and heuristic designs from Som et al. (2014)
+#' Construct probability-based and heuristic designs from Som et al. (2014).
 #' 
 #' @description 
 #' 
@@ -19,6 +19,10 @@
 #' @details 
 #' 
 #' STUFF.
+#' 
+#' @references 
+#' 
+#' Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
 #' 
 #' @export
 drawStreamNetworkSamples <- function(
