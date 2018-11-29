@@ -25,14 +25,13 @@ importStreams <- function(filepath, o.write = FALSE){
     Path = old.wd
   }
   setwd(paste(Path, "/", ssn.obj, sep = ""))
-  edges <- readOGR(".", "edges", verbose = FALSE, stringsAsFactors = FALSE, 
-                   integer64 = "allow.loss")
+  on.exit(setwd(old.wd))
+  edges <- readOGR(".", "edges", verbose = FALSE, stringsAsFactors = FALSE, integer64 = "allow.loss")
   rownames(edges@data) <- edges@data[, "rid"]
   if (exists("edges") == 0) {
     stop("edges.shp is missing from ", Path, " folder")
   }
-  if (getinfo.shape("edges.shp")[[2]] != 3 & getinfo.shape("edges.shp")[[2]] != 
-      13) {
+  if (getinfo.shape("edges.shp")[[2]] != 3 & getinfo.shape("edges.shp")[[2]] != 13) {
     stop("edges.shp does not have polyline geometry")
   }
   ind1 <- colnames(edges@data) == c("netID")
@@ -48,18 +47,14 @@ importStreams <- function(filepath, o.write = FALSE){
     stop("upDist is missing from streams attribute table")
   }
   if (is.factor(edges@data$netID)) {
-    edges@data$netID <- as.character(edges@data$netID)
+    edges@data$netID <- anum(edges@data$netID)
   }
-  network.line.coords <- data.frame(edges@data$netID, edges@data[, 
-                                                                 "rid"], edges@data[, "upDist"])
-  colnames(network.line.coords) <- c("NetworkID", "SegmentID", 
-                                     "DistanceUpstream")
+  network.line.coords <- data.frame(edges@data$netID, edges@data[, "rid"], edges@data[, "upDist"])
+  colnames(network.line.coords) <- c("NetworkID", "SegmentID", "DistanceUpstream")
   network.line.coords <- as.data.frame(network.line.coords)
   row.names(network.line.coords) <- row.names(edges@data)
-  network.line.coords[, 1] <- as.factor(network.line.coords[, 
-                                                            1])
-  network.line.coords[, 2] <- as.factor(network.line.coords[, 
-                                                            2])
+  network.line.coords[, 1] <- as.factor(network.line.coords[, 1])
+  network.line.coords[, 2] <- as.factor(network.line.coords[, 2])
   rm(ind1, ind2, ind3)
   op <- new("SSNPoint", network.point.coords = data.frame(NULL), 
             point.coords = matrix(nrow = 1, ncol=2), point.data = data.frame(NULL), 
@@ -67,15 +62,15 @@ importStreams <- function(filepath, o.write = FALSE){
   ops <- new("SSNPoints")
   ops@SSNPoints[[1]] <- op
   ops@ID[[1]] <- "Obs"
-  ssn <- new("SpatialStreamNetwork", edges, network.line.coords = network.line.coords, 
-             obspoints = ops, 
-             #predpoints = pps, 
-             path = paste(Path, 
-                                                             "/", ssn.obj, sep = ""))
+  ssn <- new(
+    "SpatialStreamNetwork", 
+    edges, network.line.coords = network.line.coords, 
+    obspoints = ops, 
+    path = paste(Path, "/", ssn.obj, sep = "")
+  )
   ssn@obspoints@SSNPoints[[1]]@point.data$netID <- as.factor(ssn@obspoints@SSNPoints[[1]]@point.data$netID)
   ssn@data$netID <- as.factor(ssn@data$netID)
   rm(network.line.coords, edges)
   SSN:::createBinaryID(ssn, o.write = o.write)
-  setwd(old.wd)
   return(ssn)
 }
