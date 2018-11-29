@@ -1,21 +1,3 @@
-#' Extract Shreve stream order and additive function values to observed and prediction points on a SpatialStreamNetwork
-#' 
-#'@description 
-#'
-#' This function is designed to be used internally to join the appropriate shreve stream order and additive function values to the observed and prediction points on a SpatialStreamNetwork when \code{calculateShreveStreamOrderAndAFVs()} is run.
-#' 
-#'@usage 
-#' 
-#'\code{extractShreveAndAFVs(ssn)}
-#' 
-#'@param ssn an object of class SpatialStreamNetwork
-#'@return An object of class SpatialStreamNetwork. 
-#'
-#'@details
-#'
-#'Using this function directly is not recommended.
-#'
-#'@export
 extractShreveAndAFVs <- function(ssn){
   
   # Check whether prediction sites exist
