@@ -1,7 +1,7 @@
 design.validation.fixed.effects.estimation <- function(full.ssn, designs.list, glmssn, dist.type, n.sims){
   
   ## Get true values of standard errors in the model
-  se_true <- diag(glmssn$estimates$V)
+  se_true <- diag(glmssn$estimates$covb)
   
   ## Find number of designs to validate
   
@@ -19,7 +19,7 @@ design.validation.fixed.effects.estimation <- function(full.ssn, designs.list, g
     # Simulations
     ssn.sim.i <- simulateFromSSNM(full.ssn, glmssn)
     sim.obs <- getSSNdata.frame(ssn.sim.i)
-    
+
     ## Do validation for this set of simulated data
     results.sim.i <- vector("numeric", n.designs)
     for(j in 1:n.designs){
@@ -50,20 +50,10 @@ design.validation.fixed.effects.estimation <- function(full.ssn, designs.list, g
           )
           
           # Extract se of FE out of model
-          se_fit <- diag(model$estimates$V) # Ask James whether diagonal is what I want
+          se_fit <- diag(model$estimates$covb) # Ask James whether diagonal is what I want
           
           # Calculate distance between fit and true models in terms of se of fe
           results.sim.i[j] <- dist.type(se_fit, se_true)
-          
-          # # Predict from model
-          # preds <- predict.glmssn(model, "preds")$ssn.object
-          
-          # # Calculate distance between simulated and predicted values
-          # preds.true <- getSSNdata.frame(designs.list[[j]], "preds")
-          # preds.pred <- getSSNdata.frame(preds, "preds")
-          # sim <- preds.true$SIM
-          # pred <- preds.pred$SIM
-          # results.sim.i[j] <- dist.type(sim, pred)
           
         }, 
         
