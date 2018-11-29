@@ -1,21 +1,3 @@
-#' Construct distance and net.zero matrices for a SpatialStreamNetwork with multiple networks 
-#' 
-#'@description
-#'
-#'This function combines the dist.junc matrices from each network into a single matrix.
-#'
-#'@usage
-#'
-#'\code{constructTotalMatrix(list.matrices)}
-#'
-#'@param list.matrices A list whose elements are the dist.junc matrices for each network. The networks are assumed to be in ascending numerical order.
-#'@param pxo A logical indicating whether the function is constructing the dist.junc matrix between the observed and predicted sites.
-#'@return A list of two matrices: one being the total distance matrix and the other being a binary matrix referred to as net.zero.
-#'
-#'@details
-#'This function is used internally in \code{\link{findOptimalDesign}} and \code{\link{doAdaptiveDesign}}.
-#'
-#'@export
 constructTotalMatrix <- function(list.matrices, pxo = FALSE){
   
   # Input checking
