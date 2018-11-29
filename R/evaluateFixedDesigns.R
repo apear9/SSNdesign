@@ -12,7 +12,7 @@
 #'@param glmssn an object of class glmssn
 #'@param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
 #'@param list.designs a list containing vectors of  
-#'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions, including \code{\link{DOptimality}}, \code{\link{KOptimality}}, and \code{\link{CPOptimality}}. 
+#'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions. 
 #'@param prior.parameters a function to act as a prior for covariance parameter values
 #'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs
 #'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
