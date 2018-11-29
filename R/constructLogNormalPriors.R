@@ -2,19 +2,33 @@
 #' 
 #' @description 
 #' 
-#' The main design functions in SSNdesign, \code{findOptimalDesign} and \code{doAdaptiveDesign}, require an argument specifying a list of independent priors on the covariance parameters of the 'true' model. This function can automatically construct these priors from a fitted glmssn object.
+#' The main design function in SSNdesign, \code{optimiseSSNDesign}, has an argument specifying a list of independent priors on the covariance parameters of a fitted glmssn object.
 #' 
 #' @usage 
 #' 
-#' constructLogNormalCovPriors(glmssn, std = c(0.25, 0.5))
+#' \code{constructLogNormalCovPriors(glmssn, std = c(0.25, 0.5))}
 #'
 #' @param glmssn A fitted glmssn object.
-#' @param std A numeric vector. This vector specifies the standard deviation of the log-normal priors. It can be of length 1, in which case all covariance parameters (parsill, range) will have the same value for standard deviation. Alternatively, it can be of length two, in which case the first element will be used for the partial sill parameters and the second for range parameters. Alternatively, it can be of the same length as glmssn$estimates$theta in which the elements will be matched to their corresponding parameters.
-#' @return A list whose elements are functions parameterised in terms of x. 
+#' @param std A numeric vector. This vector specifies the standard deviation of the log-normal priors. See Details for more information.
+#' @return A list whose elements are functions parameterised in terms of x, the number of Monte Carlo draws to be taken from the priors when evaluating the expected utility. 
 #' 
 #' @details 
 #' 
-#' NONE YET
+#' The argument std can be of length 1, in which case all covariance parameters (parsill, range) will have the same value for standard deviation. Alternatively, it can be of length two, in which case the first element will be used for the partial sill parameters and the second for range parameters. Alternatively, it can be of the same length as glmssn$estimates$theta in which the elements will be matched to their corresponding parameters.
+#' 
+#' @examples 
+#' 
+#' # Create SSN
+#' s <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+#' 
+#' # Simulate data
+#' s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~ 1, CorModels = c("Exponential.tailup"), CorParms = c(1, 2, 0.1), addfunccol = "addfunccol")$ssn.object
+#' 
+#' # Fit model
+#' m <- glmssn(s, formula = Sim_Values ~ 1, CorModels = c("Exponential.tailup"), addfunccol = "addfunccol")
+#' 
+#' # Construct log-normal priors
+#' p <- constructLogNormalCovPriors(m)
 #' 
 #' @export
 constructLogNormalCovPriors <- function(glmssn, std = c(0.25, 0.5)){
