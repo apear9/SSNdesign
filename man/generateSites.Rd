@@ -4,33 +4,26 @@
 \alias{generateSites}
 \title{Simulate observed and/or predicted points on an empty SpatialStreamNetwork.}
 \usage{
-\code{generateSites(ssn, edgeweights, edgeafv, obsDesign, predDesign = noPoints, importToR = FALSE)}
+generateSites(ssn, obsDesign, predDesign = SSN:::noPoints,
+  o.write = FALSE)
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}
 
-\item{edgeweights}{a string indicating the name of a column in the data slot of the SpatialStreamNetwork that is used to weight edges}
-
-\item{edgeafv}{a string indicating the name of a column in the data slot of the SpatialStreamNetwork that serves as the additive function values for the network.}
-
 \item{obsDesign}{a design function from the package SSN.}
 
-\item{predDesign}{a design function from the package SSN. By default, no prediction points are generated using the function noPoints.}
+\item{predDesign}{a design function from the package SSN. By default, no prediction points are generated using the function \code{noPoints}.}
 
-\item{importToR}{a logical value indicating whether the data for the SpatialStreamNetwork should be imported to R afresh after it has been created. Defaults to FALSE.}
+\item{o.write}{a logical indicating whether any existing observed and/or predicted sites in \code{ssn@path} should be overwritten. Defaults to \code{FALSE}.}
 }
 \value{
 An object of class SpatialStreamNetwork
 }
 \description{
-Creates observed and predicted sites on an empty SpatialStreamNetwork.
+This function takes an empty SpatialStreamNetwork and creates a set of proposed design points on the stream network.
 }
 \details{
 This function works in a similar fashion to \code{createSSN} from the package SSN. This function uses one of the design functions provided in SSN to generate a set of sites on an empty SpatialStreamNetwork. The differences with this function are that (1) this function assumes the stream network already exists and concentrates only on generating the site locations and associated data, and (2) locates the sites in physical space with physical coordinates. The function \code{createSSN} only locates sites on an abstract network which is not associated with a coordinate reference system, hence limiting its applications to real data.
+
+The new observed and/or predicted sites will appear as shapefiles in \code{ssn@path}.
 }
-\section{Warning}{
-
-
-This function is currently written such that any observed or predicted sites generated on a SpatialStreamNetwork will overwrite any existing sites. Use with extreme caution. The safest approach is to simply copy the SpatialStreamNetwork to another folder before working with it, to preserve the old files.
-}
-

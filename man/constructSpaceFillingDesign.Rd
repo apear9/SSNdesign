@@ -33,7 +33,7 @@ constructSpaceFillingDesign <- function(ssn, new.ssn.path, n.points, type = c("m
 A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
 }
 \description{
-This function finds a space-filling design on a Spatial Stream Network. It does so by optimising one of two space-filling utility functions: (1) the maximin utility function in \code{\link{spaceFillingMaximin}} or (2) the modified maximin utility proposed by Morris and Mitchell (1995) in \code{\link{spaceFillingMorrisMitchell}}. 
+This function finds a space-filling design on a Spatial Stream Network. It does so by optimising one of two space-filling utility functions: (1) the maximin utility function in \code{\link{spaceFillingMaxiMin}} or (2) the modified maximin utility proposed by Morris and Mitchell (1995) in \code{\link{spaceFillingMorrisMitchell}}. 
 
 The Greedy Exchange Algorithm is used to optimise the design.
 }
