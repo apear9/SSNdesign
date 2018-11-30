@@ -2,7 +2,7 @@
 #' 
 #' @description 
 #' 
-#' This function finds a space-filling design on a Spatial Stream Network. It does so by optimising one of two space-filling utility functions: (1) the maximin utility function in \code{\link{spaceFillingMaximin}} or (2) the modified maximin utility proposed by Morris and Mitchell (1995) in \code{\link{spaceFillingMorrisMitchell}}. 
+#' This function finds a space-filling design on a Spatial Stream Network. It does so by optimising one of two space-filling utility functions: (1) the maximin utility function in \code{\link{spaceFillingMaxiMin}} or (2) the modified maximin utility proposed by Morris and Mitchell (1995) in \code{\link{spaceFillingMorrisMitchell}}. 
 #' 
 #' The Greedy Exchange Algorithm is used to optimise the design.
 #' 
