@@ -106,13 +106,16 @@ optimiseSSNDesign <- function(
   if(!(is.null(parallelism.seed) | is.numeric(parallelism.seed))){
     stop("The argument parallelism.seed should either be left as NULL or changed to a positive integer.")
   }
-  if(parallelism.seed <= 0){
-    stop("The argument parallelism.seed must be a POSITIVE integer.")
-  }
-  if(floor(parallelism.seed) != parallelism.seed){
-    stop("The argument parallelism.seed must be an INTEGER such that floor(parallelism.seed) is equal to parallelism.seed")
+  if(is.numeric(parallelism.seed)){
+    if(parallelism.seed <= 0){
+      stop("The argument parallelism.seed must be a POSITIVE integer.")
+    }
+    if(floor(parallelism.seed) != parallelism.seed){
+      stop("The argument parallelism.seed must be an INTEGER such that floor(parallelism.seed) is equal to parallelism.seed")
+    }
   }
   
+  # Check if any points are to remain fixed
   any.fixed  <- !missing(legacy.sites)
   
   # Detect parallel options

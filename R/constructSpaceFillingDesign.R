@@ -85,11 +85,14 @@ constructSpaceFillingDesign <- function(
   if(!(is.null(parallelism.seed) | is.numeric(parallelism.seed))){
     stop("The argument parallelism.seed should either be left as NULL or changed to a positive integer.")
   }
-  if(parallelism.seed <= 0){
-    stop("The argument parallelism.seed must be a POSITIVE integer.")
-  }
-  if(floor(parallelism.seed) != parallelism.seed){
-    stop("The argument parallelism.seed must be an INTEGER such that floor(parallelism.seed) is equal to parallelism.seed")
+  
+  if(is.numeric(parallelism.seed)){
+    if(parallelism.seed <= 0){
+      stop("The argument parallelism.seed must be a POSITIVE integer.")
+    }
+    if(floor(parallelism.seed) != parallelism.seed){
+      stop("The argument parallelism.seed must be an INTEGER such that floor(parallelism.seed) is equal to parallelism.seed")
+    }
   }
   
   # Detect parallel options
@@ -128,6 +131,7 @@ constructSpaceFillingDesign <- function(
   
   # If locIDs, map locIDs to PIDs
   if(by.locID){
+    message("Multiple pids per locID have been detected. The resulting design will be for points with unique locIDs.")
     alls <- getSSNdata.frame(ssn)$locID
     lIDs <- unique(alls)
     pIDs <- getSSNdata.frame(ssn)$pid
