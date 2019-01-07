@@ -17,7 +17,7 @@
 #' 
 #'@details 
 #' 
-#'This function is wrapped by \code{\link{doAdaptiveDesign}}. The \code{doAdaptiveDesign} function should be sufficient for most adaptive design problems where this is required. However, for more bespoke applications, it may be worthwhile to use this function on its own instead. 
+#'This function is wrapped by \code{\link{optimiseSSNDesign}}. The \code{optimiseSSNDesign} function should be sufficient for most adaptive design problems where this is required. However, for more bespoke applications, it may be worthwhile to use this function on its own instead. 
 #' 
 #' @examples 
 #' 
@@ -89,8 +89,8 @@ splitSSNSites <- function(
   }
   
   ## Print
-  print(paste("Sites have been split by the variable", replication.variable))
-  print(paste("New files have been written to the folder", new.wd))
+  message(paste("Sites have been split by the variable", replication.variable))
+  message(paste("New files have been written to the folder", new.wd))
   
   ## Reset wd
   setwd(old.wd)

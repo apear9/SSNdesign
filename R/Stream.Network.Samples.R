@@ -10,14 +10,15 @@
 #' 
 #'@param ssn.list an object of class list that contains one item names "ssn.object" which is a SpatialStreamNetwork and another item named "bin.table" which is the binaryID table for the assoicated SpatialStreamNetwork
 #'@param sample.method a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"
-#'@param sample.size a numeric scaler with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.
-#'@param cluster.number a numeric scaler for the number of sampling locations contained within each clusted sample.
+#'@param sample.size a numeric scalar with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.
+#'@param use.locID a logical indicating whether sites should be selected by locID instead of pid. 
+#'@param cluster.number a numeric scalar for the number of sampling locations contained within each clusted sample.
 #'@param Wmat leftover from previous version of function when weigths matrix required as input
 #'@param DistMat leftover from previous version of function when distance matrix required as input
 #'@return a list containing a SpatialStreamNetwork for the selected samples, and a numeric vector with the selected pids
 #'  
 #'@export 
-Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...){
+Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID, cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...){
   #ssn.object
   ssn.obj<-ssn.list$ssn.object #ssn.object
   bin.table <- ssn.list$bin.table #getBIDtables(ssn.object, networks = 1:nnetwork(ssn.object))
@@ -147,7 +148,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size,cluster.nu
         cdat$Selected.Sample <- 0
         cdat$Selected.Sample[cdat$pid %in% chosen] <- 1
         
-        PID.selected<-c(PID.selected, chosen)
+        PID.selected<-c(PID.selected, chosen) # Can modify this to achieve the 'by.locID' effect
         
       }
       if(i==1){

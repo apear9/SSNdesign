@@ -16,7 +16,7 @@
 #' 
 #'@details 
 #' 
-#' As for \code{splitSSNSites}, this function is wrapped by \code{\link{doAdaptiveDesign}}. While \code{doAdaptiveDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.  
+#' As for \code{splitSSNSites}, this function is wrapped by \code{\link{optimiseSSNDesign}}. While \code{optimiseSSNDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.  
 #'  
 #'@examples
 #'

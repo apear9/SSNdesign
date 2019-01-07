@@ -401,8 +401,8 @@ optimiseSSNDesign <- function(
         
         # Evaluate utilities HERE in parallel
         n.eval <- length(designs.this.run.eval)
-        u.this.run <- foreach(i = 1:n.eval, .combine = c, .packages = c("SSN", "SSNdesign"), ...) %dopar% {
-          utility.function(ssn, glmssn, designs.this.run.eval[[i]], prior.parameters, n.draws, extra.arguments)
+        u.this.run <- foreach(x = 1:n.eval, .combine = c, .packages = c("SSN", "SSNdesign"), ...) %dopar% {
+          utility.function(ssn, glmssn, designs.this.run.eval[[x]], prior.parameters, n.draws, extra.arguments)
         }
         
         u.all <- c(u.all, u.this.run)

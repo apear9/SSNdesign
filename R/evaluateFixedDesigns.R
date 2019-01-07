@@ -4,13 +4,8 @@
 #'
 #' Evaluates the utility of a list of user-specified designs. 
 #' 
-#'@usage 
-#' 
-#' \code{evaluateFixedDesigns(ssn, glmssn, afv.column, list.designs, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
-#' 
 #'@param ssn an object of class SpatialStreamNetwork
 #'@param glmssn an object of class glmssn
-#'@param afv.column the name of the column in the SpatialStreamNetwork object that contains the additive function values
 #'@param list.designs a list containing vectors of  
 #'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions. 
 #'@param prior.parameters a function to act as a prior for covariance parameter values
@@ -26,7 +21,6 @@
 evaluateFixedDesigns <- function(
   ssn,
   glmssn, 
-  afv.column, 
   list.designs, 
   utility.function, 
   prior.parameters, 
@@ -49,6 +43,9 @@ evaluateFixedDesigns <- function(
     stop("Please choose a sensible number of draws for n.draws. Recommended values are 100 or more.")
   }
   
+  ## Get additive function values
+  afv.column <- glmssn$args$addfunccol
+  
   ## Find number of designs
   nd <- length(list.designs)
   
@@ -68,15 +65,17 @@ evaluateFixedDesigns <- function(
     )
   )
   
-  ## Extract K for greedy exchange algorithm
-  if(is.null(extra.arguments)){
-    extra.arguments <- list()
-  }
-  if(is.null(extra.arguments$K)){
-    K <- 20 
-  } else {
-    K <- extra.arguments$K
-  }
+  ## Extract model frame and coordinates of the observed points
+  ssn.obs.data <- getSSNdata.frame(ssn)
+  m.form <- glmssn$args$formula
+  m.char <- as.character(m.form)
+  m.form <- as.formula(paste(m.char[1], m.char[3]))
+  obs.X  <- model.matrix(m.form, ssn.obs.data)
+  obs.C  <- ssn@obspoints@SSNPoints[[1]]@point.coords
+  row.names(obs.X) <- row.names(obs.C) <- ssn.obs.data$pid
+  colnames(obs.C) <- c("x", "y")
+  extra.arguments$obs.X <- obs.X
+  extra.arguments$obs.C <- obs.C
   
   ## Extract important matrices for each network
   dist.junc.obs <- getStreamDistMatInOrder(ssn)
@@ -88,35 +87,66 @@ evaluateFixedDesigns <- function(
   total.mats.obs <- constructTotalMatrix(dist.junc.obs)
   extra.arguments$net.zero.obs <- total.mats.obs$net.zero
   # Process matrix to obtain important matrices
-  extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
-    total.mats.obs$d.junc,
-    ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column]
-  )
+  if(!is.null(afv.column)){
+    extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
+      total.mats.obs$d.junc,
+      ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column]
+    )
+  } else {
+    extra.arguments$Matrices.Obs <- getImportantMatrices.obs(
+      total.mats.obs$d.junc,
+      rep(1, nrow(ssn.obs.data))
+    )
+  }
   rm(total.mats.obs) # remove from memory in case it is very large
   # Do the same for prediction related matrices if needed
-  if(length(ssn@predpoints@SSNPoints) > 0){
+  if(anyPreds(ssn) > 0){
     total.mats.prd <- constructTotalMatrix(dist.junc.prd)
     extra.arguments$net.zero.prd <- total.mats.prd$net.zero
-    extra.arguments$Matrices.prd <- getImportantMatrices.obs(
-      total.mats.prd$d.junc,
-      ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
-    )
+    if(!is.null(afv.column)){
+      extra.arguments$Matrices.prd <- getImportantMatrices.obs(
+        total.mats.prd$d.junc,
+        ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
+      )
+    } else {
+      extra.arguments$Matrices.prd <- getImportantMatrices.obs(
+        total.mats.prd$d.junc,
+        rep(1, nrow(getSSNdata.frame(ssn, "preds")))
+      )
+    }
     rm(total.mats.prd)
     total.mats.pxo <- constructTotalMatrix(dist.junc.pxo, TRUE)
     extra.arguments$net.zero.pxo <- total.mats.pxo$net.zero
-    extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
-      total.mats.pxo$d.junc,
-      t(total.mats.pxo$d.junc),
-      ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column],
-      ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
-    )
+    if(!is.null(afv.column)){
+      extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
+        total.mats.pxo$d.junc,
+        t(total.mats.pxo$d.junc),
+        ssn@obspoints@SSNPoints[[1]]@point.data[, afv.column],
+        ssn@predpoints@SSNPoints[[1]]@point.data[, afv.column]
+      )
+    } else {
+      extra.arguments$Matrices.pxo <- getImportantMatrices.pxo(
+        total.mats.pxo$d.junc,
+        t(total.mats.pxo$d.junc),
+        rep(1, nrow(ssn.obs.data)),
+        rep(1, nrow(getSSNdata.frame(ssn, "preds")))
+      )
+    }
     rm(total.mats.pxo)
+    # Similarly extract the required model matrices and coordinates for the prediction points
+    prd.X <- model.matrix(m.form, getSSNdata.frame(ssn, "preds"))
+    prd.C <- ssn@predpoints@SSNPoints[[1]]@point.coords
+    row.names(prd.X) <- row.names(prd.C) <- getSSNdata.frame(ssn, "preds")$pid
+    colnames(prd.C) <- c("x", "y")
+    # Now stick these into the extra.arguments list
+    extra.arguments$prd.X <- prd.X
+    extra.arguments$prd.C <- prd.C
   }
   
   # Initialise loops by creating a list of potential sites to choose from
   is.replicated <- n.pids != n.locIDs
   if(is.replicated){
-    print("Replicates found. Mapping PIDs to locIDs...")
+    message("Replicates found. Mapping PIDs to locIDs...")
     # Create mapping from locID to pid
     all.locIDs <- as.numeric(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
     unique.locIDs <- unique(all.locIDs)
@@ -149,7 +179,7 @@ evaluateFixedDesigns <- function(
   ) 
   m[, 1] <- 1:nd 
   m[, 2] <- unlist(ndp) - size.offsets # sometimes sites in the designs aren't actually present among the locIDs...
-  
+
   ## Evaluate all designs
   for(i in 1:nd){
     U <- utility.function(
@@ -165,7 +195,7 @@ evaluateFixedDesigns <- function(
   
   # Turn into real data frame and name columns
   results.df <- data.frame(m)
-  names(results.df) <- c("ID", "Size", "Utility") 
+  names(results.df) <- c("ID", "Size", "Expected utility") 
   
   # Possibly rename elements in first column
   if(!is.null(names(list.designs))){
