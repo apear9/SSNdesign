@@ -10,16 +10,16 @@
 #' 
 #'@param ssn An object of class SpatialStreamNetwork. Its obspoints slot must contain all the potential sampling sites for the stream network. It must also contain all the covariates and other information referred to in the glmssn object. 
 #'@param new.ssn.path A path to a folder where the result can be stored. 
-#'@param glmssn An object of class glmssn. This must be a fitted model. However, this model does not need to have been fitted to the SpatialStreamNetwork data in the argument ssn.
+#'@param glmssn A fitted \code{glmssn} object. However, this model does not need to have been fitted to the SpatialStreamNetwork data in the argument ssn.
 #'@param n.points A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.
-#'@param legacy.sites A numeric, character, or factor vector indicating any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points. 
+#'@param legacy.sites A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points. 
 #'@param utility.function A function with the signature 'utility.function'. See Details for more information.
 #'@param prior.parameters A list of functions. The elements of this list specify the independent priors on the covariance parameters in the glmssn object. See Details for more information.
 #'@param n.cores The number of CPUs which should be used when running \code{optimiseSSNDesign}. This argument must agree with the argument parallelism. For example, if n.cores > 1 and \code{parallelism = "none"}, this argument will be ignored and all computations will be performed sequentially. Defaults to 1. 
-#'@param parallelism A character which must be one of "none", "windows", "linux/osx". These can be spelled with in any case or in any combination of cases. Note the argument must be selected appropriately for the operating system on the user's computer. Definitely do not select "linux/osx" when running this function on a Windows operating system. 
+#'@param parallelism Must be one of "none", "windows", or "osx/linux". These can be spelled with in any case or in any combination of cases. Note the argument must be selected appropriately for the operating system on the user's computer. Definitely do not select "linux/osx" when running this function on a Windows operating system. 
 #'@param parallelism.seed Either a numeric integer or NULL. This argument can be used to seed a random number generator which ensures reproducible calculations. This argument is effective regardless of whether parallel computations are being used.
-#'@param n.optim A numeric integer. The number of times the Greedy Exchange Algorithm (Falk et al., 2014) is iterated to find an optimal design. Any integer greater than or equal to 1 is permissible, though larger values will produce more reliable results (while multiplying run-time). Defaults to 5.
-#'@param n.draws A numeric integer. The number of Monte Carlo draws used to approximate the expected utility from the utility function per Muller (1999). Any values larger than 1 are permitted, though a minimum of 100 are recommended for the most stable results. 
+#'@param n.optim The number of times the Greedy Exchange Algorithm (Falk et al., 2014) is iterated to find an optimal design. Any integer greater than or equal to 1 is permissible, though larger values will produce more reliable results (while multiplying run-time). Defaults to 5.
+#'@param n.draws The number of Monte Carlo draws used to approximate the expected utility from the utility function per Muller (1999). Any values larger than 1 are permitted, though a minimum of 100 are recommended for the most stable results. 
 #'@param extra.arguments A list of miscellaneous arguments and values which may be used to control the behaviour of the utility.function. See Details for more information.
 #'@param ... Any additional arguments for the \code{foreach} iterator. The version of \code{foreach} from the package \code{doRNG} is used.
 #'@return A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
@@ -301,6 +301,11 @@ optimiseSSNDesign <- function(
     }
   }
   
+  # Convert all of these to numeric
+  for(q in 1:length(c.points)){
+    c.points[[q]] <- anum(c.points[[q]])
+  }
+  
   # If legacy.sites not missing, do the same for the fixed sites. Remove them from the pool of points which may be selected.
   if(any.fixed){
     x.points <- vector("list", length(n.points))
@@ -354,8 +359,9 @@ optimiseSSNDesign <- function(
           ind <- match(r.point[z], lIDs)
           r.point.eval <- c(r.point.eval, locIDs[[ind]])
         }
+        r.point.eval <- c(r.point.eval, x.point.eval)
       } else {
-        r.point.eval <- r.point
+        r.point.eval <- c(r.point, x.point.eval) 
       }
       
       # Evaluate utility once, store information
