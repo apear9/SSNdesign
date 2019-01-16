@@ -440,6 +440,7 @@ optimiseSSNDesign <- function(
   
   # Collapse results into one list
   f.p <<- unlist(f.p.nets)
+  f.p.scope <- f.p
   
   # Subset based on list
   if(by.locID){
@@ -448,8 +449,12 @@ optimiseSSNDesign <- function(
     ssn.new <- subsetSSN(ssn, new.ssn.path, pid %in% f.p)
   }
   
+  
+  # Delete the object that was assigned in the global environment
+  rm(list = "f.p", pos = ".GlobalEnv")
+  
   # Return list, subset, and diagnostics
   
-  return(list(ssn.old = ssn, ssn.new = ssn.new, final.points = f.p, utilities = f.u.nets))
+  return(list(ssn.old = ssn, ssn.new = ssn.new, final.points = f.p.scope, utilities = f.u.nets))
   
 }
