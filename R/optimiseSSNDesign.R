@@ -356,7 +356,7 @@ optimiseSSNDesign <- function(
       
       # Print progress to user
       if(verbose){
-        message(paste0("Now on iteration ", j, "out of ", n.optim))
+        message(paste0("Now on iteration ", j, " out of ", n.optim))
       }
       
       # Take random sample of points
