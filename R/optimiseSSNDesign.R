@@ -442,7 +442,7 @@ optimiseSSNDesign <- function(
       end.time <- Sys.time()
       if(verbose){
         elapsed.time <- end.time - begin.time
-        message(paste0("Iteration ", j, " took ", as.numeric(elapsed.time), " ", units(elapsed.time)))
+        message(paste0("Iteration ", j, " took ", round(as.numeric(elapsed.time), 2), " ", units(elapsed.time)))
       }
       
     }
