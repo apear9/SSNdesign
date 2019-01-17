@@ -79,7 +79,7 @@ optimiseSSNDesign <- function(
   n.optim = 5, 
   n.draws = 500,
   extra.arguments = list(),
-  verbose = TRUE
+  verbose = TRUE,
   ...
 ){
   
