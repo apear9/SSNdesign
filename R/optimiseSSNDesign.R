@@ -2,11 +2,7 @@
 #' 
 #'@description 
 #' 
-#' \code{optimiseSSNDesign} is the main workhorse function of the package \code{SSNdesign}. It works with a range of utilities to construct optimal solutions to both static and adaptive design problems.
-#' 
-#'@usage
-#' 
-#' \code{optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites, utility.function, prior.parameters, n.cores = 1, parallelism = "none", parallelism.seed = NULL, n.optim = 5, n.draws = 500, ...)}
+#' The function \code{optimiseSSNDesign} is the main workhorse function of the package \code{SSNdesign}. It works with a range of utilities to construct optimal solutions to both static and adaptive design problems.
 #' 
 #'@param ssn An object of class SpatialStreamNetwork. Its obspoints slot must contain all the potential sampling sites for the stream network. It must also contain all the covariates and other information referred to in the glmssn object. 
 #'@param new.ssn.path A path to a folder where the result can be stored. 
@@ -21,6 +17,7 @@
 #'@param n.optim The number of times the Greedy Exchange Algorithm (Falk et al., 2014) is iterated to find an optimal design. Any integer greater than or equal to 1 is permissible, though larger values will produce more reliable results (while multiplying run-time). Defaults to 5.
 #'@param n.draws The number of Monte Carlo draws used to approximate the expected utility from the utility function per Muller (1999). Any values larger than 1 are permitted, though a minimum of 100 are recommended for the most stable results. 
 #'@param extra.arguments A list of miscellaneous arguments and values which may be used to control the behaviour of the utility.function. See Details for more information.
+#'@param verbose Whether messages indicating the function's progress should be printed to the console. Defaults to \code{TRUE}.
 #'@param ... Any additional arguments for the \code{foreach} iterator. The version of \code{foreach} from the package \code{doRNG} is used.
 #'@return A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
 #' 
@@ -82,6 +79,7 @@ optimiseSSNDesign <- function(
   n.optim = 5, 
   n.draws = 500,
   extra.arguments = list(),
+  verbose = TRUE
   ...
 ){
   
@@ -157,7 +155,9 @@ optimiseSSNDesign <- function(
   
   # If locIDs, map locIDs to PIDs
   if(by.locID){
-    message("Multiple pids per locID have been detected. The resulting design will be for points with unique locIDs.")
+    if(verbose){
+      message("Multiple pids per locID have been detected. The resulting design will be for points with unique locIDs.")
+    }
     alls <- ssn.obs.data$locID
     lIDs <- unique(alls)
     pIDs <- ssn.obs.data$pid
@@ -351,6 +351,14 @@ optimiseSSNDesign <- function(
     us.per.optims <- list()
     for(j in 1:n.optim){
       
+      # Record time
+      begin.time <- Sys.time()
+      
+      # Print progress to user
+      if(verbose){
+        message(paste0("Now on iteration ", j, "out of ", n.optim))
+      }
+      
       # Take random sample of points
       r.point <- sample(c.point, n.final, FALSE)
       if(by.locID){
@@ -429,6 +437,13 @@ optimiseSSNDesign <- function(
       best.u.in.opt <- c(best.u.in.opt, u.star)
       best.in.optim <- append(best.in.optim, list(c(d.star, x.point)))
       us.per.optims <- append(us.per.optims, list(u.all))
+      
+      # Record end time and print to user
+      end.time <- Sys.time()
+      if(verbose){
+        elapsed.time <- end.time - begin.time
+        message(paste0("Iteration ", j, " took ", as.numeric(elapsed.time), " ", units(elapsed.time)))
+      }
       
     }
     
