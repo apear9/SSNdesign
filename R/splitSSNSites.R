@@ -47,6 +47,10 @@ splitSSNSites <- function(
   old.wd <- getwd()
   new.wd <- preferred.wd
   setwd(new.wd)
+  ## Reset wd on exit
+  on.exit(
+    setwd(old.wd)
+  )
   
   ## Find number of replicates in the replication variable
   rep.var <- big.ssn@obspoints@SSNPoints[[1]]@point.data[,replication.variable]
@@ -54,7 +58,7 @@ splitSSNSites <- function(
   rep.num <- length(rep.val)
   
   ## Find which value of the replication variable is smallest
-  rep.min <- sort(rep.val)[1] # most general, works for factors, character and numeric (though for characters extra care should be taken)
+  rep.min <- sort(rep.val)[1] # most general, works for factors, character and numeric
   
   ## Start splitting (observations only at this stage)
   prj.4st <- big.ssn@proj4string
@@ -71,6 +75,13 @@ splitSSNSites <- function(
   obs.ind <- big.dat[, replication.variable] == rep.min
   obs.pid <<- big.dat$pid[obs.ind]
   
+  ## Subset SSN to match the first set of sites
+  new.ssn <- suppressWarnings(suppressMessages(subsetSSN(big.ssn, new.ssn.path, subset = pid %in% obs.pid)))
+  rm(
+    list = "obs.pid", 
+    pos = ".GlobalEnv"
+  )
+  
   ## Do same for preds if they exist
   if(preds){
     prj.4st <- big.ssn@proj4string
@@ -83,26 +94,18 @@ splitSSNSites <- function(
       crd.i <- big.crd[row.names(big.crd) %in% pid.i,] # DO NOT TRUST THE ORDERING OF THE COORDINATES THESE THINGS ARE EVIL
       spd.i <- SpatialPointsDataFrame(coords = crd.i, data = dat.i, proj4string = prj.4st)
       writeOGR(spd.i, paste0("preds", i, ".shp"), paste0("preds", i), "ESRI Shapefile", overwrite_layer = TRUE)
+      if(i == 1){
+        writeOGR(spd.i, paste(new.ssn@path, "preds.shp", sep = "/"), "preds", "ESRI Shapefile", overwrite_layer = TRUE)
+        new.ssn <- suppressWarnings(suppressMessages(importSSN(new.ssn@path, "preds")))
+      }
     }
-    prd.ind <- big.dat[, replication.variable] == rep.min
-    prd.pid <<- big.dat$pid[prd.ind]
   }
   
-  ## Print
+  ## Print messages to user
   message(paste("Sites have been split by the variable", replication.variable))
   message(paste("New files have been written to the folder", new.wd))
   
-  ## Reset wd
-  setwd(old.wd)
-  
-  ## Subset SSN to match the first set of sites
-  new.ssn <- subsetSSN(big.ssn, new.ssn.path, subset = pid %in% obs.pid)
-  if(preds){
-    new.ssn <- subsetPreds(new.ssn, pid %in% prd.pid)
-  }
-  
   ## Return new ssn object
-  
   return(new.ssn)
   
 }
