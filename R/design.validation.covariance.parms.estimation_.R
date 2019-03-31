@@ -1,7 +1,4 @@
-design.validation.covariance.parms.estimation <- function(full.ssn, designs.list, glmssn, dist.type, n.sims){
-  
-  ## Get true values of cov parms
-  theta_true <- glmssn$estimates$theta
+design.validation.covariance.parms.estimation_ <- function(full.ssn, designs.list, glmssn, n.sims){
   
   ## Find number of designs to validate
   
@@ -49,11 +46,8 @@ design.validation.covariance.parms.estimation <- function(full.ssn, designs.list
             control = glmssn$args$control
           )
           
-          # Extract se of FE out of model
-          theta_fit <- model$estimates$theta # Ask James whether diagonal is what I want
-          
-          # Calculate distance between fit and true models in terms of se of fe
-          results.sim.i[j] <- dist.type(se_fit, se_true)
+          # Compute the CP-optimal utility
+          results.sim.i[j] <- log(det(solve(model$optimOutput$hessian)))
           
         }, 
         

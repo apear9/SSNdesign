@@ -1,7 +1,15 @@
-design.validation.covariance.parms.estimation <- function(full.ssn, designs.list, glmssn, dist.type, n.sims){
+design.validation.predictions_ <- function(full.ssn, designs.list, glmssn, n.sims){
   
-  ## Get true values of cov parms
-  theta_true <- glmssn$estimates$theta
+  ## Check that prediction sites are present
+  any.preds <- unlist(
+    lapply(
+      designs.list,
+      anyPreds
+    )
+  )
+  if(!all(any.preds)){
+    stop("No prediction points are present in the SpatialStreamNetwork.")
+  }
   
   ## Find number of designs to validate
   
@@ -19,6 +27,7 @@ design.validation.covariance.parms.estimation <- function(full.ssn, designs.list
     # Simulations
     ssn.sim.i <- simulateFromSSNM(full.ssn, glmssn)
     sim.obs <- getSSNdata.frame(ssn.sim.i)
+    sim.prd <- getSSNdata.frame(ssn.sim.i, "preds")
     
     ## Do validation for this set of simulated data
     results.sim.i <- vector("numeric", n.designs)
@@ -26,9 +35,13 @@ design.validation.covariance.parms.estimation <- function(full.ssn, designs.list
       
       # Extract simulated values
       rn.obs <- row.names(sim.obs)
+      rn.prd <- row.names(sim.prd)
       pid.obs <- designs.list[[j]]@obspoints@SSNPoints[[1]]@point.data$pid
+      pid.prd <- designs.list[[j]]@predpoints@SSNPoints[[1]]@point.data$pid
       ind.obs <- match(pid.obs, rn.obs)
+      ind.prd <- match(pid.prd, rn.prd)
       designs.list[[j]]@obspoints@SSNPoints[[1]]@point.data$SIM <- sim.obs$Sim_Values[ind.obs]
+      designs.list[[j]]@predpoints@SSNPoints[[1]]@point.data$SIM <- sim.prd$Sim_Values[ind.prd]
       
       # Fit model
       results.sim.i[j] <- tryCatch(
@@ -48,12 +61,12 @@ design.validation.covariance.parms.estimation <- function(full.ssn, designs.list
             trans.shift = glmssn$args$trans.shift,
             control = glmssn$args$control
           )
+          # Predict from model
+          preds <- getSSNdata.frame(predict.glmssn(model, "preds")$ssn.object)
+          preds_var <- unlist(preds[, ncol(preds)])
           
-          # Extract se of FE out of model
-          theta_fit <- model$estimates$theta # Ask James whether diagonal is what I want
-          
-          # Calculate distance between fit and true models in terms of se of fe
-          results.sim.i[j] <- dist.type(se_fit, se_true)
+          # Calculate empirical K-optimal utility
+          results.sim.i[j] <- 1/sum(preds_var^2)
           
         }, 
         

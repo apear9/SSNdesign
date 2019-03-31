@@ -2,12 +2,8 @@
 #' 
 #' @description 
 #' 
-#' This function performs validation on
-#' 
-#' @usage 
-#' 
-#' validateDesigns(designs.list, glmssn, type, dist = rmse, n.sims = 500)
-#' 
+#' This function performs validation on a 
+#'
 #' @param full.ssn An object of class SpatialStreamNetwork from which the designs were originally selected.
 #' @param designs.list A SpatialStreamNetwork objects containing the design points to be used for valdiation.
 #' @param glmssn A fitted glmssn object 
@@ -18,12 +14,10 @@
 #' 
 #' @details
 #' 
-#' The functions given to the argument dist should be functions of the form \code{function(x, y)}. They must at least accept two arguments. If the ordering of the arguments is important, then note that the simulated values are passed to the x argument and the predicted values to the y argument. 
-#' 
 #' The list of validation results returned by this function contains a matrix of dimensions m x n.sims, where m is equal to length(designs.list). The elements of this matrix represent a single validation result for one design at one simulation. It also contains a numeric vector of m elements, which are obtained by taking the rowmeans of the aforementioned matrix.
 #' 
 #' @export
-validateDesigns <- function(full.ssn, designs.list, glmssn, type, dist.type = rmse, n.sims = 500){
+validateDesigns <- function(full.ssn, designs.list, glmssn, type, n.sims = 500){
   
   # Check that type argument is not longer than one
   if(length(type) > 1){
@@ -33,19 +27,19 @@ validateDesigns <- function(full.ssn, designs.list, glmssn, type, dist.type = rm
   
   # Check that type argument is valid
   if(!(type %in% c("fixed.effects", "covariance.parms", "prediction"))){
-    stop("The argument type must be one of fixed.effects, covariance.parms or prediction")
+    stop("The argument type must be one of: fixed.effects, covariance.parms or prediction")
   }
   
   # Check what case to use
   results <- list()
   if(type == "fixed.effects"){
-    results <- design.validation.fixed.effects.estimation(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, dist.type = dist.type, n.sims = n.sims)
+    results <- design.validation.fixed.effects.estimation_(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, n.sims = n.sims)
   }
   if(type == "covariance.parms"){
-    results <- design.validation.covariance.parms.estimation(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, dist.type = dist.type, n.sims = n.sims)
+    results <- design.validation.covariance.parms.estimation_(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, n.sims = n.sims)
   }
   if(type == "prediction"){
-    results <- design.validation.predictions(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, dist.type = dist.type, n.sims = n.sims)
+    results <- design.validation.predictions_(full.ssn = full.ssn, designs.list = designs.list, glmssn = glmssn, n.sims = n.sims)
   }
   
   # RETURN

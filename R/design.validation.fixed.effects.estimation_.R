@@ -1,7 +1,7 @@
-design.validation.covariance.parms.estimation <- function(full.ssn, designs.list, glmssn, dist.type, n.sims){
+design.validation.fixed.effects.estimation_ <- function(full.ssn, designs.list, glmssn, n.sims){
   
-  ## Get true values of cov parms
-  theta_true <- glmssn$estimates$theta
+  ## Get true values of standard errors in the model
+  se_true <- diag(glmssn$estimates$covb)
   
   ## Find number of designs to validate
   
@@ -49,11 +49,9 @@ design.validation.covariance.parms.estimation <- function(full.ssn, designs.list
             control = glmssn$args$control
           )
           
-          # Extract se of FE out of model
-          theta_fit <- model$estimates$theta # Ask James whether diagonal is what I want
-          
-          # Calculate distance between fit and true models in terms of se of fe
-          results.sim.i[j] <- dist.type(se_fit, se_true)
+          # Calculate empirical D-optimal utility
+          info_mat <- model$estimates$covbi 
+          results.sim.i[j] <- log(det(info_mat))
           
         }, 
         
