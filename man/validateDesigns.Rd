@@ -4,7 +4,7 @@
 \alias{validateDesigns}
 \title{Validate designs on SpatialStreamNetworks}
 \usage{
-validateDesigns(designs.list, glmssn, type, dist = rmse, n.sims = 500)
+validateDesigns(full.ssn, designs.list, glmssn, type, n.sims = 500)
 }
 \arguments{
 \item{full.ssn}{An object of class SpatialStreamNetwork from which the designs were originally selected.}
@@ -23,10 +23,8 @@ validateDesigns(designs.list, glmssn, type, dist = rmse, n.sims = 500)
 A list of validation results. See Details for more information.
 }
 \description{
-This function performs validation on
+This function performs validation on a
 }
 \details{
-The functions given to the argument dist should be functions of the form \code{function(x, y)}. They must at least accept two arguments. If the ordering of the arguments is important, then note that the simulated values are passed to the x argument and the predicted values to the y argument. 
-
 The list of validation results returned by this function contains a matrix of dimensions m x n.sims, where m is equal to length(designs.list). The elements of this matrix represent a single validation result for one design at one simulation. It also contains a numeric vector of m elements, which are obtained by taking the rowmeans of the aforementioned matrix.
 }

@@ -24,7 +24,7 @@ This function returns an object of class SpatialStreamNetwork. This SpatialStrea
 Primarily intended to be used with the \code{\link{optimiseSSNDesign}} function, this function takes an SSN with temporal replicates across some number of sites and splits the sites into separate shapefiles based on the levels of the replication variable. This makes it easier to deal with the SSN in a statistically consistent way when performing sequential design over the network.
 }
 \details{
-This function is wrapped by \code{\link{doAdaptiveDesign}}. The \code{doAdaptiveDesign} function should be sufficient for most adaptive design problems where this is required. However, for more bespoke applications, it may be worthwhile to use this function on its own instead.
+This function is wrapped by \code{\link{optimiseSSNDesign}}. The \code{optimiseSSNDesign} function should be sufficient for most adaptive design problems where this is required. However, for more bespoke applications, it may be worthwhile to use this function on its own instead.
 }
 \examples{
 

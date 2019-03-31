@@ -22,7 +22,7 @@ An object of class SpatialStreamNetwork that contains the old and new sites.
 This function does the reverse of \code{\link{splitSSNSites}}. Instead of separating a \code{SpatialStreamNetwork} object into different shapefiles, this function combines a set of observed points from a shapefile with an existing SSN object.
 }
 \details{
-As for \code{splitSSNSites}, this function is wrapped by \code{\link{doAdaptiveDesign}}. While \code{doAdaptiveDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.
+As for \code{splitSSNSites}, this function is wrapped by \code{\link{optimiseSSNDesign}}. While \code{optimiseSSNDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.
 }
 \examples{
 

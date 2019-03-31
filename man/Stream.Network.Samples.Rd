@@ -11,9 +11,11 @@
 
 \item{sample.method}{a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"}
 
-\item{sample.size}{a numeric scaler with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.}
+\item{sample.size}{a numeric scalar with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.}
 
-\item{cluster.number}{a numeric scaler for the number of sampling locations contained within each clusted sample.}
+\item{use.locID}{a logical indicating whether sites should be selected by locID instead of pid.}
+
+\item{cluster.number}{a numeric scalar for the number of sampling locations contained within each clusted sample.}
 
 \item{Wmat}{leftover from previous version of function when weigths matrix required as input}
 

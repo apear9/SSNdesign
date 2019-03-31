@@ -4,16 +4,18 @@
 \alias{evaluateFixedDesigns}
 \title{Evaluate fixed designs}
 \usage{
-\code{evaluateFixedDesigns(ssn, glmssn, afv.column, list.designs, utility.function, prior.parameters, n.draws = 500, extra.arguments = NULL)}
+evaluateFixedDesigns(ssn, glmssn, list.designs, list.of = "pid",
+  utility.function, prior.parameters, n.draws = 1000,
+  extra.arguments = NULL)
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}
 
 \item{glmssn}{an object of class glmssn}
 
-\item{afv.column}{the name of the column in the SpatialStreamNetwork object that contains the additive function values}
+\item{list.designs}{a list containing vectors of pid or locID values. Use pid values if the sites in a design change over time.}
 
-\item{list.designs}{a list containing vectors of}
+\item{list.of}{a string (either "pid" or "locID") indicating whether the designs are expressed as vectors of pid or locID values}
 
 \item{utility.function}{a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions.}
 
@@ -24,7 +26,7 @@
 \item{extra.arguments}{a list of any extra parameters which can be used to control the behaviour of this function or the utility function}
 }
 \value{
-A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; and, Utility, the utility value.
+A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale.
 }
 \description{
 Evaluates the utility of a list of user-specified designs.

@@ -4,7 +4,8 @@
 \alias{EKOptimality}
 \title{A dual utility function for optimal designs for prediction with estimated covariance and fixed effects parameters.}
 \usage{
-\code{EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws,
+  extra.arguments)
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
