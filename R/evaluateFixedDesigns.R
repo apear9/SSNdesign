@@ -6,25 +6,27 @@
 #' 
 #'@param ssn an object of class SpatialStreamNetwork
 #'@param glmssn an object of class glmssn
-#'@param list.designs a list containing vectors of  
+#'@param list.designs a list containing vectors of pid or locID values. Use pid values if the sites in a design change over time.
+#'@param list.of a string (either "pid" or "locID") indicating whether the designs are expressed as vectors of pid or locID values
 #'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions. 
 #'@param prior.parameters a function to act as a prior for covariance parameter values
 #'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs
 #'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
-#'@return A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; and, Utility, the utility value. 
+#'@return A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale. 
 #'
 #'@details 
 #'
-#'This function takes a list of user-specified designs for a spatial stream network and evaluates some utility function over those designs. This function should be relatively fast compared to the functions which search for an optimal design. However, because this function is not parallellised, it is recommended that users limit themselves to fewer than one hundred designs. Note, this function is called internally in the design diagnostic functions.  
+#' This function takes a list of user-specified designs for a spatial stream network and evaluates some utility function over those designs. This function should be relatively fast compared to the functions which search for an optimal design. However, because this function is not parallellised, it is recommended that users limit themselves to fewer than one hundred designs. Note, this function is called internally in the design diagnostic functions.  
 #'  
 #'@export
 evaluateFixedDesigns <- function(
   ssn,
   glmssn, 
   list.designs, 
+  list.of = "pid",
   utility.function, 
   prior.parameters, 
-  n.draws = 500, 
+  n.draws = 1000, 
   extra.arguments = NULL
 ){
   # Check inputs
@@ -38,9 +40,6 @@ evaluateFixedDesigns <- function(
   }
   if(!is.numeric(n.draws) | n.draws < 1){
     stop("The argument n.draws must have a positive integer value.")
-  }
-  if(n.draws < 2){
-    stop("Please choose a sensible number of draws for n.draws. Recommended values are 100 or more.")
   }
   
   ## Get additive function values
@@ -143,10 +142,25 @@ evaluateFixedDesigns <- function(
     extra.arguments$prd.C <- prd.C
   }
   
+  # Take prior draws now, and fix these for later
+  prior.draws <- matrix()
+  if(length(prior.parameters) != 0){
+    n.parms <- length(prior.parameters)
+    prior.draws <- matrix(0, ncol = n.parms, nrow = n.draws)
+    for(parameter in 1:n.parms){
+      prior.draws[, parameter] <- prior.parameters[[parameter]](n.draws)
+    }
+  }
+  # As required for ED and EK optimality
+  fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
+  fep <- unname(fep)
+  extra.arguments$Empirical.FEP <- fep
+  
   # Initialise loops by creating a list of potential sites to choose from
-  is.replicated <- n.pids != n.locIDs
+  # is.replicated <- n.pids != n.locIDs
+  is.replicated <- list.of != "pid"
   if(is.replicated){
-    message("Replicates found. Mapping PIDs to locIDs...")
+    message("Mapping PIDs to locIDs...")
     # Create mapping from locID to pid
     all.locIDs <- as.numeric(as.character(ssn@obspoints@SSNPoints[[1]]@point.data$locID))
     unique.locIDs <- unique(all.locIDs)
@@ -179,14 +193,14 @@ evaluateFixedDesigns <- function(
   ) 
   m[, 1] <- 1:nd 
   m[, 2] <- unlist(ndp) - size.offsets # sometimes sites in the designs aren't actually present among the locIDs...
-
+  
   ## Evaluate all designs
   for(i in 1:nd){
     U <- utility.function(
       ssn,
       glmssn,
       list.designs[[i]],
-      prior.parameters, 
+      prior.draws, 
       n.draws,
       extra.arguments
     )
@@ -201,6 +215,11 @@ evaluateFixedDesigns <- function(
   if(!is.null(names(list.designs))){
     results.df[, 1] <- names(list.designs)
   }
+  
+  # Compute efficiencies
+  max.exp <- max(results.df$`Expected utility`)
+  results.df$Efficiency <- results.df$`Expected utility`/max.exp
+  results.df$Efficiency_Unlogged <- exp(results.df$`Expected utility` - max.exp)
   
   # Spit out the results
   return(results.df)
