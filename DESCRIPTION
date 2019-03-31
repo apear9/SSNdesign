@@ -8,13 +8,14 @@ Authors@R: c(
   person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut"))
   )
 Description: Pseudo-Bayesian optimal and adaptive sampling design on stream networks.
-Depends: R (>= 3.4.2), SSN, doParallel, doRNG, spsurvey, shp2graph
+Depends: R (>= 3.5.0), SSN, doParallel, doRNG, spsurvey, shp2graph
 License: GPL-2
 Imports:
   SSN,
   doParallel,
   rgdal,
   igraph,
+  shp2graph,
   doRNG
 Encoding: UTF-8
 LazyData: true
