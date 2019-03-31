@@ -32,6 +32,9 @@ drawStreamNetworkSamples <- function(
   ...
 ){
   
+  # Check whether prediction sites present
+  has.preds <- anyPreds(ssn)
+  
   # Check inputs
   opts <- c(
     "SRS",
@@ -83,10 +86,16 @@ drawStreamNetworkSamples <- function(
   )
   
   # Reimport from new path
-  result.final <- importSSN(
-    new.ssn.path,
-    o.write = overwrite.path
-  )
+  if(has.preds){
+    result.final <- importSSN(
+      new.ssn.path,
+      "preds"
+    )
+  } else {
+    result.final <- importSSN(
+      new.ssn.path
+    )
+  }
   
   # Return result
   return(result.final)
