@@ -45,13 +45,12 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Simulate parameters as required
-  cvp.cols <- length(glmssn$estimates$theta)
-  cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  for(i in 1:cvp.cols){
-    cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
-  }
-  fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
-  fep <- unname(fep)
+  # cvp.cols <- length(glmssn$estimates$theta)
+  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
+  # for(i in 1:cvp.cols){
+  #   cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
+  # }
+  fep <- extra.arguments$Empirical.FEP
   
   # Extract model formula
   mod.formula <- as.character(glmssn$args$formula)
@@ -73,7 +72,7 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
       coefficients = fep[i, ],
       CorModels = glmssn$args$CorModels,
       use.nugget = glmssn$args$use.nugget,
-      CorParms = cvp[i, ],
+      CorParms = prior.parameters[i, ],
       use.anisotropy = glmssn$args$use.anisotropy,
       addfunccol = glmssn$args$addfunccol,
       useTailDownWeight = glmssn$args$useTailDownWeight,

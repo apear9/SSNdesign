@@ -71,8 +71,8 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   ## Simulate covariance parameters
-  cvp.cols <- length(glmssn$estimates$theta)
-  cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
+  # cvp.cols <- length(glmssn$estimates$theta)
+  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
   
   ## Get other model parameters
   td <- glmssn$args$useTailDownWeight
@@ -82,9 +82,9 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   re <- glmssn$sampInfo$REs
   
   ## Simulate covparms from priors
-  for(i in 1:cvp.cols){
-    cvp[, i] <- prior.parameters[[i]](n.draws)
-  }
+  # for(i in 1:cvp.cols){
+  #   cvp[, i] <- prior.parameters[[i]](n.draws)
+  # }
   
   ## Perform MC simulations
   FIM <- vector("numeric", n.draws)
@@ -100,7 +100,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   for(i in 1:n.draws){
     
     # Get covariance matrix on the data
-    theta.i <- cvp[i, ]
+    theta.i <- prior.parameters[i, ]
     V <- SSN:::makeCovMat(
       theta.i, 
       mat$d, 

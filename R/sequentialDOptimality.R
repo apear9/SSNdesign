@@ -46,19 +46,19 @@ sequentialDOptimality <- function(ssn, glmssn, design.points, prior.parameters, 
   ua <- glmssn$args$use.anisotropy
   re <- glmssn$sampInfo$REs
   
-  ## Simulate covparms from priors
-  cvp.cols <- length(glmssn$estimates$theta)
-  cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  for(i in 1:cvp.cols){
-    cvp[, i] <- prior.parameters[[i]](n.draws)
-  }
+  # ## Simulate covparms from priors
+  # cvp.cols <- length(glmssn$estimates$theta)
+  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
+  # for(i in 1:cvp.cols){
+  #   cvp[, i] <- prior.parameters[[i]](n.draws)
+  # }
   
   ## Perform MC simulations
   D <- vector("numeric", n.draws)
   
   for(i in 1:n.draws){
     
-    theta.i <- cvp[i, ]
+    theta.i <- prior.parameters[i, ]
     V <- SSN:::makeCovMat(
       theta.i, 
       mat$d, 

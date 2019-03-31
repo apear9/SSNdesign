@@ -89,27 +89,13 @@ DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   ua <- glmssn$args$use.anisotropy
   re <- glmssn$sampInfo$REs
   
-  ## Get simulated covariance parameters
-  
-  cvp.cols <- length(glmssn$estimates$theta)
-  cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  
-  ## Simulate covparms from priors
-  
-  for(i in 1:cvp.cols){
-    
-    cvp[, i] <- prior.parameters[[i]](n.draws)
-    
-  }
-  
   ## Perform MC simulations
   
   D <- vector("numeric", n.draws)
   
   for(i in 1:n.draws){
     
-    theta.i <- cvp[i, ]
-    #print(n.zero)
+    theta.i <- prior.parameters[i, ]
     V <- SSN:::makeCovMat(
       theta.i, 
       mat$d, 

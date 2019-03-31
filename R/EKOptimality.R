@@ -6,10 +6,6 @@
 #' 
 #' This function can be used with \code{\link{optimiseSSNDesign}}.
 #' 
-#'@usage
-#'
-#'\code{EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
-#'
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn A fitted model object of class glmssn.
 #' @param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
@@ -96,14 +92,8 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   extra.arguments$Matrices.pxo <- mat
   net.zero.pxo <- extra.arguments$net.zero.pxo[ind.mat, ]
   
-  # Simulate parameters as required
-  cvp.cols <- length(glmssn$estimates$theta)
-  cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  for(i in 1:cvp.cols){
-    cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
-  }
-  fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
-  fep <- unname(fep)
+  # Get simulated empirical fixed effects to generate prior predictive datasets
+  fep <- extra.arguments$Empirical.FEP
   
   # Estimate utility
   EK <- vector("numeric", n.draws)
@@ -121,7 +111,7 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       coefficients = fep[i, ],
       CorModels = glmssn$args$CorModels,
       use.nugget = glmssn$args$use.nugget,
-      CorParms = cvp[i, ],
+      CorParms = prior.parameters[i, ],
       use.anisotropy = glmssn$args$use.anisotropy,
       addfunccol = glmssn$args$addfunccol,
       useTailDownWeight = glmssn$args$useTailDownWeight,
@@ -151,11 +141,33 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
       n = net.zero.obs
     )
     # Obtain kriging variances at prediction sites from this model
-    n.preds.uncertainty <- ncol(mdl.tmp$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 2 # based on behaviour of predict.glmssn
-    EK.i <- predict.glmssn(mdl.tmp, "preds")$ssn.object@predpoints@SSNPoints[[1]]@point.data[,n.preds.uncertainty]^2
+    n.preds.uncertainty <- ncol(mdl.tmp$ssn.object@predpoints@SSNPoints[[1]]@point.data) + 1 # based on behaviour of predict.glmssn
+    EK.i <- predict.glmssn_minimal(
+      mdl.tmp,
+      extra.arguments$Matrices.obs$a,
+      extra.arguments$Matrices.obs$b,
+      extra.arguments$Matrices.obs$w,
+      net.zero.obs,
+      extra.arguments$Matrices.obs$d,
+      ssn2@obspoints@SSNPoints[[1]]@point.coords,
+      extra.arguments$Matrices.prd$a,
+      extra.arguments$Matrices.prd$b,
+      extra.arguments$Matrices.prd$w,
+      net.zero.prd,
+      extra.arguments$Matrices.prd$d,
+      cds.prd,
+      extra.arguments$Matrices.pxo$a,
+      extra.arguments$Matrices.pxo$b,
+      extra.arguments$Matrices.pxo$w,
+      net.zero.pxo,
+      extra.arguments$Matrices.pxo$d
+    )$ssn.object@predpoints@SSNPoints[[1]]@point.data[,n.preds.uncertainty]^2
     # Sum, invert
-    EK[i] <- 1/sum(EK.i)
+    EK[i] <- 1/sum(EK.i[!is.nan(EK.i)])
   }
-  EK <- mean(EK)
-  return(EK)
+  if(any(is.nan(EK))){
+    return(c(-1e9))
+  } else {
+    return(mean(EK))
+  }
 }
