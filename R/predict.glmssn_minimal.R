@@ -1,24 +1,47 @@
-predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, d.hydro.obs, cds.obs,
-                           a.mat.prd, b.mat.prd, w.mat.prd, n.zero.prd, d.hydro.prd, cds.prd, yeet){
-  if(length(object$estimates$Warnlog) > 0 &&
-     length(grep("Algorithm diverging",object$estimates$Warnlog)) > 0)
+predict.glmssn_minimal <- function(
+  object, 
+  a.mat.obs, 
+  b.mat.obs, 
+  w.mat.obs, 
+  n.zero.obs, 
+  d.hydro.obs, 
+  cds.obs,
+  a.mat.prd, 
+  b.mat.prd, 
+  w.mat.prd, 
+  n.zero.prd, 
+  d.hydro.prd, 
+  cds.prd,
+  a.mat.pxo,
+  b.mat.pxo,
+  w.mat.pxo,
+  n.zero.pxo,
+  d.hydro.pxo
+){
+  if(
+    length(object$estimates$Warnlog) > 0 && length(grep("Algorithm diverging",object$estimates$Warnlog)) > 0
+  ){
     stop("No predictions for diverging algorithm")
+  }
   datao <- object$ssn.object@obspoints@SSNPoints[[1]]@point.data
-  ocoord <- object$ssn.object@obspoints@SSNPoints[[1]]@point.coords
+  # ocoord <- object$ssn.object@obspoints@SSNPoints[[1]]@point.coords
+  datap <- object$ssn.object@predpoints@SSNPoints[[1]]@point.data
+  # pcoord <- object$ssn.object@predpoints@SSNPoints[[1]]@point.coords
   theta <- object$estimates$theta
   ind <- object$sampinfo$ind.obs
   nobs <- length(ind)
   CorModels <- object$args$CorModels
   useTailDownWeight <-object$args$useTailDownWeight
   REs <- object$sampinfo$REs
-  distord <- order(as.integer(as.character(datao[,"netID"])),
-                   datao[,"pid"])
-  
-  a.mat <- a.mat
-  b.mat <- b.mat
-  net.zero <- n.zero
-  w.matrix <- w.mat
-  dist.hydro <- d.hydro
+  distord <- order(as.integer(as.character(datao[,"netID"])),datao[,"pid"])
+  distordp <- order(as.integer(as.character(datap[,"netID"])),datap[,"pid"])
+  a.mat <- a.mat.pxo
+  b.mat <- b.mat.pxo
+  net.zero <- n.zero.pxo
+  w.matrix <- w.mat.pxo
+  dist.hydro <- d.hydro.pxo
+  ocoord <- cds.obs
+  pcoord <- cds.prd
   xcoord <- NULL
   ycoord <- NULL
   xyobs <- NULL
@@ -49,39 +72,33 @@ predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, 
     for(ii in 1:length(REnames)){
       #we'll add "o" to observed levels and "p" to prediction
       # levels so create all possible levels
-      plevels <- unique(c(levels(PredSimDF[,REnames[[ii]]]),
-                          paste("o",levels(ObsSimDF[,REnames[[ii]]]),sep = ""),
-                          paste("p",levels(PredSimDF[,REnames[[ii]]]),sep = "")))
+      plevels <- unique(
+        c(
+          levels(PredSimDF[,REnames[[ii]]]),
+          paste("o",levels(ObsSimDF[,REnames[[ii]]]),sep = ""),
+          paste("p",levels(PredSimDF[,REnames[[ii]]]),sep = "")
+        )
+      )
       # sites with prediction levels same as observation levels
       pino <- PredSimDF[,REnames[[ii]]] %in% ObsSimDF[,REnames[[ii]]]
       #add "o" to observed levels
-      ObsSimDF[,REnames[[ii]]] <- paste("o",
-                                        ObsSimDF[,REnames[[ii]]], sep = "")
-      ObsSimDF[,REnames[[ii]]] <- as.factor(as.character(
-        ObsSimDF[,REnames[[ii]]]))
+      ObsSimDF[,REnames[[ii]]] <- paste("o", ObsSimDF[,REnames[[ii]]], sep = "")
+      ObsSimDF[,REnames[[ii]]] <- as.factor(as.character(ObsSimDF[,REnames[[ii]]]))
       #add all possible levels to prediction data frame
       levels(PredSimDF[,REnames[[ii]]]) <- plevels
       # add "o" to prediction sites with observation levels
-      if(any(pino)) PredSimDF[pino,REnames[[ii]]] <- paste("o",
-                                                           PredSimDF[pino,REnames[[ii]]], sep = "")
+      if(any(pino)) PredSimDF[pino,REnames[[ii]]] <- paste("o",PredSimDF[pino,REnames[[ii]]], sep = "")
       # add "p" to all predicition sites without observation levels
-      if(any(!pino)) PredSimDF[!pino,REnames[[ii]]] <- paste("p",
-                                                             PredSimDF[!pino,REnames[[ii]]], sep = "")
-      PredSimDF[,REnames[[ii]]] <- as.factor(as.character(
-        PredSimDF[,REnames[[ii]]]))
+      if(any(!pino)) PredSimDF[!pino,REnames[[ii]]] <- paste("p",PredSimDF[!pino,REnames[[ii]]], sep = "")
+      PredSimDF[,REnames[[ii]]] <- as.factor(as.character(PredSimDF[,REnames[[ii]]]))
       # now get down to just levels with "o" & "p" added
-      blevels <- unique(c(levels(ObsSimDF[,REnames[[ii]]]),
-                          levels(PredSimDF[,REnames[[ii]]])))
-      ObsSimDF[,REnames[[ii]]] <- factor(ObsSimDF[,REnames[[ii]]],
-                                         levels = blevels, ordered = FALSE)
-      PredSimDF[,REnames[[ii]]] <- factor(PredSimDF[,REnames[[ii]]],
-                                          levels = blevels, ordered = FALSE)
+      blevels <- unique(c(levels(ObsSimDF[,REnames[[ii]]]), levels(PredSimDF[,REnames[[ii]]])))
+      ObsSimDF[,REnames[[ii]]] <- factor(ObsSimDF[,REnames[[ii]]], levels = blevels, ordered = FALSE)
+      PredSimDF[,REnames[[ii]]] <- factor(PredSimDF[,REnames[[ii]]], levels = blevels, ordered = FALSE)
       # now ordering of factors in Z matrices should be compatible
       # with obs x obs Z matrices
-      REOs[[ii]] <- model.matrix(~ObsSimDF[distord,
-                                           REnames[[ii]]] - 1)
-      REPs[[ii]] <- model.matrix(~PredSimDF[,
-                                            REnames[[ii]]] - 1)
+      REOs[[ii]] <- model.matrix(~ObsSimDF[distord, REnames[[ii]]] - 1)
+      REPs[[ii]] <- model.matrix(~PredSimDF[, REnames[[ii]]] - 1)
       rownames(REOs[[ii]]) <- datao[distord,"pid"]
       rownames(REPs[[ii]]) <- datap[,"pid"]
       if(any(rownames(REOs[[ii]])!=rownames(a.mat)))
@@ -90,10 +107,9 @@ predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, 
         stop("rownames RE for preds do not match colnames of a.mat")
     }
     ## corresponding block matrix
-    for(ii in 1:length(REnames)) REPs[[ii]] <-
-      REOs[[ii]] %*% t(REPs[[ii]])
+    for(ii in 1:length(REnames)) REPs[[ii]] <- REOs[[ii]] %*% t(REPs[[ii]])
   }
-  Vpred <- makeCovMat(theta = theta, dist.hydro = dist.hydro,
+  Vpred <- SSN:::makeCovMat(theta = theta, dist.hydro = dist.hydro,
                       a.mat = a.mat, b.mat = b.mat, w.matrix = w.matrix,
                       net.zero = net.zero, x.row = x.samp, y.row = y.samp,
                       x.col = x.pred, y.col = y.pred,
@@ -150,10 +166,8 @@ predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, 
     beta.hat <- object$estimates$betahat
     eta.hatp <- Xpred[ind.allcov,] %*% beta.hat
     eta.hato <- Xobs %*% beta.hat
-    #diagonal elements of Delta~^{-1} of my manuscript
     Del.ip <- as.vector(1/exp(eta.hatp))
     Del.io <- as.vector(1/exp(eta.hato))
-    #diagonal elements of A^(1/2) of my manuscript
     A.5p <- as.vector(sqrt(exp(eta.hatp)))
     A.5o <- as.vector(sqrt(exp(eta.hato)))
     Vpred <- t((Del.ip*A.5p)*t(Del.io*A.5o*Vpred))
@@ -163,14 +177,10 @@ predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, 
     beta.hat <- object$estimates$betahat
     eta.hatp <- Xpred[ind.allcov,] %*% beta.hat
     eta.hato <- Xobs %*% beta.hat
-    #diagonal elements of Delta~^{-1} of my manuscript
     Del.ip <- as.vector((1 + exp(eta.hatp))^2/exp(eta.hatp))
     Del.io <- as.vector((1 + exp(eta.hato))^2/exp(eta.hato))
-    #diagonal elements of A^(1/2) of my manuscript
-    A.5p <- as.vector(sqrt(exp(eta.hatp)/(1 +
-                                            exp(eta.hatp))^2))
-    A.5o <- as.vector(sqrt(exp(eta.hato)/(1 +
-                                            exp(eta.hato))^2/object$sampinfo$trialsvec))
+    A.5p <- as.vector(sqrt(exp(eta.hatp)/(1 + exp(eta.hatp))^2))
+    A.5o <- as.vector(sqrt(exp(eta.hato)/(1 + exp(eta.hato))^2/object$sampinfo$trialsvec))
     Vpred <- t((Del.ip*A.5p)*t(Del.io*A.5o*Vpred))
     parsilvec <- sumparsil*(A.5p*Del.ip)^2
   }
@@ -178,17 +188,28 @@ predict.glmssn <- function(object, a.mat.obs, b.mat.obs, w.mat.obs, n.zero.obs, 
   M <- rbind(Vpred, t(Xpred), parsilvec)
   XXSiXi <- Xobs %*% covb
   XSi <- t(Xobs) %*% Vi
-  pred.out <- t(apply(M, 2, UK4Apply, covb = covb,
+  # print(M)
+  # print(covb)
+  # print(XXSiXi)
+  # print(XSi)
+  # print(Vi)
+  # print(z)
+  # print(n)
+  # print(p)
+  pred.out <- t(apply(M, 2, SSN:::UK4Apply, covb = covb,
                       XXSiXi = XXSiXi, XSi = XSi, Vi = Vi, z = z, n = n, p = p))
   datap1[,response.col] <- pred.out[,1]
   datap1[,paste(response.col,".predSE", sep = "")] <- pred.out[,2]
   datap[ind.allcov,] <- datap1
+
   #put the predictions in the predicted data data.frame and return the SSN object
-  for(i in 1:length((object$ssn.object@predpoints@SSNPoints)))
-    if(object$ssn.object@predpoints@ID[i] == predpointsID){
-      object$ssn.object@predpoints@SSNPoints[[i]]@point.data <-
-        datap[order(distordp),]
-    }
+  # predpointsID <- object$ssn.object@predpoints@ID
+  # for(i in 1:length((object$ssn.object@predpoints@SSNPoints)))
+  #   if(object$ssn.object@predpoints@ID[i] == predpointsID){
+  #     object$ssn.object@predpoints@SSNPoints[[i]]@point.data <-
+  #       datap[order(distordp),]
+  #   }
+  object$ssn.object@predpoints@SSNPoints[[1]]@point.data <- datap[order(distordp), ]
   #object$args$predpointsID <- predpointsID
   #class(object) <- "glmssn.predict"
   
