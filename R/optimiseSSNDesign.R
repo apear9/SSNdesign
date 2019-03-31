@@ -10,7 +10,7 @@
 #'@param n.points A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.
 #'@param legacy.sites A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points. 
 #'@param utility.function A function with the signature 'utility.function'. See Details for more information.
-#'@param prior.parameters A list of functions. The elements of this list specify the independent priors on the covariance parameters in the glmssn object. See Details for more information.
+#'@param prior.parameters A list of functions or a matrix. If a list, the elements of this list specify the independent priors on the covariance parameters in the glmssn object. If a matrix, the matrix contains the prior draws from any kind of prior (multivariate or independent) on the covariance parameters in the \code{glmssn} object. If a matrix, then the n.draws argument will be ignored because the matrix will have as many rows as there are prior draws. See Details for more information.
 #'@param n.cores The number of CPUs which should be used when running \code{optimiseSSNDesign}. This argument must agree with the argument parallelism. For example, if n.cores > 1 and \code{parallelism = "none"}, this argument will be ignored and all computations will be performed sequentially. Defaults to 1. 
 #'@param parallelism Must be one of "none", "windows", or "osx/linux". These can be spelled with in any case or in any combination of cases. Note the argument must be selected appropriately for the operating system on the user's computer. Definitely do not select "linux/osx" when running this function on a Windows operating system. 
 #'@param parallelism.seed Either a numeric integer or NULL. This argument can be used to seed a random number generator which ensures reproducible calculations. This argument is effective regardless of whether parallel computations are being used.
@@ -18,6 +18,7 @@
 #'@param n.draws The number of Monte Carlo draws used to approximate the expected utility from the utility function per Muller (1999). Any values larger than 1 are permitted, though a minimum of 100 are recommended for the most stable results. 
 #'@param extra.arguments A list of miscellaneous arguments and values which may be used to control the behaviour of the utility.function. See Details for more information.
 #'@param verbose Whether messages indicating the function's progress should be printed to the console. Defaults to \code{TRUE}.
+#'@param record.designs Whether the function should return all the designs evaluated. This is FALSE by default and should remain FALSE for larger examples due to the incredible amount of memory this requires.
 #'@param ... Any additional arguments for the \code{foreach} iterator. The version of \code{foreach} from the package \code{doRNG} is used.
 #'@return A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
 #' 
@@ -27,7 +28,7 @@
 #' \itemize{
 #' \item n.points: this argument can be a single number or a vector. If the user supplies a single number, then, regardless of the number of isolated networks present in the ssn object, a total of n.points sites will be selected across ALL these networks. That is, the networks are not treated as separate design problems. However, if the user supplies a vector, things become more complicated. Firstly, the vector must be named. The names of the elements correspond to networks in the ssn argument and the element itself is the number of sites which should be selected within that network. The n.points argument may therefore look like this: \code{c("1" = 5, "3" = 6)}. In this example, the user is asking for 5 sites to be chosen from network 1 and 6 from network 3. It also shows that there is no need to select sites in every network. One final caveat is that no sites will appear in ssn.new for any networks which are skipped over.
 #' \item utility.function: there are a number of pre-defined utility functions such as \code{DOptimality} and \code{KOptimality}. See THIS PAGE for an exhaustive list. Instructions for creating user-defined utility functions can also be found through that link.
-#' \item prior.parameters: the number of elements in the prior.parameters list must be the same as the number of covariance parameters in the fitted \code{glmssn} which is also passed to this function. For example, if the only covariance parameter is the nugget (i.e. there is no spatial autocorrelation), then prior.parameters would be a list with one element. Each list element must be structured as an anonymous function as follows: \code{prior.parameters[[i]] <- function(x) runif(x)}. The random sample function does not have to be \code{runif}. The key message is that the function must only have a single argument, which is the number of draws to be taken from a random sample function. The function \code{\link{constructLogNormalCovPriors}} is able to construct lists of log-normal priors from \code{glmssn} objects. 
+#' \item prior.parameters: the number of elements in the prior.parameters list must be the same as the number of covariance parameters in the fitted \code{glmssn} which is also passed to this function. For example, if the only covariance parameter is the nugget (i.e. there is no spatial autocorrelation), then prior.parameters would be a list with one element. Each list element must be structured as an anonymous function as follows: \code{prior.parameters[[i]] <- function(x) runif(x)}. The random sample function does not have to be \code{runif}. The key message is that the function must only have a single argument, which is the number of draws to be taken from a random sample function. The function \code{\link{constructLogNormalPriors}} is able to construct lists of log-normal priors from \code{glmssn} objects. 
 #' \item extra.arguments: this is an argument that is mostly exploited internally by \code{optimiseSSNDesign}, since the list structure is convenient for storing myriad objects such as design and distance matrices involved in the computation of the expected utility. However, some utility functions, such as \code{CPOptimality}, have additional parameters that they expect from the extra.arguments list. In particular, \code{CPOptimality} expects extra.arguments$h, a step-size argument that it uses in the forward-finite differencing of the covariance matrix. (It needs to do this to estimate the expected Fisher information matrix, which the utility function relies on.)
 #' }
 #' @examples
@@ -48,7 +49,7 @@
 #' ## Model-fitting
 #' m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
 #' ## Construct a list of log-normal priors
-#' p <- constructLogNormalCovPriors(m1)
+#' p <- constructLogNormalPriors(m1)
 #' ## Use optimiseSSNDesign
 #' r.together <- optimiseSSNDesign(
 #'  ssn = s, new.ssn.path = paste(tempdir(), "s2.ssn", sep = "/"), glmssn = m, n.points = 25, 
@@ -80,6 +81,7 @@ optimiseSSNDesign <- function(
   n.draws = 500,
   extra.arguments = list(),
   verbose = TRUE,
+  record.designs = FALSE,
   ...
 ){
   
@@ -98,7 +100,7 @@ optimiseSSNDesign <- function(
     stop("The argument parallelism must be one of : none, windows, osx/linux.")
   }
   n.draws <- floor(n.draws)
-  if(n.draws < 2){
+  if(n.draws < 1){
     stop("The argument n.draws must be a positive integer greater than 1. Please make sure this is the case. Note that the recommended minimum value for n.draws is 100.")
   }
   if(!(is.null(parallelism.seed) | is.numeric(parallelism.seed))){
@@ -112,6 +114,9 @@ optimiseSSNDesign <- function(
       stop("The argument parallelism.seed must be an INTEGER such that floor(parallelism.seed) is equal to parallelism.seed")
     }
   }
+  
+  # Extract a bunch of information we will eventually return
+  the.call <- match.call()
   
   # Check if any points are to remain fixed
   any.fixed  <- !missing(legacy.sites)
@@ -278,6 +283,26 @@ optimiseSSNDesign <- function(
     extra.arguments$prd.C <- prd.C
   }
   
+  # Take prior draws now, and fix these for later
+  prior.draws <- matrix()
+  if(length(prior.parameters) != 0){
+    if(!is.matrix(prior.parameters)){
+      n.parms <- length(prior.parameters)
+      prior.draws <- matrix(0, ncol = n.parms, nrow = n.draws)
+      for(parameter in 1:n.parms){
+        prior.draws[, parameter] <- prior.parameters[[parameter]](n.draws)
+      }
+    } else {
+      prior.draws <- prior.parameters
+      n.draws <- nrow(prior.draws)
+    }
+    
+  }
+  # As required for ED and EK optimality
+  fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
+  fep <- unname(fep)
+  extra.arguments$Empirical.FEP <- fep
+  
   # Construct sets of candidate points
   if(by.locID){
     if(length(n.points) != 1){
@@ -349,6 +374,8 @@ optimiseSSNDesign <- function(
     best.u.in.opt <- c()
     best.in.optim <- list()
     us.per.optims <- list()
+    designs.per.optims <- list()
+    trace.per.optims <- list()
     for(j in 1:n.optim){
       
       # Record time
@@ -373,28 +400,33 @@ optimiseSSNDesign <- function(
       }
       
       # Evaluate utility once, store information
-      u <- u.star <- utility.function(ssn, glmssn, r.point.eval, prior.parameters, n.draws, extra.arguments)
+      u <- u.stars <- u.star <- max.utility <- utility.function(ssn, glmssn, r.point.eval, prior.draws, n.draws, extra.arguments)
+      u.star.old <- u.star - 0.0001 # Just to make the while loop condition true in the first instance
       r <- r.point
       
       # Initialise loop
       designs <- list(r.point)
       d.star <- designs[[1]]
       u.all <- c(u)
-      condition <- TRUE
-      while(condition){
+      while(u.star > u.star.old){
         
-        # Construct list of designs to evaluate
-        u.this.run <- c()
-        designs.this.run <- designs.this.run.eval <- list()
+        u.star.old <- u.star
+        
         for(k in 1:n.final){
           
+          # Construct list of designs to evaluate
+          u.this.run <- c()
+          designs.this.run <- designs.this.run.eval <- list()
+          
+          # Identify candidate points to exchange
           ind <- !(c.point %in% r.point) 
           not.in <- c.point[ind]
           
           # Replace k'th position with by cycling through remaining values
           for(l in 1:length(not.in)){
-            
+            # Coordinate exchange
             r.point[k] <- not.in[l]
+            # locID-pid matching if required
             if(by.locID){
               r.point.eval <- c()
               for(z in 1:n.final){
@@ -405,38 +437,41 @@ optimiseSSNDesign <- function(
             } else {
               r.point.eval <- c(r.point, x.point.eval)
             }
-            
+            # Put these in a list of designs
             designs.this.run <- append(designs.this.run, list(r.point))
             designs.this.run.eval <- append(designs.this.run.eval, list(r.point.eval))
-            
           }
           
+          # Evaluate expected utilities here
+          n.eval <- length(designs.this.run.eval)
+          u.this.run <- foreach(x = 1:n.eval, .combine = c, .packages = c("SSN", "SSNdesign"), ...) %dopar% {
+            utility.function(ssn, glmssn, designs.this.run.eval[[x]], prior.draws, n.draws, extra.arguments)
+          }
+          designs <- append(designs, designs.this.run)
+          u.all <- c(u.all, u.this.run)
+          max.utility <- max(u.this.run)
+          # Check logical condition
+          if(max.utility > u.star){
+            better.ind <- which(u.this.run == max.utility)[1]
+            # ind <- which(u.this.run == u.star)
+            d.star <- designs.this.run[[better.ind]]
+            r.point <- d.star
+            u.star <- max.utility
+          }
+          u.stars <- c(u.stars, u.star)
         }
-        
-        # Evaluate utilities HERE in parallel
-        n.eval <- length(designs.this.run.eval)
-        u.this.run <- foreach(x = 1:n.eval, .combine = c, .packages = c("SSN", "SSNdesign"), ...) %dopar% {
-          utility.function(ssn, glmssn, designs.this.run.eval[[x]], prior.parameters, n.draws, extra.arguments)
-        }
-        
-        u.all <- c(u.all, u.this.run)
-        designs <- append(designs, designs.this.run)
-        
-        # Check logical condition
-        condition <- any(u.this.run > u.star)
-        if(condition){
-          u.star <- max(u.this.run)[1]
-          ind <- which(u.this.run == u.star)
-          d.star <- designs[[ind[1]]]
-          r.point <- d.star
-        } 
-        
       }
       
       # Store best
       best.u.in.opt <- c(best.u.in.opt, u.star)
       best.in.optim <- append(best.in.optim, list(c(d.star, x.point)))
       us.per.optims <- append(us.per.optims, list(u.all))
+      
+      # Store designs that were evaluated 
+      if(record.designs) designs.per.optims <- append(designs.per.optims, list(designs))
+      
+      # Save algorithm trace
+      trace.per.optims <- append(trace.per.optims, list(u.stars))
       
       # Record end time and print to user
       end.time <- Sys.time()
@@ -464,12 +499,33 @@ optimiseSSNDesign <- function(
     ssn.new <- subsetSSN(ssn, new.ssn.path, pid %in% f.p)
   }
   
-  
   # Delete the object that was assigned in the global environment
   rm(list = "f.p", pos = ".GlobalEnv")
   
-  # Return list, subset, and diagnostics
+  # Create return list
+  if(!record.designs) designs.per.optims <- NULL
+  if(missing(legacy.sites)) legacy.sites <- numeric(0)
+  ssn.design <- list(
+    ssn.old = ssn, 
+    ssn.new = ssn.new, 
+    call = the.call,
+    glmssn = glmssn,
+    legacy.sites = legacy.sites,
+    utility.function = utility.function,
+    prior.draws = prior.draws,
+    n.draws = n.draws,
+    random.seed = parallelism.seed,
+    final.points = f.p.scope, 
+    best.designs.per.K.iteration = best.in.optim, 
+    trace.per.random.start = trace.per.optims,
+    designs = designs.per.optims,
+    utilities = f.u.nets
+  )
+  class(ssn.design) <- "ssndesign"
   
-  return(list(ssn.old = ssn, ssn.new = ssn.new, final.points = f.p.scope, utilities = f.u.nets))
+  # Return list, subset, and diagnostics
+  return(
+    ssn.design
+  )
   
 }
