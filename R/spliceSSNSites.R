@@ -55,17 +55,18 @@ spliceSSNSites <- function(
   
   ## Get proj4string from ssn
   p4s.old <- ssn@proj4string
+  no.p4s  <- is.na(p4s.old@projargs)
   
   ## Ingest the shapefile of new observed (plus maybe prediction) sites 
   lyr.obs <- tools::file_path_sans_ext(basename(splice.obs))
   shp.obs <- readOGR(dsn = splice.obs, layer = lyr.obs)
-  shp.obs <- spTransform(shp.obs, p4s.old) # project in case this has different CRS
+  if(!no.p4s) shp.obs <- spTransform(shp.obs, p4s.old) # project in case this has different CRS
   # overwrite row names with pids
   row.names(shp.obs@data) <- row.names(shp.obs@coords) <- as.character(shp.obs@data$pid)
   if(preds){
     lyr.prd <- tools::file_path_sans_ext(basename(splice.preds))
     shp.prd <- readOGR(dsn = splice.preds, layer = lyr.prd)
-    shp.prd <- spTransform(shp.prd, p4s.old) # as above
+    if(!no.p4s) shp.prd <- spTransform(shp.prd, p4s.old) # as above
     # overwrite row names with pids
     row.names(shp.prd@data) <- row.names(shp.prd@coords) <- as.character(shp.prd@data$pid)
   }
@@ -106,7 +107,13 @@ spliceSSNSites <- function(
   pid.odr <- match(sort(new.dat.obs$pid), new.dat.obs$pid)
   new.dat.obs <- new.dat.obs[pid.odr, ]
   new.crd.obs <- new.crd.obs[pid.odr, ]
-  obs.new <- SpatialPointsDataFrame(new.crd.obs, new.dat.obs, proj4string = p4s.old)
+  if(no.p4s){
+    print(row.names(new.crd.obs))
+    print(row.names(new.dat.obs))
+    obs.new <- SpatialPointsDataFrame(new.crd.obs, new.dat.obs, match.ID = FALSE)
+  }else{
+    obs.new <- SpatialPointsDataFrame(new.crd.obs, new.dat.obs, proj4string = p4s.old)
+  }
   
   ## Repeat process for preds if necessary
   if(preds){
@@ -122,7 +129,7 @@ spliceSSNSites <- function(
     frwd <- all(nam.new %in% nam.old)
     bkwd <- all(nam.old %in% nam.new)
     if(!frwd){
-      stop("Column names of new and old data for the prediction sites do not match. Please check this and adjust the names in the shapefile accordingly.")
+      stop(paste0("Column names of new and old data for the prediction sites do not match. Please check this and adjust the names in the shapefile accordingly. Currently the new column names are: ", paste(nam.new, collapse = ", "), " and the old ones are ", paste(nam.old, collapse = ", ")))
     }
     if(!bkwd){
       dat.old <- dat.old[, nam.old %in% nam.new]
@@ -134,7 +141,11 @@ spliceSSNSites <- function(
     pid.odr <- match(sort(new.dat.prd$pid), new.dat.prd$pid)
     new.dat.prd <- new.dat.prd[pid.odr, ]
     new.crd.prd <- new.crd.prd[pid.odr, ]
-    prd.new <- SpatialPointsDataFrame(new.crd.prd, new.dat.prd, proj4string = p4s.old)
+    if(no.p4s){
+      prd.new <- SpatialPointsDataFrame(new.crd.prd, new.dat.prd, match.ID = FALSE)
+    } else {
+      prd.new <- SpatialPointsDataFrame(new.crd.prd, new.dat.prd, proj4string = p4s.old)
+    }
     
   }
   
