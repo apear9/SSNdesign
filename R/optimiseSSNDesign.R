@@ -9,6 +9,7 @@
 #'@param glmssn A fitted \code{glmssn} object. However, this model does not need to have been fitted to the SpatialStreamNetwork data in the argument ssn.
 #'@param n.points A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.
 #'@param legacy.sites A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points. 
+#'@param select.by A string argument which specifies whether each pid represents a single design point or each locID. The options are "auto" (the function will autodetect whether there are multiple pids per locID and use locIDs as unique design points), "pid" or "locID". This argument defaults to "auto".
 #'@param utility.function A function with the signature 'utility.function'. See Details for more information.
 #'@param prior.parameters A list of functions or a matrix. If a list, the elements of this list specify the independent priors on the covariance parameters in the glmssn object. If a matrix, the matrix contains the prior draws from any kind of prior (multivariate or independent) on the covariance parameters in the \code{glmssn} object. If a matrix, then the n.draws argument will be ignored because the matrix will have as many rows as there are prior draws. See Details for more information.
 #'@param n.cores The number of CPUs which should be used when running \code{optimiseSSNDesign}. This argument must agree with the argument parallelism. For example, if n.cores > 1 and \code{parallelism = "none"}, this argument will be ignored and all computations will be performed sequentially. Defaults to 1. 
@@ -72,6 +73,7 @@ optimiseSSNDesign <- function(
   glmssn, 
   n.points, 
   legacy.sites,
+  select.by = "auto",
   utility.function,
   prior.parameters,
   n.cores = 1,
@@ -156,11 +158,18 @@ optimiseSSNDesign <- function(
   ssn.obs.data <- getSSNdata.frame(ssn)
   
   # Detect whether we're dealing with PIDs or locIDs
-  by.locID <- length(unique(ssn.obs.data$locID)) != length(ssn.obs.data$pid) 
+  if(select.by == "auto"){
+    by.locID <- length(unique(ssn.obs.data$locID)) != length(ssn.obs.data$pid)
+  } else if(select.by == "locID"){
+    by.locID <- TRUE
+    if(verbose) message("The argument select.by has been set to 'locID'. The resulting design will be for points with unique locIDs. Please note that this means the arguments n.points and legacy.sites will be interpreted as referring to pids also.")
+  } else {
+    by.locID <- FALSE
+  }
   
   # If locIDs, map locIDs to PIDs
   if(by.locID){
-    if(verbose){
+    if(verbose & select.by == "auto"){
       message("Multiple pids per locID have been detected. The resulting design will be for points with unique locIDs.")
     }
     alls <- ssn.obs.data$locID
@@ -243,7 +252,8 @@ optimiseSSNDesign <- function(
   m.form <- glmssn$args$formula
   m.char <- as.character(m.form)
   m.form <- as.formula(paste(m.char[1], m.char[3]))
-  obs.X  <- model.matrix(m.form, ssn.obs.data)
+  # obs.X  <- SSN:::dataXY(m.form, ssn.obs.data, glmssn$args$family, glmssn$args$trialscol, glmssn$args$trans.power, glmssn$args$trans.shift, 1:nrow(ssn.obs.data), glmssn$args$CorModels)
+  obs.X  <- model.matrix(m.form, ssn.obs.data, contrasts)
   obs.C  <- ssn@obspoints@SSNPoints[[1]]@point.coords
   row.names(obs.X) <- row.names(obs.C) <- ssn.obs.data$pid
   colnames(obs.C) <- c("x", "y")
