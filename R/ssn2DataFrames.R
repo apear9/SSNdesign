@@ -2,7 +2,7 @@
 #' 
 #' @description
 #' 
-#' This function takes a SpatialStreamNetwork and returns a list of two or three data.frame objects. The first and second data.frame objects are for the stream edges and observed points. The third data.frame is only produced when \code{preds = TRUE}. This function is intended to simplify the process of preparing a SpatialStreamNetwork to plot with ggplot2, which only accepts data.frame objects.
+#' This function takes a SpatialStreamNetwork and returns a list of one to three data.frame objects. The first data.frame object is for the stream edges and the second is for the observed points. The third data.frame is only produced when \code{preds = TRUE}. This function is intended to simplify the process of preparing a SpatialStreamNetwork to plot with ggplot2, which only accepts data.frame objects.
 #' 
 #' @param ssn An object of class SpatialStreamNetwork. 
 #' @param preds A logical to specify whether the prediction points in the SSN (if any) should be coerced to data.frame. Defaults to FALSE.
@@ -34,6 +34,7 @@ ssn2DataFrames <- function(ssn, preds = FALSE){
   if(class(ssn) != "SpatialStreamNetwork"){
     stop("ssn must be an object of class SpatialStreamNetwork")
   }
+  is.obs <- length(ssn@obspoints@SSNPoints) > 0
   if(preds){
     # Check prediction points are actually present
     is.prd <- length(ssn@predpoints@SSNPoints) > 0
@@ -42,12 +43,14 @@ ssn2DataFrames <- function(ssn, preds = FALSE){
     }
   }
   
-  # Extract prediction and observed frames, including coordinates
-  obs.cd <- ssn@obspoints@SSNPoints[[1]]@point.coords
-  obs.cd <- data.frame(obs.cd)
-  names(obs.cd) <- c("x", "y")
-  obs.df <- getSSNdata.frame(ssn)
-  obs.df <- cbind(obs.cd, obs.df)
+  if(is.obs){
+    # Extract prediction and observed frames, including coordinates
+    obs.cd <- ssn@obspoints@SSNPoints[[1]]@point.coords
+    obs.cd <- data.frame(obs.cd)
+    names(obs.cd) <- c("x", "y")
+    obs.df <- getSSNdata.frame(ssn)
+    obs.df <- cbind(obs.cd, obs.df)
+  }
   if(preds){
     prd.cd <- ssn@predpoints@SSNPoints[[1]]@point.coords
     prd.cd <- data.frame(prd.cd)
@@ -65,9 +68,11 @@ ssn2DataFrames <- function(ssn, preds = FALSE){
   
   # Assemble into list
   df.list <- list(
-    edges = edges.df,
-    obspoints = obs.df
+    edges = edges.df
   )
+  if(is.obs){
+    df.list$obspoints <- obs.df
+  }
   if(preds){
     df.list$predpoints <- prd.df
   }
