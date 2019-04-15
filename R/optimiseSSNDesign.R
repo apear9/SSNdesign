@@ -252,7 +252,11 @@ optimiseSSNDesign <- function(
   m.form <- glmssn$args$formula
   m.char <- as.character(m.form)
   m.form <- as.formula(paste(m.char[1], m.char[3]))
-  obs.X  <- SSN:::dataXY(m.form, ssn.obs.data, glmssn$args$family, glmssn$args$trialscol, glmssn$args$trans.power, glmssn$args$trans.shift, order(ssn.obs.data$pid), glmssn$args$CorModels)$Xmats$X2
+  if(m.char[3] != "1"){
+    obs.X  <- SSN:::dataXY(m.form, ssn.obs.data, glmssn$args$family, glmssn$args$trialscol, glmssn$args$trans.power, glmssn$args$trans.shift, order(ssn.obs.data$pid), glmssn$args$CorModels)$Xmats$X2
+  } else {
+    obs.X <- model.matrix(m.form, data = ssn.obs.data)
+  }
   obs.C  <- ssn@obspoints@SSNPoints[[1]]@point.coords
   row.names(obs.X) <- row.names(obs.C) <- ssn.obs.data$pid
   colnames(obs.C) <- c("x", "y")
