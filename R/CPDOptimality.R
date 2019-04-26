@@ -12,6 +12,8 @@
 #' @param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.
 #' @return A single number representing the expected utility for the design specified by \code{design.points}.
 #' 
+#' @details A value of \code{-1e9} or \code{-2e9} indicates a failure of this utility function. Usually this means either the design matrix or the covariance matrix is rank-deficient. 
+#' 
 #' @examples
 #' 
 #' \dontrun{

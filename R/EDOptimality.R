@@ -24,6 +24,8 @@
 #' 
 #' where \eqn{\hat{Var}(\beta)} is the estimated variance-covariance matrix of the fixed effects from a fitted \code{glmssn} object.
 #' 
+#' A value of \code{-1e9} indicates a failure of this utility function.
+#' 
 #' One final note: do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}. 
 #' 
 #' @examples 

@@ -21,6 +21,8 @@
 #' \deqn{U(d, \theta, y) = (\sum_{i = 1}^n Var(\hat{y}_i))^{-1}}{U(d, \theta, y) = SUM(VAR(\hat{Y}_i))}
 #'  
 #' That is, it is the inverse sum of the estimated kriging variances for a set of prediction sites with indices \eqn{i = 1, 2, ..., n}. 
+#'
+#' A value of \code{-1e9} indicates a failure of this utility function.
 #' 
 #' One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
 #'

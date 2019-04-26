@@ -26,6 +26,9 @@ A single number representing the expected utility for the design specified by \c
 \description{
 The function \code{CPDOptimality} combines the D- and CPP-optimal utility functions from Falk et al. (2014).
 }
+\details{
+A value of \code{-1e9} or \code{-2e9} indicates a failure of this utility function. Usually this means either the design matrix or the covariance matrix is rank-deficient.
+}
 \examples{
 
 \dontrun{
