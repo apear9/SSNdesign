@@ -5,7 +5,7 @@
 \title{A function to optimise designs under pseudo-Bayesian utility functions using the Greedy Exchange Algorithm}
 \usage{
 optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
-  utility.function, prior.parameters, n.cores = 1,
+  select.by = "auto", utility.function, prior.parameters, n.cores = 1,
   parallelism = "none", parallelism.seed = NULL, n.optim = 5,
   n.draws = 500, extra.arguments = list(), verbose = TRUE,
   record.designs = FALSE, ...)
@@ -20,6 +20,8 @@ optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
 \item{n.points}{A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.}
 
 \item{legacy.sites}{A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points.}
+
+\item{select.by}{A string argument which specifies whether each pid represents a single design point or each locID. The options are "auto" (the function will autodetect whether there are multiple pids per locID and use locIDs as unique design points), "pid" or "locID". This argument defaults to "auto".}
 
 \item{utility.function}{A function with the signature 'utility.function'. See Details for more information.}
 

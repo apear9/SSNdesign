@@ -15,7 +15,7 @@ ssn2DataFrames(ssn, preds = FALSE)
 A list. The list contains at least two elements. The first element will be the data.frame equivalent of the edges shapefile, obtained in the same format as the output of a \code{ggplot2::fortify()} call on a SpatialLines* object. This data.frame will also include the attributes of the edges. The second element will be data.frame equivalent of the obspoints slot in the SpatialStreamNetwork, including both the point.data and the point.coords slots. The third element will only be returned if \code{preds = TRUE}. This is the data.frame equivalent of the predpoints slot, processed in exactly the same way as the obspoint slot discussed previously.
 }
 \description{
-This function takes a SpatialStreamNetwork and returns a list of two or three data.frame objects. The first and second data.frame objects are for the stream edges and observed points. The third data.frame is only produced when \code{preds = TRUE}. This function is intended to simplify the process of preparing a SpatialStreamNetwork to plot with ggplot2, which only accepts data.frame objects.
+This function takes a SpatialStreamNetwork and returns a list of one to three data.frame objects. The first data.frame object is for the stream edges and the second is for the observed points. The third data.frame is only produced when \code{preds = TRUE}. This function is intended to simplify the process of preparing a SpatialStreamNetwork to plot with ggplot2, which only accepts data.frame objects.
 }
 \examples{
 

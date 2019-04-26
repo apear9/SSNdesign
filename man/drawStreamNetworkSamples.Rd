@@ -14,7 +14,7 @@ drawStreamNetworkSamples(ssn, new.ssn.path, overwrite.path = FALSE,
 
 \item{overwrite.path}{A logical indicating whether the ssn directory referred to in new.ssn.path should be overwritten, if it exists already. Defaults to FALSE.}
 
-\item{sample.method}{A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"}
+\item{sample.method}{A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Extreme.Clust.and.Singles", "Trib.Sets.Ext.Singles.sample", "Trib.Sets.Ext.Singles.Mouth.sample"}
 
 \item{sample.size}{A numeric scalar specifying the desired sample size.}
 
@@ -27,9 +27,6 @@ An object of class SpatialStreamNetwork. Note, any prediction points will have t
 }
 \description{
 This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs any of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
-}
-\details{
-STUFF.
 }
 \references{
 Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
