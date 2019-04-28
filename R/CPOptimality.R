@@ -24,6 +24,8 @@
 #' 
 #' where \eqn{I(\theta)} is the expected Fisher information matrix for the covariance parameters \eqn{\theta}.
 #' 
+#' A value of \code{-1e9} indicates a failure of this utility function.
+#' 
 #' One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
 #' 
 #' @examples

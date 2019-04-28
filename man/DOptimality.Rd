@@ -34,6 +34,8 @@ The utility function is
 
 where \eqn{X} is the design matrix for the model specified by \code{glmssn}, \eqn{X'} is its transpose, and \eqn{\Sigma(\theta)} is the covariance matrix for the data, which is obtained by evaluating a covariance function given a distance matrix and simulated values for the parameters \eqn{\theta}. The values of \eqn{\theta} are simulated from the priors in \code{prior.parameters}. The result will be averaged over \code{n.draws} simulations of the parameters \eqn{\theta}.
 
+A value of \code{-1e9} indicates a failure of this utility function.
+
 One final note: do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}.
 }
 \examples{
