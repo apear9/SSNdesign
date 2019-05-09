@@ -62,25 +62,25 @@ spliceSSNSites <- function(
   shp.obs <- readOGR(dsn = splice.obs, layer = lyr.obs)
   if(!no.p4s) shp.obs <- spTransform(shp.obs, p4s.old) # project in case this has different CRS
   # overwrite row names with pids
-  row.names(shp.obs@data) <- row.names(shp.obs@coords) <- as.character(shp.obs@data$pid)
+  # row.names(shp.obs@data) <- row.names(shp.obs@coords) <- as.character(shp.obs@data$pid)
   if(preds){
     lyr.prd <- tools::file_path_sans_ext(basename(splice.preds))
     shp.prd <- readOGR(dsn = splice.preds, layer = lyr.prd)
     if(!no.p4s) shp.prd <- spTransform(shp.prd, p4s.old) # as above
     # overwrite row names with pids
-    row.names(shp.prd@data) <- row.names(shp.prd@coords) <- as.character(shp.prd@data$pid)
+    # row.names(shp.prd@data) <- row.names(shp.prd@coords) <- as.character(shp.prd@data$pid)
   }
   
   ## Ingest sites of existing ssn as shapefile
   dsn.obs.old <- paste0(ssn@path, "/sites.shp")
   shp.obs.old <- readOGR(dsn.obs.old, "sites")
   # overwrite row names with pids
-  row.names(shp.obs.old@data) <- row.names(shp.obs.old@coords) <- as.character(shp.obs.old@data$pid)
+  # row.names(shp.obs.old@data) <- row.names(shp.obs.old@coords) <- as.character(shp.obs.old@data$pid)
   if(preds){
     dsn.prd.old <- paste0(ssn@path, "/preds.shp")
     shp.prd.old <- readOGR(dsn.prd.old, "preds")
     # overwrite row names with pids
-    row.names(shp.prd.old@data) <- row.names(shp.prd.old@coords) <- as.character(shp.prd.old@data$pid)
+    # row.names(shp.prd.old@data) <- row.names(shp.prd.old@coords) <- as.character(shp.prd.old@data$pid)
   }
   
   ## Recombine existing sites plus new ones (inside SSN)
@@ -104,12 +104,10 @@ spliceSSNSites <- function(
   ## Create new sites SpatialPointsDataFrame
   new.dat.obs <- rbind(dat.old, dat.new)
   new.crd.obs <- rbind(crd.old, crd.new)
-  pid.odr <- match(sort(new.dat.obs$pid), new.dat.obs$pid)
+  pid.odr <- order(new.dat.obs$pid)
   new.dat.obs <- new.dat.obs[pid.odr, ]
   new.crd.obs <- new.crd.obs[pid.odr, ]
   if(no.p4s){
-    print(row.names(new.crd.obs))
-    print(row.names(new.dat.obs))
     obs.new <- SpatialPointsDataFrame(new.crd.obs, new.dat.obs, match.ID = FALSE)
   }else{
     obs.new <- SpatialPointsDataFrame(new.crd.obs, new.dat.obs, proj4string = p4s.old)
@@ -155,13 +153,17 @@ spliceSSNSites <- function(
   
   ## Shoehorn the new sites shapefile over the top of the old one
   shp.name <- paste0(new.ssn.path, "/sites.shp")
+  row.names(obs.new@data) <- row.names(obs.new@coords) <- obs.new@data$pid
   writeOGR(obs.new, shp.name, "sites", driver = "ESRI Shapefile", overwrite_layer = TRUE)
+  row.names(new.dat.obs) <- new.dat.obs$pid
   SSN:::write.dbf.SSN(new.dat.obs, "sites", max_nchar = 30)
   
   ## Same for predpoints if they exist
   if(preds){
     shp.name <- paste0(new.ssn.path, "/preds.shp")
+    row.names(prd.new@data) <- row.names(prd.new@coords) <- prd.new@data$pid
     writeOGR(prd.new, shp.name, "preds", driver = "ESRI Shapefile", overwrite_layer = TRUE)
+    row.names(new.dat.prd) <- new.dat.prd$pid
     SSN:::write.dbf.SSN(new.dat.prd, "preds", max_nchar = 30)
   }
   
