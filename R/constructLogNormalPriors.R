@@ -45,7 +45,11 @@ constructLogNormalPriors <- function(glmssn, std){
       # inv.hessian <- solve(glmssn$optimOutput$hessian)
       # theta <- glmssn$estimates$theta[1:length(glmssn$estimates$theta)]
       # theta.se <- sqrt(diag(inv.hessian))
-      std <- theta.se <- getCalculatedSE(glmssn, log.scale = TRUE)
+      std <- theta.se <- try(getCalculatedSE(glmssn, log.scale = TRUE), TRUE)
+      if(class(theta.se) == "try-error"){
+        warning("The argument glmssn contains glmssn$optimOutput$hessian but it is singular, so the expected fisher information will be used instead.")
+        std <- theta.se <- getExpectedSE(glmssn, log.scale = TRUE)
+      } # Otherwise proceed as normal
     }
   }
   

@@ -1,14 +1,12 @@
-#' A utility function for fixed effects parameter estimation with known covariance parameters
+#' Utility functions
 #' 
 #' @description
 #'
-#' The function \code{DOoptimality} implements the D-optimal utility function from Falk et al. (2014). 
-#' 
-#' This function can be used with \code{\link{optimiseSSNDesign}}. 
+#' Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
 #' 
 #' @usage
 #'
-#' \code{DOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+#' \code{utility.function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
 #' 
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn A fitted model object of class glmssn.
@@ -20,15 +18,26 @@
 #' 
 #' @details
 #'
-#' The utility function is
-#' 
-#' \deqn{U(d, \theta) = \log\det(X'\Sigma(\theta)^-1X)}{U(d, \theta) = log(det(X'\Sigma(\theta)^-1X))}
-#' 
-#' where \eqn{X} is the design matrix for the model specified by \code{glmssn}, \eqn{X'} is its transpose, and \eqn{\Sigma(\theta)} is the covariance matrix for the data, which is obtained by evaluating a covariance function given a distance matrix and simulated values for the parameters \eqn{\theta}. The values of \eqn{\theta} are simulated from the priors in \code{prior.parameters}. The result will be averaged over \code{n.draws} simulations of the parameters \eqn{\theta}.
+#' The following utility functions have been implemented.
 #'
-#' A value of \code{-1e9} indicates a failure of this utility function.
+#' \itemize{
+#' \item{DOptimality for optimal estimation of the fixed effects when the covariance parameters are known.}
+#' \item{EDOptimality for optimal estimation of the fixed effects when the covariance parameters are not well known and must be estimated from the data.}
+#' \item{CPOptimality for optimal estimation of the covariance parameters.}
+#' \item{CPDOptimality for optimal estiamtion of both the covariance parameters and fixed effects parameters.}
+#' \item{KOptimality for maximising the accuracy of kriging predictions when the covariance parameters are known.}
+#' \item{EKOptimality for maximising the accuracy of kriging predictions when the covariance parameters are unknown and must be estimated fomr the data.}
+#' \item{spaceFillingMaximin for constructing space filling designs that maximise the minimum distance between any pair of points in a design.}
+#' \item{spaceFillingMorrisMitchell for constructing space filling designs using a modified version of the maximin utility function that also accounts for larger distances between pairs of points.}
+#' \item{sequentialDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are known.}
+#' \item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+#' \item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+#' \item{sequentialCPOptimality for adaptively constructing designs that allow for optimal estimation of the covariance parameters.}
+#' }
+#'
+#' When the returned value is \code{-1e9}, this indicates the utility function has failed to compute.
 #' 
-#' One final note: do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}. 
+#' Do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}. 
 #' 
 #' @examples 
 #' 
@@ -61,7 +70,6 @@
 #' 
 #' @export
 DOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
-  #t1 <- Sys.time()
   
   ## Get data for design points. Note that design matrix is stored as obs.X in extra.arguments
   ind <- row.names(extra.arguments$obs.X) %in% design.points 

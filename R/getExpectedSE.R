@@ -8,6 +8,7 @@
 #' @param log.scale Whether the standard errors should be given on the log scale. Defaults to FALSE.
 #' @param ... Optional. Additional arguments to \code{extractExpectedFisherInformation}. 
 #' @return A vector of expected standard errors for the \code{glmssn} object's covariance parameters.
+#' 
 #' @export
 getExpectedSE <- function(glmssn, log.scale = FALSE, ...){
   fish <- extractExpectedFisherInformation(glmssn, ...)

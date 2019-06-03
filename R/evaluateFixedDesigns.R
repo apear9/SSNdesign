@@ -10,9 +10,9 @@
 #'@param list.of a string (either "pid" or "locID") indicating whether the designs are expressed as vectors of pid or locID values
 #'@param utility.function a function with the signature utility.function. Users may define their own. This package provides several built-in utility functions. 
 #'@param prior.parameters a function to act as a prior for covariance parameter values
-#'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs
+#'@param n.draws a numeric value for the number of Monte Carlo draws to take when evaluating potential designs. This defaults to 1000.
 #'@param extra.arguments a list of any extra parameters which can be used to control the behaviour of this function or the utility function
-#'@return A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale. 
+#'@return A \code{data.frame} with the columns: ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale. 
 #'
 #'@details 
 #'
@@ -69,7 +69,7 @@ evaluateFixedDesigns <- function(
   m.form <- glmssn$args$formula
   m.char <- as.character(m.form)
   m.form <- as.formula(paste(m.char[1], m.char[3]))
-  obs.X  <- model.matrix(m.form, ssn.obs.data)
+  obs.X  <- model.matrix(m.form, ssn.obs.data, contrasts)
   obs.C  <- ssn@obspoints@SSNPoints[[1]]@point.coords
   row.names(obs.X) <- row.names(obs.C) <- ssn.obs.data$pid
   colnames(obs.C) <- c("x", "y")

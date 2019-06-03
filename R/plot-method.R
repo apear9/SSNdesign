@@ -1,5 +1,9 @@
 #' Plot trace of the Greedy Exchange Algorithm
 #' 
+#' @description 
+#' 
+#' A generic plot function adapted for `ssndesign` objects. It plots the traces from the optimisation algorithm.
+#' 
 #' @method plot ssndesign
 #' 
 #' @param x An object of class \code{ssndesign}

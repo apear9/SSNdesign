@@ -1,28 +1,24 @@
 #'Introduce new sites into a SpatialStreamNetwork object from a shapefile
 #' 
-#'@description 
+#' @description 
 #' 
 #' This function does the reverse of \code{\link{splitSSNSites}}. Instead of separating a \code{SpatialStreamNetwork} object into different shapefiles, this function combines a set of observed points from a shapefile with an existing SSN object.
 #' 
-#'@usage 
+#' @param ssn An object of class SpatialStreamNetwork
+#' @param new.ssn.path A file path to a folder to store the augmented ssn.
+#' @param splice.obs A file path for the shapefile of observed sites which should be brought into the ssn object.
+#' @param splice.preds Optionally a file path for a shapefile of prediction points which should also be brought into the ssn object. This can be (and is by default) NULL if there are no such prediction points.
+#' @return An object of class SpatialStreamNetwork that contains the old and new sites.
 #' 
-#' \code{spliceSSNSites(ssn, splice.obs, splice.preds = NULL)}
-#' 
-#'@param ssn An object of class SpatialStreamNetwork
-#'@param new.ssn.path A file path to a folder to store the augmented ssn.
-#'@param splice.obs A file path for the shapefile of observed sites which should be brought into the ssn object.
-#'@param splice.preds Optionally a file path for a shapefile of prediction points which should also be brought into the ssn object. This can be (and is by default) NULL if there are no such prediction points.
-#'@return An object of class SpatialStreamNetwork that contains the old and new sites.
-#' 
-#'@details 
+#' @details 
 #' 
 #' As for \code{splitSSNSites}, this function is wrapped by \code{\link{optimiseSSNDesign}}. While \code{optimiseSSNDesign} should be sufficient for solving most adaptive design problems, more specialised or unusual applicaitons may require this function to be used separately.  
 #'  
-#'@examples
+#' @examples
 #'
-#'\dontrun{#code}
+#' \dontrun{#code}
 #'  
-#'@export
+#' @export
 spliceSSNSites <- function(
   ssn, 
   new.ssn.path,

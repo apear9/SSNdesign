@@ -1,4 +1,7 @@
-#' A wrapper function for SimulateOnSSN that avoids issues with the use of Random Effects.
+#' Wrapper function for SimulateOnSSN
+#' 
+#' @inherit SSN::SimulateOnSSN
+#' 
 #' @export
 bandaid_fix <- function(...){
   

@@ -4,10 +4,6 @@
 #'   
 #'\code{ndpoints(ssn, use = "pids")} is a function that returns the number of design points on a SpatialStreamNetwork object, both in total and by network.
 #'
-#'@usage
-#'
-#'\code{ndpoints(ssn, use = c("pids", "locIDs"))}
-#'
 #'@param ssn An object of class SpatialStreamNetwork
 #'@param use A string indicating whether pids or locIDs should be used to count sites.
 #'@return A list with two elements: a vector of design points by network, and a scalar being the total number of design points in the SpatialStreamNetwork object.
