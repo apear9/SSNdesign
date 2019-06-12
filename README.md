@@ -6,7 +6,7 @@ Install `SSNdesign` directly from GitHub with `devtools`
 
 ```devtools::install_github(repo = 'apear9/SSNdesign')```
 
-Alternatively, download and install using command line with `R CMD INSTALL SSNdesign`. Note that Rtools 3.4 (or later) must be installed.
+Alternatively, download the repository files and run `devtools::install_local(...)` where `...` is the path to the folder on the user's computer which contains the repository files. The command line can also be used with `R CMD INSTALL SSNdesign`, where we assume the folder SSNdesign contains all the repository's package files and sits in the user's current working directory. Note that Rtools 3.4 (or later) must be installed to perform the local install.
 
 ### Maintainer
 
