@@ -2,9 +2,10 @@
 % Please edit documentation in R/CPOptimality.R
 \name{CPOptimality}
 \alias{CPOptimality}
-\title{A utility function for covariance parameter estimation}
+\title{Utility functions}
 \usage{
-\code{CPOptimality(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
+CPOptimality(ssn, glmssn, design.points, prior.parameters, n.draws,
+  extra.arguments)
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
@@ -23,28 +24,40 @@
 A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-The function \code{CPOptimality} implements the CP-optimal utility function from Falk et al. (2014).
+Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
 }
 \details{
-The utility function is
+The following utility functions have been implemented.
 
-\deqn{U(d,\theta) = \log \det \left(I(\theta)\right)}{U(d, \theta) = log(det(I(\theta)))}
+\itemize{
+\item{DOptimality for optimal estimation of the fixed effects when the covariance parameters are known.}
+\item{EDOptimality for optimal estimation of the fixed effects when the covariance parameters are not well known and must be estimated from the data.}
+\item{CPOptimality for optimal estimation of the covariance parameters.}
+\item{CPDOptimality for optimal estiamtion of both the covariance parameters and fixed effects parameters.}
+\item{KOptimality for maximising the accuracy of kriging predictions when the covariance parameters are known.}
+\item{EKOptimality for maximising the accuracy of kriging predictions when the covariance parameters are unknown and must be estimated fomr the data.}
+\item{spaceFillingMaximin for constructing space filling designs that maximise the minimum distance between any pair of points in a design.}
+\item{spaceFillingMorrisMitchell for constructing space filling designs using a modified version of the maximin utility function that also accounts for larger distances between pairs of points.}
+\item{sequentialDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are known.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialCPOptimality for adaptively constructing designs that allow for optimal estimation of the covariance parameters.}
+}
 
-where \eqn{I(\theta)} is the expected Fisher information matrix for the covariance parameters \eqn{\theta}.
+When the returned value is \code{-1e9}, this indicates the utility function has failed to compute.
 
-A value of \code{-1e9} indicates a failure of this utility function.
-
-One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
+Do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}.
 }
 \examples{
 
 \dontrun{
+
 # Create stream network
 s <- createSSN(100, systematicDesign(0.25), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
 createDistMat(s)
 
 # Simulate data on network
-s <- SimulateOnSSN(s, getSSNdata.frame(s),formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
 
 # Fit a model to the simulated data
 m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
@@ -53,10 +66,14 @@ m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
 p <- constructLogNormalCovPriors(m)
 
 # Find the optimal design using D-optimality as the utility function
-r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = CPOptimality, prior.parameters = p)
+r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = DOptimality, prior.parameters = p)
 
 # Plot result to check
 plot(r$ssn.new, "Sim_Values")
+
 }
 
+}
+\references{
+Falk, M., McGree, J.M., and Pettit, A.N. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, \emph{21}(4), 751-773.
 }

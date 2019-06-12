@@ -18,7 +18,7 @@
 \item{...}{Additional arguments to plot.}
 }
 \description{
-Plot trace of the Greedy Exchange Algorithm
+A generic plot function adapted for `ssndesign` objects. It plots the traces from the optimisation algorithm.
 }
 \details{
 The plot method produces line plots tracing the expected utility of the best design in the algorithm for each set of coordinate exchanges.

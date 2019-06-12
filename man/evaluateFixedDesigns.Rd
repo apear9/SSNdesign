@@ -21,12 +21,12 @@ evaluateFixedDesigns(ssn, glmssn, list.designs, list.of = "pid",
 
 \item{prior.parameters}{a function to act as a prior for covariance parameter values}
 
-\item{n.draws}{a numeric value for the number of Monte Carlo draws to take when evaluating potential designs}
+\item{n.draws}{a numeric value for the number of Monte Carlo draws to take when evaluating potential designs. This defaults to 1000.}
 
 \item{extra.arguments}{a list of any extra parameters which can be used to control the behaviour of this function or the utility function}
 }
 \value{
-A dataframe of design ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale.
+A \code{data.frame} with the columns: ID (integers from 1 in the same order as list.designs); Size, the number of design points; Expected Utility; Efficiency, the ratio between each expected utility and the largest expected utility; and Efficiency_Unlogged, the same but for expected utilities expressed on the log scale.
 }
 \description{
 Evaluates the utility of a list of user-specified designs.

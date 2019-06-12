@@ -4,7 +4,7 @@
 \alias{ndpoints}
 \title{Calculate the number of design points on a network}
 \usage{
-\code{ndpoints(ssn, use = c("pids", "locIDs"))}
+ndpoints(ssn, use = "pids")
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}

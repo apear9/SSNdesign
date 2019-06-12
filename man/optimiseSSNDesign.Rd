@@ -11,29 +11,29 @@ optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
   record.designs = FALSE, ...)
 }
 \arguments{
-\item{ssn}{An object of class SpatialStreamNetwork. Its obspoints slot must contain all the potential sampling sites for the stream network. It must also contain all the covariates and other information referred to in the glmssn object.}
+\item{ssn}{An object of class SpatialStreamNetwork. This object must contain all potential sampling sites in its\code{obspoints} slot.}
 
-\item{new.ssn.path}{A path to a folder where the result can be stored.}
+\item{new.ssn.path}{A path to a folder where the result can be stored. The folder name must end in \code{.ssn}. This function will throw an error if the argument matches the name of an existing folder.}
 
-\item{glmssn}{A fitted \code{glmssn} object. However, this model does not need to have been fitted to the SpatialStreamNetwork data in the argument ssn.}
+\item{glmssn}{A fitted \code{glmssn} object. However, this model does not need to have been fitted to the \code{SpatialStreamNetwork} object in the argument ssn.}
 
 \item{n.points}{A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.}
 
-\item{legacy.sites}{A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is OPTIONAL. Simply leave blank if not required. Note that the total number of sampling sites in the final design will still be n.points.}
+\item{legacy.sites}{A vector of the pids or locIDs of any 'legacy sites' which must appear in the final design. This argument is optional and should be left missing if not required. Note that the total number of sampling sites in the final design will still be \code{n.points}.}
 
 \item{select.by}{A string argument which specifies whether each pid represents a single design point or each locID. The options are "auto" (the function will autodetect whether there are multiple pids per locID and use locIDs as unique design points), "pid" or "locID". This argument defaults to "auto".}
 
 \item{utility.function}{A function with the signature 'utility.function'. See Details for more information.}
 
-\item{prior.parameters}{A list of functions or a matrix. If a list, the elements of this list specify the independent priors on the covariance parameters in the glmssn object. If a matrix, the matrix contains the prior draws from any kind of prior (multivariate or independent) on the covariance parameters in the \code{glmssn} object. If a matrix, then the n.draws argument will be ignored because the matrix will have as many rows as there are prior draws. See Details for more information.}
+\item{prior.parameters}{A list of functions or a matrix. If this argument is a list, the elements of this list specify independent priors for the covariance parameters in the glmssn object. If this argument is a matrix, the matrix contains the prior draws from any kind of prior (multivariate or independent) on the covariance parameters in the \code{glmssn} object. Note, in this case, the \code{n.draws} argument will be ignored because the matrix will have as many rows as there are prior draws. See Details for more information.}
 
-\item{n.cores}{The number of CPUs which should be used when running \code{optimiseSSNDesign}. This argument must agree with the argument parallelism. For example, if n.cores > 1 and \code{parallelism = "none"}, this argument will be ignored and all computations will be performed sequentially. Defaults to 1.}
+\item{n.cores}{The number of CPUs which should be used when running \code{optimiseSSNDesign}. This argument must agree with the argument \code{parallelism}. For example, this means that, if n.cores > 1 and \code{parallelism = "none"}, this argument will be ignored and all computations will be performed sequentially. Defaults to 1.}
 
-\item{parallelism}{Must be one of "none", "windows", or "osx/linux". These can be spelled with in any case or in any combination of cases. Note the argument must be selected appropriately for the operating system on the user's computer. Definitely do not select "linux/osx" when running this function on a Windows operating system.}
+\item{parallelism}{Must be one of "none", "windows", or "osx/linux". These arugments are insensitive to case. Note the argument must be selected appropriately for the operating system on the user's computer.}
 
 \item{parallelism.seed}{Either a numeric integer or NULL. This argument can be used to seed a random number generator which ensures reproducible calculations. This argument is effective regardless of whether parallel computations are being used.}
 
-\item{n.optim}{The number of times the Greedy Exchange Algorithm (Falk et al., 2014) is iterated to find an optimal design. Any integer greater than or equal to 1 is permissible, though larger values will produce more reliable results (while multiplying run-time). Defaults to 5.}
+\item{n.optim}{The number of times the Greedy Exchange Algorithm is iterated to find an optimal design. Any integer greater than or equal to 1 is permissible, though larger values will produce more reliable results. Defaults to 5.}
 
 \item{n.draws}{The number of Monte Carlo draws used to approximate the expected utility from the utility function per Muller (1999). Any values larger than 1 are permitted, though a minimum of 100 are recommended for the most stable results.}
 
@@ -41,7 +41,7 @@ optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
 
 \item{verbose}{Whether messages indicating the function's progress should be printed to the console. Defaults to \code{TRUE}.}
 
-\item{record.designs}{Whether the function should return all the designs evaluated. This is FALSE by default and should remain FALSE for larger examples due to the incredible amount of memory this requires.}
+\item{record.designs}{Whether the function should return all the designs evaluated. This is FALSE by default and should remain \code{FALSE} for larger examples due to the incredible amount of memory this requires.}
 
 \item{...}{Any additional arguments for the \code{foreach} iterator. The version of \code{foreach} from the package \code{doRNG} is used.}
 }
@@ -49,7 +49,7 @@ optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
 A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
 }
 \description{
-The function \code{optimiseSSNDesign} is the main workhorse function of the package \code{SSNdesign}. It works with a range of utilities to construct optimal solutions to both static and adaptive design problems.
+The function \code{optimiseSSNDesign} is the main workhorse function of the package \code{SSNdesign}. It works to construct optimal and adaptive designs using a greedy exchange algorithm under a variety of different circumstances.
 }
 \details{
 There are several aspects of this function that require explanations beyond the brief descriptions of the arguments above. 

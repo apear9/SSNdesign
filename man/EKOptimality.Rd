@@ -2,7 +2,7 @@
 % Please edit documentation in R/EKOptimality.R
 \name{EKOptimality}
 \alias{EKOptimality}
-\title{A dual utility function for optimal designs for prediction with estimated covariance and fixed effects parameters.}
+\title{Utility functions}
 \usage{
 EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws,
   extra.arguments)
@@ -24,30 +24,40 @@ EKOptimality(ssn, glmssn, design.points, prior.parameters, n.draws,
 A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-The function \code{EKoptimality} implements the EK-optimal utility function from Falk et al. (2014). This is appropriate for both optimal and adaptive design problems.
-
-This function can be used with \code{\link{optimiseSSNDesign}}.
+Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
 }
 \details{
-The utility function is
+The following utility functions have been implemented.
 
-\deqn{U(d, \theta, y) = (\sum_{i = 1}^n Var(\hat{y}_i))^{-1}}{U(d, \theta, y) = SUM(VAR(\hat{Y}_i))}
- 
-That is, it is the inverse sum of the estimated kriging variances for a set of prediction sites with indices \eqn{i = 1, 2, ..., n}. 
+\itemize{
+\item{DOptimality for optimal estimation of the fixed effects when the covariance parameters are known.}
+\item{EDOptimality for optimal estimation of the fixed effects when the covariance parameters are not well known and must be estimated from the data.}
+\item{CPOptimality for optimal estimation of the covariance parameters.}
+\item{CPDOptimality for optimal estiamtion of both the covariance parameters and fixed effects parameters.}
+\item{KOptimality for maximising the accuracy of kriging predictions when the covariance parameters are known.}
+\item{EKOptimality for maximising the accuracy of kriging predictions when the covariance parameters are unknown and must be estimated fomr the data.}
+\item{spaceFillingMaximin for constructing space filling designs that maximise the minimum distance between any pair of points in a design.}
+\item{spaceFillingMorrisMitchell for constructing space filling designs using a modified version of the maximin utility function that also accounts for larger distances between pairs of points.}
+\item{sequentialDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are known.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialCPOptimality for adaptively constructing designs that allow for optimal estimation of the covariance parameters.}
+}
 
-A value of \code{-1e9} indicates a failure of this utility function.
+When the returned value is \code{-1e9}, this indicates the utility function has failed to compute.
 
-One final note: do not worry about passing arguments to this function. All arguments are dealt with internally by \code{\link{optimiseSSNDesign}}.
+Do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}.
 }
 \examples{
 
 \dontrun{
+
 # Create stream network
-s <- createSSN(100, systematicDesign(0.25), systematicDesign(0.25), paste(tempdir(), "s.ssn", sep = "/"), TRUE)
-createDistMat(s, "preds", TRUE, TRUE)
+s <- createSSN(100, systematicDesign(0.25), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+createDistMat(s)
 
 # Simulate data on network
-s <- SimulateOnSSN(s, getSSNdata.frame(s), getSSNdata.frame(s, "preds"), "preds", formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
 
 # Fit a model to the simulated data
 m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
@@ -56,9 +66,14 @@ m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
 p <- constructLogNormalCovPriors(m)
 
 # Find the optimal design using D-optimality as the utility function
-r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = EKOptimality, prior.parameters = p)
+r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = DOptimality, prior.parameters = p)
 
 # Plot result to check
 plot(r$ssn.new, "Sim_Values")
+
 }
+
+}
+\references{
+Falk, M., McGree, J.M., and Pettit, A.N. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, \emph{21}(4), 751-773.
 }

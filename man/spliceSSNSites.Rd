@@ -4,7 +4,7 @@
 \alias{spliceSSNSites}
 \title{Introduce new sites into a SpatialStreamNetwork object from a shapefile}
 \usage{
-\code{spliceSSNSites(ssn, splice.obs, splice.preds = NULL)}
+spliceSSNSites(ssn, new.ssn.path, splice.obs, splice.preds = NULL)
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}

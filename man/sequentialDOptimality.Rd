@@ -2,7 +2,7 @@
 % Please edit documentation in R/sequentialDOptimality.R
 \name{sequentialDOptimality}
 \alias{sequentialDOptimality}
-\title{A utility function for parameter estimation with known covariance parameters (sequential)}
+\title{Utility functions}
 \usage{
 sequentialDOptimality(ssn, glmssn, design.points, prior.parameters,
   n.draws, extra.arguments)
@@ -10,7 +10,7 @@ sequentialDOptimality(ssn, glmssn, design.points, prior.parameters,
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
 
-\item{glmssn}{An model object of class glmssn.}
+\item{glmssn}{A fitted model object of class glmssn.}
 
 \item{design.points}{A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.}
 
@@ -21,11 +21,59 @@ sequentialDOptimality(ssn, glmssn, design.points, prior.parameters,
 \item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.}
 }
 \value{
-A numeric scalar.
+A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-The function \code{sequentialDOptimality} is a utility function that can be used with \code{\link{optimiseSSNDesign}}. It is a utility function that minimises the determinant of the variance-covariance matrix of the fixed effects for models that are fit over a set of design points.
+Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
 }
 \details{
-Note that this function operates differently to \code{DOptimality}. The functions \code{DOptimality} and \code{EDOptimality} assume there are no sites which have already been incorporated into a design. They compute the variance-covariance matrix on the fixed effects (Som et al., 2014) for each set of simulated or esimated covariance parameters, respectively. In this sequential form, the observed variance-covariance matrix is extracted for the sites which are fixed in the design. Then the sites which are not fixed are used to estimate the expected variance-covariance matrix. The observed and expected matrices are added, before being reduced to a scalar value to serve as the utility.
+The following utility functions have been implemented.
+
+\itemize{
+\item{DOptimality for optimal estimation of the fixed effects when the covariance parameters are known.}
+\item{EDOptimality for optimal estimation of the fixed effects when the covariance parameters are not well known and must be estimated from the data.}
+\item{CPOptimality for optimal estimation of the covariance parameters.}
+\item{CPDOptimality for optimal estiamtion of both the covariance parameters and fixed effects parameters.}
+\item{KOptimality for maximising the accuracy of kriging predictions when the covariance parameters are known.}
+\item{EKOptimality for maximising the accuracy of kriging predictions when the covariance parameters are unknown and must be estimated fomr the data.}
+\item{spaceFillingMaximin for constructing space filling designs that maximise the minimum distance between any pair of points in a design.}
+\item{spaceFillingMorrisMitchell for constructing space filling designs using a modified version of the maximin utility function that also accounts for larger distances between pairs of points.}
+\item{sequentialDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are known.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialEDOptimality for adaptively constructing designs that allow for optimal estimation of the fixed effects parameters when the covariance parameters are unknown and must be estimated from the data.}
+\item{sequentialCPOptimality for adaptively constructing designs that allow for optimal estimation of the covariance parameters.}
+}
+
+When the returned value is \code{-1e9}, this indicates the utility function has failed to compute.
+
+Do not worry about passing arguments to this function. All arguments are handled internally by \code{\link{optimiseSSNDesign}}.
+}
+\examples{
+
+\dontrun{
+
+# Create stream network
+s <- createSSN(100, systematicDesign(0.25), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+createDistMat(s)
+
+# Simulate data on network
+s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+
+# Fit a model to the simulated data
+m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
+
+# Define the priors on the covariance parameters
+p <- constructLogNormalCovPriors(m)
+
+# Find the optimal design using D-optimality as the utility function
+r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = DOptimality, prior.parameters = p)
+
+# Plot result to check
+plot(r$ssn.new, "Sim_Values")
+
+}
+
+}
+\references{
+Falk, M., McGree, J.M., and Pettit, A.N. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, \emph{21}(4), 751-773.
 }

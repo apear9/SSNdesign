@@ -4,7 +4,7 @@
 \alias{nppoints}
 \title{Calculate the number of prediction points on a network}
 \usage{
-\code{nppoints(ssn, use = "pids")}
+nppoints(ssn, use = "pids")
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}
