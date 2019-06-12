@@ -3,7 +3,7 @@
 #' @inherit SSN::SimulateOnSSN
 #' 
 #' @export
-bandaid_fix <- function(...){
+SimulateOnSSN2 <- function(...){
   
   # Simulate data as usual (but keep only the ssn object)
   ssn <- SimulateOnSSN(...)$ssn.object
