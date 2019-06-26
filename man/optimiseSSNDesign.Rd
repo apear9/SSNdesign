@@ -46,7 +46,21 @@ optimiseSSNDesign(ssn, new.ssn.path, glmssn, n.points, legacy.sites,
 \item{...}{Any additional arguments for the \code{foreach} iterator. The version of \code{foreach} from the package \code{doRNG} is used.}
 }
 \value{
-A list of four elements: 1) ssn.old, the original and unaltered ssn; 2) ssn.new, the original ssn modified such that it contains only the sites in the optimal design; 3) final.points, a vector of the locIDs or pids for the sampling sites present in the optimal design; and 4) utilities, a list of n.optim elements containing the expected utilities computed at every iteration of the Greedy Exchange Algorithm.
+A list with the following elements: 
+1. ssn.old, the original and unaltered ssn. 
+2. ssn.new, the original ssn modified such that it contains only the sites in the optimal design.
+3. call, the code block used to run \code{optimiseSSNDesign}.
+4. glmssn, the original and unmodified glmssn.
+5. legacy.sites, a vector containing the locID or pid values of any legacy sites.
+6. utility.function, the original and unmodified utility function used to optimise the design. 
+7. prior.draws, a matrix containing the simulated values of the covariance parameters drawn from the priors.
+8. n.draws, a numeric indicating the number of Monte Carlo draws that were used when evaluating the expected utility of each design.
+9. random.seed, the random seed specified in the \code{parallelism.seed} argument.
+10. final.points, a vector of the locID or pid values for the sites included in the final design.
+11. best.designs.per.K.iteration, the same as final.points for each of the random starts.
+12. trace.per.random.start, 
+13. designs, a list of all the designs evaluated when optimising the design. This will be empty unless \code{record.designs = TRUE}.
+14. utilities, a list of all the expected utility values of the designs evaluated when optimising the design.
 }
 \description{
 The function \code{optimiseSSNDesign} is the main workhorse function of the package \code{SSNdesign}. It works to construct optimal and adaptive designs using a greedy exchange algorithm under a variety of different circumstances.
