@@ -11,7 +11,7 @@
 #'@param ssn.obj an object of class SpatialStreamNetwork
 #'@param ClustDistMethod a character vector providing the method for how clustered samples are selected from within a single reach.
 #'@param segment.vector a numeric vector of rids for which clustered samples are desired.
-#'@param max.dist an option distance provided as the upper limit for a distance between two locations within a common reach whereby those locations can be selected into a common cluster.
+#'@param max.dist an optional distance provided as the upper limit for a distance between two locations within a common reach whereby those locations can be selected into a common cluster.
 #'@param start.point.method a character vector providing the method for how the first location in each cluster should be selected
 #'@param bin.table an object of class data.frame which represents the bindaryID object for a SpatialStreamNetwork
 #'@return a data.frame
@@ -27,7 +27,6 @@ SameSegmentClusters.sample<-function(ssn.obj, ClustDistMethod="prop.shortest.seg
     # find segment lengths
     seg.lengths<-find.segment.lengths(ssn.obj, bin.table)
     max.dist<-min(seg.lengths$length)
-    
     for (i in 1:length(segment.vector)){
       ssn.DF.now<-subset(ssn.DF, rid==segment.vector[i])
       ## Pick first location
@@ -36,6 +35,7 @@ SameSegmentClusters.sample<-function(ssn.obj, ClustDistMethod="prop.shortest.seg
       ## Pick other points in "cluster" of loc.1
       ssn.DF.now$potential.clusterees<-abs(ssn.DF.now$upDist-ssn.DF.now$upDist[ssn.DF.now$pid==loc.1])<=max.dist
       ssn.DF.now$potential.clusterees[ssn.DF.now$pid==loc.1]<-0
+      if(cluster.size - 1 > length(ssn.DF.now$pid)) stop("There are not enough sites to include in at least one of the requested clusters. This has most likely happened because your grid of potential sites is too coarse.")
       clust.locs<-sample(ssn.DF.now$pid, (cluster.size-1), prob=ssn.DF.now$potential.clusterees)
       Sample.Holder<-c(Sample.Holder, loc.1, clust.locs)
       
@@ -45,6 +45,7 @@ SameSegmentClusters.sample<-function(ssn.obj, ClustDistMethod="prop.shortest.seg
   if(ClustDistMethod=="fixed"){
     
     for (i in 1:length(segment.vector)){
+      
       ssn.DF.now<-subset(ssn.DF, rid==segment.vector[i])
       ## Pick first location
       loc.1<-first.loc(ssn.DF.now, start.point.method)

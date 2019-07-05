@@ -4,10 +4,6 @@
 #' 
 #'For a Spatial Stream Network with a dense grid of potential sampling locations, this function draws samples according to the sampling designs found most optimal in Som et al. (2014), and a few others.
 #' 
-#'@usage 
-#'    
-#'\code{Stream.Network.Samples(ssn.list, sample.method, sample.size,cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...)} 
-#' 
 #'@param ssn.list an object of class list that contains one item names "ssn.object" which is a SpatialStreamNetwork and another item named "bin.table" which is the binaryID table for the assoicated SpatialStreamNetwork
 #'@param sample.method a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"
 #'@param sample.size a numeric scalar with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.
@@ -15,13 +11,16 @@
 #'@param cluster.number a numeric scalar for the number of sampling locations contained within each clusted sample.
 #'@param Wmat leftover from previous version of function when weigths matrix required as input
 #'@param DistMat leftover from previous version of function when distance matrix required as input
+#'@param ClustDistMethod An argument that controls the way that clusters of sites are created. Defaults to \code{"prop.shortest.seg"}. Other options are \code{"NoBound"} and \code{"fixed"}. If uncertain, leave blank. If you choosed \code{"fixed"}, then you will need to specify \code{max.dist}.
+#'@param max.dist The largest distance (in map units) that can separate any two sites belonging to a single cluster. Defaults to the minimum edge length in the SSN. Leave blank if you have no strong beliefs about what this should be. 
+#'@param ... Other arguments to internal functions. None implemented as yet.
 #'@return a list containing a SpatialStreamNetwork for the selected samples, and a numeric vector with the selected pids
 #'  
 #'@export 
-Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID, cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...){
+Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID, cluster.number=NULL, Wmat=NULL, DistMat=NULL, ClustDistMethod, max.dist, ...){
   #ssn.object
   ssn.obj<-ssn.list$ssn.object #ssn.object
-  bin.table <- ssn.list$bin.table #getBIDtables(ssn.object, networks = 1:nnetwork(ssn.object))
+  bin.table <- do.call(rbind, ssn.list$bin.table) #getBIDtables(ssn.object, networks = 1:nnetwork(ssn.object))
   ssn.obj2<-ssn.obj ## keep an untouched version, potential locs will be dropped from available when moving amonst multiple sample types
   PID.selected<-vector() ## holder of chosen samples through the loops
   ## keep an untouched verson of list too, subset at each sample type
@@ -45,14 +44,14 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
     } # ends SRS
     
     if(sample.method[i]=="GRTS"){
-      require(spsurvey)
+      
       cdat <- ssn.obj2@obspoints@SSNPoints[[1]]@point.data
       cdat$xcoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,1] 
       cdat$ycoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,2] 
       cdat$id <- cdat$pid
       
       Des1 <- list(None=list(panel=c(Panel1=sample.size[i]),seltype="Equal", over=0))
-      Grts2 <- grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
+      Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
                     src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
                     ycoord = "ycoord", shapefile=FALSE)
       chosen <- sort(Grts2$id)
@@ -68,7 +67,6 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
     } # ends GRTS
     
     if(sample.method[i]=="GRTSmouth"){
-      require(spsurvey)
       cdat <- ssn.obj2@obspoints@SSNPoints[[1]]@point.data
       cdat$xcoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,1] 
       cdat$ycoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,2] 
@@ -81,7 +79,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
       
       sampsize <- sample.size[i] - 1
       Des1 <- list(None=list(panel=c(Panel1=sampsize),seltype="Equal", over=0))
-      Grts2 <- grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
+      Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
                     src.frame = "att.frame", att.frame = cdat2, id = "pid", xcoord="xcoord",
                     ycoord = "ycoord", shapefile=FALSE)
       chosen <- c(chosen, sort(Grts2$id))
@@ -98,7 +96,7 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
     
     if(sample.method[i]=="GRTSclus"){
       #### cluster.number is the number of number of clusters
-      require(spsurvey)
+      
       cdat <- ssn.obj2@obspoints@SSNPoints[[1]]@point.data
       cdat$xcoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,1] #cdat$NEAR_X
       cdat$ycoord <- ssn.obj2@obspoints@SSNPoints[[1]]@point.coords[,2] #cdat$NEAR_Y
@@ -108,18 +106,18 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
         
         grts.size <- cluster.number
         cluster.size <- sample.size[i]/cluster.number
-        
         Des1 <- list(None=list(panel=c(Panel1=grts.size),seltype="Equal", over=0))
-        Grts2 <- grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
+        Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
                       src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
                       ycoord = "ycoord", shapefile=FALSE)
         
         ## get the segments from these samples
         Grids <- unique(cdat$rid[cdat$pid %in% Grts2$id])
         ## Get the clusters
-        cdat<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vector=Grids, 
-                                         max.dist=NA, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
-        
+        if(missing(ClustDistMethod)) ClustDistMethod <- "prop.shortest.seg"
+        if(missing(max.dist)) max.dist <- NA
+        cdat<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod=ClustDistMethod, segment.vector=Grids, 
+                                         max.dist=max.dist, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
         PID.selected<-c(PID.selected, cdat$pid[cdat$Selected.Sample==1])
         
       }else{  ### here is the case where some GRTS singles and some GRTS clusters
@@ -128,9 +126,8 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
         n.singles <- sample.size[i] - (floor(sample.size[i]/cluster.number)*cluster.number)
         cluster.size <- floor(sample.size[i]/cluster.number)
         grts.size <- cluster.number + n.singles
-        
         Des1 <- list(None=list(panel=c(Panel1=grts.size),seltype="Equal", over=0))
-        Grts2 <- grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
+        Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
                       src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
                       ycoord = "ycoord", shapefile=FALSE)
         
@@ -141,13 +138,14 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
         ## get the segments from these cluster samples
         Grids <- unique(cdat$rid[cdat$pid %in% forclust])
         ## Get the clusters
-        cdat2<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vector=Grids, 
-                                          max.dist=NA, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
+        if(missing(ClustDistMethod)) ClustDistMethod <- "prop.shortest.seg"
+        if(missing(max.dist)) max.dist <- NA
+        cdat2<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod=ClustDistMethod, segment.vector=Grids, 
+                                          max.dist=max.dist, cluster.size=cluster.size, start.point.method="random", bin.table=bin.table)
         chosen.pid2 <- cdat2$pid[cdat2$Selected.Sample==1]
         chosen <- c(chosen.pid, chosen.pid2)
         cdat$Selected.Sample <- 0
         cdat$Selected.Sample[cdat$pid %in% chosen] <- 1
-        
         PID.selected<-c(PID.selected, chosen) # Can modify this to achieve the 'by.locID' effect
         
       }
@@ -175,8 +173,10 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
       
       Clusters <-c(MouthSeg, extreme.clusters)
       
-      ClustSamps<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod="prop.shortest.seg", segment.vectort=Clusters, 
-                                             max.dist=NA, cluster.size=2, start.point.method="random", bin.table=bin.table)
+      if(missing(ClustDistMethod)) ClustDistMethod <- "prop.shortest.seg"
+      if(missing(max.dist)) max.dist <- NA
+      ClustSamps<-SameSegmentClusters.sample(ssn.obj2, ClustDistMethod=ClustDistMethod, segment.vector=Clusters, 
+                                             max.dist=max.dist, cluster.size=2, start.point.method="random", bin.table=bin.table)
       chosen.Clust.samps <- ClustSamps$pid[ClustSamps$Selected.Sample ==1]
       
       How.many.samples.left <- sample.size - length(Clusters)*2
