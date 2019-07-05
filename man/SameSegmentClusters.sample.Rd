@@ -13,7 +13,7 @@
 
 \item{segment.vector}{a numeric vector of rids for which clustered samples are desired.}
 
-\item{max.dist}{an option distance provided as the upper limit for a distance between two locations within a common reach whereby those locations can be selected into a common cluster.}
+\item{max.dist}{an optional distance provided as the upper limit for a distance between two locations within a common reach whereby those locations can be selected into a common cluster.}
 
 \item{start.point.method}{a character vector providing the method for how the first location in each cluster should be selected}
 

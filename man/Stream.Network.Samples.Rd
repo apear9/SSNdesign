@@ -4,7 +4,9 @@
 \alias{Stream.Network.Samples}
 \title{For a Spatial Stream Network with a dense grid of potential sampling locations, this function draws samples according to the sampling designs found most optimal in Som et al. (2014), and a few others.}
 \usage{
-\code{Stream.Network.Samples(ssn.list, sample.method, sample.size,cluster.number=NULL, Wmat=NULL, DistMat=NULL, ...)}
+Stream.Network.Samples(ssn.list, sample.method, sample.size, use.locID,
+  cluster.number = NULL, Wmat = NULL, DistMat = NULL,
+  ClustDistMethod, max.dist, ...)
 }
 \arguments{
 \item{ssn.list}{an object of class list that contains one item names "ssn.object" which is a SpatialStreamNetwork and another item named "bin.table" which is the binaryID table for the assoicated SpatialStreamNetwork}
@@ -20,6 +22,12 @@
 \item{Wmat}{leftover from previous version of function when weigths matrix required as input}
 
 \item{DistMat}{leftover from previous version of function when distance matrix required as input}
+
+\item{ClustDistMethod}{An argument that controls the way that clusters of sites are created. Defaults to \code{"prop.shortest.seg"}. Other options are \code{"NoBound"} and \code{"fixed"}. If uncertain, leave blank. If you choosed \code{"fixed"}, then you will need to specify \code{max.dist}.}
+
+\item{max.dist}{The largest distance (in map units) that can separate any two sites belonging to a single cluster. Defaults to the minimum edge length in the SSN. Leave blank if you have no strong beliefs about what this should be.}
+
+\item{...}{Other arguments to internal functions. None implemented as yet.}
 }
 \value{
 a list containing a SpatialStreamNetwork for the selected samples, and a numeric vector with the selected pids
