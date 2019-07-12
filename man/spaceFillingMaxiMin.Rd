@@ -21,7 +21,7 @@ spaceFillingMaxiMin(ssn, glmssn, design.points, prior.parameters, n.draws,
 \item{extra.arguments}{A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.}
 }
 \value{
-The expected utility of a design. This number represents the minimum (non-zero) distance between any pair of points in the design.
+The expected utility of a design. This number represents the smallest non-zero distance between any pair of sites in the design.
 }
 \description{
 \code{spaceFillingMaximin} is a utility function used by \code{\link{constructSpaceFillingDesign}}. It is also fully compatible with \code{\link{optimiseSSNDesign}}. It is a utility function that maximises the minimum interpoint distance between a set of design points.

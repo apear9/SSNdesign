@@ -4,13 +4,14 @@
 \alias{hardCoreDesign}
 \title{The hardCoreDesign function from SSN updated to be compatible with functions from SSNDesign}
 \usage{
-\code{hardCoreDesign(...)}
+hardCoreDesign(n, inhibition_region, replications = 1,
+  rep.variable = "Time", rep.values)
 }
 \arguments{
 \item{...}{Arguments for the function \code{hardCoreDesign} in the package SSN.}
 }
 \value{
-An object of class data.frame
+The output is not seen by the user.
 }
 \description{
 \code{hardCoreDesign} replaces a function of the same name from the package SSN.

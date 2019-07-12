@@ -4,7 +4,7 @@
 \alias{getBIDtables}
 \title{A function to retrieve the BinaryID tables associated with a SpatialStreamNetwork}
 \usage{
-\code{getBIDtables(ssn.object, networks = 1:nnetwork(ssn.object))}
+getBIDtables(ssn.object, networks = 1:nnetwork(ssn.object))
 }
 \arguments{
 \item{ssn.object}{An object of class SpatialStreamNetwork.}
@@ -19,4 +19,15 @@ Retrieves the Binary ID tables which are stored in a database in the path slot o
 }
 \details{
 The ssn.object must have a valid folder path stored in its path slot. This folder must contain a binaryID.db database.
+}
+\examples{
+
+# Single network
+s <- createSSN(50, binomialDesign(20), path = tempPath("s.ssn"), importToR = TRUE)
+tabs <- getBIDtables(s)
+
+# Multiple networks
+s <- createSSN(c(50, 50), binomialDesign(c(20, 20)), path = tempPath("s.ssn"), importToR = TRUE)
+tabs <- getBIDtables(s)
+
 }

@@ -26,3 +26,6 @@ This is a function to subset the observed and/or prediction sites on a SpatialSt
 \details{
 Note, the SpatialStreamNetwork that is returned will have been re-imported from the new.ssn.path directory after the subset operations are complete.
 }
+\author{
+Erin E. Peterson and Alan R. Pearse
+}

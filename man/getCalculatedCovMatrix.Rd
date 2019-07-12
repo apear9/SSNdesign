@@ -15,5 +15,8 @@ getCalculatedCovMatrix(glmssn, log.scale = FALSE)
 A covariance matrix for the \code{glmssn} object's covariance parameters.
 }
 \description{
-This function returns the estimated covariance matrix on the covariance parameters from a \code{glmssn} object. Importantly it can be set the return the estimated covariance matrix on its native scale, as opposed to the log scale.
+This function returns the estimated covariance matrix on the covariance parameters from a \code{glmssn} object. Importantly it can be set the return the estimated covariance matrix on its native scale, as opposed to the log scale. This is an extended version of \code{\link{getCalculatedSE}}.
+}
+\details{
+The transformation of the covariance matrix to and from the log-scale is performed using the delta method.
 }

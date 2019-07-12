@@ -4,7 +4,7 @@
 \alias{nnetwork}
 \title{Find the number of distinct networks in a SpatialStreamNetwork}
 \usage{
-\code{nnetwork(ssn)}
+nnetwork(ssn)
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}

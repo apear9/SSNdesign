@@ -20,7 +20,7 @@ drawStreamNetworkSamples(ssn, new.ssn.path, overwrite.path = FALSE,
 
 \item{use.locID}{A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE.}
 
-\item{...}{Other arguments to Stream.Network.Samples; chiefly, cluster.number, which is required for some sample.method arguments.}
+\item{...}{Other arguments to Stream.Network.Samples. An example is \code{cluster.number}, which is required for some sample.method arguments.}
 }
 \value{
 An object of class SpatialStreamNetwork. Note, any prediction points will have to be imported separately.

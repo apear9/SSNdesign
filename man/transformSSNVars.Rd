@@ -4,7 +4,8 @@
 \alias{transformSSNVars}
 \title{A function to conveniently transform multiple variables inside the observed and predicted points' data slots in a SpatialStreamNetwork object}
 \usage{
-\code{transformSSNVars(ssn, obs.vars, preds.vars, func, write.out = FALSE)}
+transformSSNVars(ssn, new.ssn.path, obs.vars, preds.vars, func,
+  write.out = FALSE, ...)
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}

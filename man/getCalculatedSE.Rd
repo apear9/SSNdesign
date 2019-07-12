@@ -15,5 +15,8 @@ getCalculatedSE(glmssn, log.scale = FALSE)
 A vector of expected standard errors for the glmssn object's covariance parameters.
 }
 \description{
-This function returns the expected standard errors on the covariance parameters for a given set of parameter values.
+This function returns the expected standard errors on the covariance parameters for a given set of parameter values. It is a more limited version of \code{\link{getCalculatedCovMatrix}}. This function returns only the square roots of the diagonals of the observed fisher information matrix.
+}
+\details{
+The transformation of the covariance matrix to and from the log-scale is performed using the delta method.
 }

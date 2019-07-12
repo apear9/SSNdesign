@@ -4,7 +4,7 @@
 \alias{importStreams}
 \title{Import a shapefile of stream edges without observed or predicted sites as a SpatialStreamNetwork}
 \usage{
-\code{importStreams(filepath, o.write = FALSE)}
+importStreams(filepath, o.write = FALSE)
 }
 \arguments{
 \item{filepath}{a path to a folder containing a stream network. The folder should have the extension .ssn.}
@@ -15,7 +15,7 @@
 An object of class SpatialStreamNetwork, with nothing in obspoints and predpoints slots.
 }
 \description{
-Imports a SpatialStreamNetwork that has no observed or predicted sites.
+Imports a SpatialStreamNetwork without loading the observed and predicted sites.
 }
 \details{
 The purpose of this function is to allow users to ingest stream shapefiles with no observed or prediction sites into R as a SpatialStreamNetwork. This will then allow them to use their data with functions like \code{generateSites}, which will allow them to explore various designs on their stream network.

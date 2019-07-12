@@ -11,11 +11,13 @@
 \arguments{
 \item{x}{An object of class \code{ssndesign}}
 
-\item{y}{Not used for \code{plot.ssndesign}}
+\item{y}{Not used}
 
-\item{which.iteration}{A numeric indicating the trace that should be plotted. This can be a vector, in which case all traces corresponding to those indices will be plotted.The first five traces are plotted by default.}
+\item{which.iteration}{A numeric indicating the trace that should be plotted. This can be a vector, in which case all traces corresponding to those indices will be plotted. All traces are plotted by default.}
 
-\item{...}{Additional arguments to plot.}
+\item{legend}{Whether the legend should be drawn on the plot. Defaults to \code{FALSE}. Not advised if there are many traces because the legend will be too large to properly fit on the plot.}
+
+\item{...}{Additional arguments to the \code{plot} function.}
 }
 \description{
 A generic plot function adapted for `ssndesign` objects. It plots the traces from the optimisation algorithm.

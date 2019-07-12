@@ -4,7 +4,7 @@
 \alias{calculateShreveStreamOrder}
 \title{A function to calculate the Shreve stream order of a stream edge}
 \usage{
-\code{calculateShreveStreamOrder(binary.id.table)}
+calculateShreveStreamOrder(binary.id.table)
 }
 \arguments{
 \item{binary.id.table}{A data.frame representing a binaryID table extracted from the binaryID.db in the path of a SpatialStreamNetwork.}
@@ -14,7 +14,4 @@ A data.frame with two columns: the first is the RID of each stream segment; the 
 }
 \description{
 For a given binaryID table, this function quickly computes the Shreve stream order of every stream segment by counting the number of upstream inlet edges there are.
-}
-\details{
-This function uses string matching on the binaryIDs devised by ... (2010) to calculate the Shreve stream order of every stream segment in a network. This process is made computationally efficient by the realisation that the Shreve stream order is the number of inlet segments upstream of a given segment.
 }

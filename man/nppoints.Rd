@@ -15,7 +15,7 @@ nppoints(ssn, use = "pids")
 A list with two elements: a vector of prediction points by network, and a scalar being the total number of prediction points in the SpatialStreamNetwork object.
 }
 \description{
-The function \code{nppoints} returns the number of prediction points on a SpatialStreamNetwork object, both in total and by network.
+The function \code{nppoints} returns the number of prediction points on a SpatialStreamNetwork object, both in total and in each network.
 }
 \details{
 To find the number of design points on a SpatialStreamNetwork object, use \code{\link{ndpoints}}.

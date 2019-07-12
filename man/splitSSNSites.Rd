@@ -4,7 +4,8 @@
 \alias{splitSSNSites}
 \title{Split the temporally replicated point data for a SpatialStreamNetwork object into separate shapefile}
 \usage{
-\code{splitSSNSites(big.ssn, replication.variable, preds = TRUE, preferred.wd = getwd())}
+splitSSNSites(big.ssn, new.ssn.path, replication.variable, preds = TRUE,
+  preferred.wd = getwd())
 }
 \arguments{
 \item{big.ssn}{The SpatialStreamNetwork object which contains the temporally replicated site data.}
@@ -28,6 +29,16 @@ This function is wrapped by \code{\link{optimiseSSNDesign}}. The \code{optimiseS
 }
 \examples{
 
-\dontrun{#CODE}
+\dontrun{
+
+s <- createSSN(10, binomialDesign(100, 2), path = tempPath("r.ssn"), importToR = T)
+
+# Split SSN sites into two shapefiles, one for each year
+split <- splitSSNSites(s, tempPath("split.ssn"), "Time", FALSE, tempdir())
+
+# Join the year 2 shapefile back to the year 1 shapefile in the SSN
+spliced <- spliceSSNSites(split, tempPath("spliced.ssn"), paste0(tempdir(), "/sites2.shp"))
+
+}
 
 }

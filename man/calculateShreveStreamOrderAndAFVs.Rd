@@ -4,12 +4,12 @@
 \alias{calculateShreveStreamOrderAndAFVs}
 \title{Calculate Shreve stream order and afv}
 \usage{
-\code{calculateShreveStreamOrderAndAFVs(ssn)}
+calculateShreveStreamOrderAndAFVs(ssn, BID.tables = NULL)
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}
 
-\item{BID.tables}{optionally provide pre-computed binary ID tables. This can be beneficial if the stream network is large or if the binary ID tables have already been computed for another purpose.}
+\item{BID.tables}{optionally provide pre-computed binary ID tables. This can be beneficial if the stream network is large or if the binary ID tables have already been computed for another purpose because computation time can be shaved off.}
 }
 \value{
 An object of class SpatialStreamNetwork.

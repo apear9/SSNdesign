@@ -17,5 +17,5 @@ getExpectedSE(glmssn, log.scale = FALSE, ...)
 A vector of expected standard errors for the \code{glmssn} object's covariance parameters.
 }
 \description{
-This function returns the expected standard errors on the covariance parameters for a \code{glmssn} object.
+This function returns the expected standard errors on the covariance parameters for a \code{glmssn} object. This function is a more limited version of \code{\link{getExpectedCovMatrix}}. The standard errors are the square roots of the diagonals of the expected information matrix.
 }

@@ -4,13 +4,14 @@
 \alias{systematicDesign}
 \title{The systematicDesign function from SSN updated to be compatible with functions from SSNDesign}
 \usage{
-\code{systematicDesign(...)}
+systematicDesign(spacing, replications = 1, rep.variable = "Time",
+  rep.values)
 }
 \arguments{
 \item{...}{Arguments for the function \code{systematicDesign} as in the package SSN.}
 }
 \value{
-An object of class data.frame.
+Result not seen by user.
 }
 \description{
 \code{systematicDesign} replaces a function of the same name from the package SSN.
