@@ -4,10 +4,6 @@
 #' 
 #' This is a function to subset the observed and/or prediction sites on a SpatialStreamNetwork based on pids or locIDs.
 #' 
-#' @usage 
-#' 
-#' subsetByID(ssn, new.ssn.path, obs, preds, locID = FALSE)
-#' 
 #' @param ssn An object of class SpatialStreamNetwork.
 #' @param new.ssn.path A path to a new .ssn directory where the outputs of this function should be stored. 
 #' @param obs A numeric or character vector containing the pids or locIDs of the observed sites that should be kept in the subset.
@@ -18,6 +14,8 @@
 #' @details 
 #' 
 #' Note, the SpatialStreamNetwork that is returned will have been re-imported from the new.ssn.path directory after the subset operations are complete.
+#' 
+#' @author Erin E. Peterson and Alan R. Pearse
 #' 
 #' @export
 subsetByID <- function(ssn, new.ssn.path, obs, preds, locID = FALSE){

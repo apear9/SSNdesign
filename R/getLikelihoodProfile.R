@@ -1,8 +1,8 @@
-#' Extract a likelihood profile that can be plotted
+  #' Extract a likelihood profile for the covariance parameters in a \code{glmssn}
 #' 
 #' @description 
 #' 
-#' This function computes the likelihood surface in the vicinity of the maximum likelihood estimates of the covariance parameters.
+#' This function computes the likelihood surface in the vicinity of the maximum likelihood estimates of the covariance parameters. Note: this is experimental. This function was initially developed as a workaround to the problem of defining log-normal priors for the covariance parameters when the standard errors extracted by \code{\link{getExpectedSE}} were manifestly unreasonable. 
 #' 
 #' @param glmssn An object of class \code{glmssn}
 #' @param which.vary A vector indicating which of the covariance parameters should be varied. You must vary at least one parameter but you can vary all of them if it suits you.
@@ -12,7 +12,7 @@
 #' @param ... Any additional arguments to \code{foreach}. Users are NOT recommended to fiddle with this. 
 #' @return A \code{data.frame} with one column for each covariance parameter and another column for the log-likelihood. 
 #' 
-#' @author Alan R. Pearse and Jay Ver Hoef
+#' @author Jay Ver Hoef and Alan R. Pearse
 #' 
 #' @export
 getLikelihoodProfile <- function(glmssn, which.vary, grid.parameters, parallelism = "none", n.cores = 1, ...){

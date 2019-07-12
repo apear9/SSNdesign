@@ -2,7 +2,7 @@
 #' 
 #' @description 
 #' 
-#' This function returns the expected standard errors on the covariance parameters for a \code{glmssn} object.
+#' This function returns the expected standard errors on the covariance parameters for a \code{glmssn} object. This function is a more limited version of \code{\link{getExpectedCovMatrix}}. The standard errors are the square roots of the diagonals of the expected information matrix. 
 #' 
 #' @param glmssn A fitted \code{glmssn} object.
 #' @param log.scale Whether the standard errors should be given on the log scale. Defaults to FALSE.

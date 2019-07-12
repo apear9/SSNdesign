@@ -16,6 +16,14 @@
 #' 
 #' The new observed and/or predicted sites will appear as shapefiles in \code{ssn@path}.  
 #' 
+#' @examples 
+#' 
+#' # SSN with small random design
+#' s <- createSSN(100, binomialDesign(20), path = tempPath("s.ssn"), importToR = T)
+#' 
+#' # Overwrite design with a systematic design
+#' s2 <- generateSites(s, systematicDesign(0.5), o.write = TRUE) 
+#' 
 #' @export
 generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write = FALSE){
   

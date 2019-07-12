@@ -2,7 +2,7 @@
 #'
 #'@description
 #'   
-#' The function \code{nppoints} returns the number of prediction points on a SpatialStreamNetwork object, both in total and by network.
+#' The function \code{nppoints} returns the number of prediction points on a SpatialStreamNetwork object, both in total and in each network.
 #'
 #'@param ssn An object of class SpatialStreamNetwork
 #'@param use A string indicating whether the pids or locIDs should be counted. 

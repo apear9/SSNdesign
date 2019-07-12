@@ -4,12 +4,8 @@
 #'
 #' Calculates Shreve stream order and additive function values on an arbitrary SpatialStreamNetwork object.
 #' 
-#'@usage 
-#' 
-#'\code{calculateShreveStreamOrderAndAFVs(ssn)}
-#' 
 #'@param ssn an object of class SpatialStreamNetwork
-#'@param BID.tables optionally provide pre-computed binary ID tables. This can be beneficial if the stream network is large or if the binary ID tables have already been computed for another purpose.
+#'@param BID.tables optionally provide pre-computed binary ID tables. This can be beneficial if the stream network is large or if the binary ID tables have already been computed for another purpose because computation time can be shaved off.
 #'@return An object of class SpatialStreamNetwork. 
 #'
 #'@details 
@@ -17,7 +13,6 @@
 #'This function accepts a SpatialStreamNetwork object and calculates Shreve stream orders and additive function values for it, which are then joined back to the `ssn@data` slot. This funciton should be used when a SpatialStreamNetwork has no edge attributes which could be used to calculate the AFV. 
 #'    
 #'@export
-#'
 calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
   
   # Calculate how many networks there are

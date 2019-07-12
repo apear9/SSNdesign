@@ -4,10 +4,6 @@
 #' 
 #' The process of modifying the data.frame objects in the observed and predicted sites of a SpatialStreamNetwork can be complicated. This function simplifies this process.
 #' 
-#' @usage 
-#' 
-#' \code{transformSSNVars(ssn, obs.vars, preds.vars, func, write.out = FALSE)}
-#' 
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param new.ssn.path The directory in which a new .ssn directory should be written out. Ignored if write.out = FALSE.
 #' @param obs.vars A character vector containing the names of the columns in the observed sites point.data slot which should be transformed. If this is a named vector, then new columns with those names will be added. Otherwise, the old columns will be overwritten.

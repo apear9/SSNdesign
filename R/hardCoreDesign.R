@@ -4,12 +4,8 @@
 #'
 #'\code{hardCoreDesign} replaces a function of the same name from the package SSN.
 #' 
-#'@usage
-#'
-#'\code{hardCoreDesign(...)} 
-#'
 #'@param ... Arguments for the function \code{hardCoreDesign} in the package SSN.
-#'@return An object of class data.frame
+#'@return The output is not seen by the user.
 #'
 #'@details
 #'

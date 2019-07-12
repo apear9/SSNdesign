@@ -10,7 +10,7 @@
 #' @param sample.method A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Extreme.Clust.and.Singles", "Trib.Sets.Ext.Singles.sample", "Trib.Sets.Ext.Singles.Mouth.sample"
 #' @param sample.size A numeric scalar specifying the desired sample size.
 #' @param use.locID A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE. 
-#' @param ... Other arguments to Stream.Network.Samples; chiefly, cluster.number, which is required for some sample.method arguments.
+#' @param ... Other arguments to Stream.Network.Samples. An example is \code{cluster.number}, which is required for some sample.method arguments.
 #' @return An object of class SpatialStreamNetwork. Note, any prediction points will have to be imported separately.  
 #' 
 #' @references 

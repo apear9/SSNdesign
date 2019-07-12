@@ -4,12 +4,8 @@
 #' 
 #' This function finds a space-filling design on a Spatial Stream Network. It does so by optimising one of two space-filling utility functions: (1) the maximin utility function in \code{\link{spaceFillingMaxiMin}} or (2) the modified maximin utility proposed by Morris and Mitchell (1995) in \code{\link{spaceFillingMorrisMitchell}}. 
 #' 
-#' The Greedy Exchange Algorithm is used to optimise the design.
-#' 
-#' @usage 
-#' 
-#' constructSpaceFillingDesign <- function(ssn, new.ssn.path, n.points, type = c("maximin", "morris.mitchell"), euclidean.distance = FALSE, p = 10, n.optim = 5, n.cores = 1, parallelism = "none", parallelism.seed = NULL, ...)
-#' 
+#' The Greedy Exchange Algorithm is used to find the optimal design.
+#'  
 #' @param ssn An object of class SpatialStreamNetwork. Its obspoints slot must contain all the potential sampling sites for the stream network.  
 #' @param new.ssn.path A path to a folder where the result can be stored.
 #' @param n.points A numeric or a named numeric vector specifying the size of the final design(s). See Details for more information.
@@ -28,6 +24,8 @@
 #' The argument n.points can be a single number or a vector. If the user supplies a single number, then, regardless of the number of isolated networks present in the ssn object, a total of n.points sites will be selected across ALL these networks. That is, the networks are not treated as separate design problems. However, if the user supplies a vector, things become more complicated. Firstly, the vector must be named. The names of the elements correspond to networks in the ssn argument and the element itself is the number of sites which should be selected within that network. The n.points argument may therefore look like this: \code{c("1" = 5, "3" = 6)}. In this example, the user is asking for 5 sites to be chosen from network 1 and 6 from network 3. It also shows that there is no need to select sites in every network. One final caveat is that no sites will appear in ssn.new for any networks which are skipped over.
 #' 
 #' @references 
+#' 
+#' Falk, M., Pettitt, A., McGree, J.M. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, 21(\emph{4}), 751-773.
 #' 
 #' Morris, M.D. & Mitchell, T.J. (1995). Exploratory Designs for Computational Experiments. \emph{Journal of Statistical Planning and Inference}, \emph{43}, 381-402. 
 #' 

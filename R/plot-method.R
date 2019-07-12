@@ -7,9 +7,10 @@
 #' @method plot ssndesign
 #' 
 #' @param x An object of class \code{ssndesign}
-#' @param y Not used for \code{plot.ssndesign}
-#' @param which.iteration A numeric indicating the trace that should be plotted. This can be a vector, in which case all traces corresponding to those indices will be plotted.The first five traces are plotted by default.
-#' @param ... Additional arguments to plot.
+#' @param y Not used 
+#' @param which.iteration A numeric indicating the trace that should be plotted. This can be a vector, in which case all traces corresponding to those indices will be plotted. All traces are plotted by default. 
+#' @param legend Whether the legend should be drawn on the plot. Defaults to \code{FALSE}. Not advised if there are many traces because the legend will be too large to properly fit on the plot. 
+#' @param ... Additional arguments to the \code{plot} function.
 #' 
 #' @details 
 #' 

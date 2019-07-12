@@ -3,13 +3,9 @@
 #'@description
 #'
 #'\code{systematicDesign} replaces a function of the same name from the package SSN.
-#' 
-#'@usage
-#'
-#'\code{systematicDesign(...)} 
 #'
 #'@param ... Arguments for the function \code{systematicDesign} as in the package SSN.
-#'@return An object of class data.frame.
+#'@return Result not seen by user.
 #'
 #'@details
 #'

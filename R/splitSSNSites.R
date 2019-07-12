@@ -4,10 +4,6 @@
 #' 
 #'Primarily intended to be used with the \code{\link{optimiseSSNDesign}} function, this function takes an SSN with temporal replicates across some number of sites and splits the sites into separate shapefiles based on the levels of the replication variable. This makes it easier to deal with the SSN in a statistically consistent way when performing sequential design over the network.
 #' 
-#'@usage 
-#' 
-#'\code{splitSSNSites(big.ssn, replication.variable, preds = TRUE, preferred.wd = getwd())}
-#' 
 #'@param big.ssn The SpatialStreamNetwork object which contains the temporally replicated site data.
 #'@param new.ssn.path A file path for a new SSN object.
 #'@param replication.variable A string which indicates which variable in the \code{big.ssn@obspoints@SSNPoints[[1]]@point.data} should be used to split big.ssn into separate shapefiles.
@@ -21,7 +17,17 @@
 #' 
 #' @examples 
 #' 
-#' \dontrun{#CODE}
+#' \dontrun{
+#' 
+#' s <- createSSN(10, binomialDesign(100, 2), path = tempPath("r.ssn"), importToR = T)
+#' 
+#' # Split SSN sites into two shapefiles, one for each year
+#' split <- splitSSNSites(s, tempPath("split.ssn"), "Time", FALSE, tempdir())
+#' 
+#' # Join the year 2 shapefile back to the year 1 shapefile in the SSN
+#' spliced <- spliceSSNSites(split, tempPath("spliced.ssn"), paste0(tempdir(), "/sites2.shp"))
+#' 
+#' }
 #' 
 #'@export
 splitSSNSites <- function(

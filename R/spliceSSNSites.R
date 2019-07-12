@@ -16,7 +16,17 @@
 #'  
 #' @examples
 #'
-#' \dontrun{#code}
+#' \dontrun{
+#' 
+#' s <- createSSN(10, binomialDesign(100, 2), path = tempPath("r.ssn"), importToR = T)
+#' 
+#' # Split SSN sites into two shapefiles, one for each year
+#' split <- splitSSNSites(s, tempPath("split.ssn"), "Time", FALSE, tempdir())
+#' 
+#' # Join the year 2 shapefile back to the year 1 shapefile in the SSN
+#' spliced <- spliceSSNSites(split, tempPath("spliced.ssn"), paste0(tempdir(), "/sites2.shp"))
+#' 
+#' }
 #'  
 #' @export
 spliceSSNSites <- function(

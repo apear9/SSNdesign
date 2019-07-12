@@ -2,7 +2,7 @@
 #' 
 #' @description 
 #' 
-#' This function returns the expected covariance matrix for the covariance parameters in a \code{glmssn} object.
+#' This function returns the expected covariance matrix for the covariance parameters in a \code{glmssn} object. This function is similar to \code{\link{getExpectedSE}}.
 #' 
 #' @param glmssn A fitted \code{glmssn} object.
 #' @param log.scale Whether the covariance matrix should be on the log-scale. Defaults to FALSE.

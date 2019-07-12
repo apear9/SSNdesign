@@ -10,7 +10,7 @@
 #'@param prior.parameters Ignored in this function but this argument is present so this function is consistent with all other utility functions.
 #'@param n.draws Ignored in this function but this argument is present so this function is consistent with all other utility functions.
 #'@param extra.arguments A list of extra parameters that control the behaviour of the utility function. The distance matrices required to compute covariance matrices are also stored in this list. Note that these are generated inside \code{\link{optimiseSSNDesign}}.
-#'@return The expected utility of a design. This number represents the minimum (non-zero) distance between any pair of points in the design.
+#'@return The expected utility of a design. This number represents the smallest non-zero distance between any pair of sites in the design.
 #' 
 #'@details
 #'

@@ -4,16 +4,8 @@
 #'
 #'For a given binaryID table, this function quickly computes the Shreve stream order of every stream segment by counting the number of upstream inlet edges there are.
 #'
-#'@usage
-#'
-#'\code{calculateShreveStreamOrder(binary.id.table)}
-#'
 #'@param binary.id.table A data.frame representing a binaryID table extracted from the binaryID.db in the path of a SpatialStreamNetwork.
 #'@return A data.frame with two columns: the first is the RID of each stream segment; the second is the Shreve order of each segment.
-#'
-#'@details
-#'
-#'This function uses string matching on the binaryIDs devised by ... (2010) to calculate the Shreve stream order of every stream segment in a network. This process is made computationally efficient by the realisation that the Shreve stream order is the number of inlet segments upstream of a given segment.
 #'
 #'@export
 calculateShreveStreamOrder <- function(binary.id.table){
