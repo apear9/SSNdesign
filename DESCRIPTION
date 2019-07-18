@@ -5,6 +5,7 @@ Authors@R: c(
   person("Alan", "Pearse", email = "ar.pearse@qut.edu.au", role = c("aut", "cre")),
   person("James", "McGree", email = "james.mcgree@qut.edu.au", role = c("aut")),
   person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut")),
+  person("Jay", "Ver Hoef", email = "", role = c("aut")),
   person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut"))
   )
 Description: Pseudo-Bayesian optimal and adaptive sampling design on stream networks.
