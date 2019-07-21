@@ -46,7 +46,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
     h <- extra.arguments$h
   }
   
-  # LOOPPPPP
+  # Compute utility function
   for(i in 1:n.draws){
     
     # Get covariance matrix on the data
@@ -110,7 +110,7 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
     
   }
   
-  if(any(is.infinite(FIM))){
+  if(any(is.infinite(FIM)) | any(is.nan(FIM))){
     return(-1e9)
   } else{
     return(mean(FIM, na.rm = TRUE))
