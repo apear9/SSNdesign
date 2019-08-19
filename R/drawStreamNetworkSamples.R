@@ -17,6 +17,22 @@
 #' 
 #' Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
 #' 
+#' @examples 
+#' 
+#' \dontrun{
+#' 
+#' # Create stream network
+#' s <- createSSN(10, systematicDesign(.25), path = tempPath("s.ssn"), importToR = T)
+#' createDistMat(s)
+#' # Plot systematic design
+#' plot(s)
+#' # Now find a GRTS design
+#' g <- drawStreamNetworkSamples(s, tempPath("g.ssn"), sample.method = "GRTS", sample.size = 10)
+#' # Plot this design
+#' plot(g)
+#' 
+#' }
+#' 
 #' @export
 drawStreamNetworkSamples <- function(
   ssn, 
