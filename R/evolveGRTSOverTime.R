@@ -67,7 +67,12 @@ evolveGRTSOverTime <- function(ssn, num.sites, rep.variable){
   sites.by.timestep <- vector("list", length(num.sites))
   for(i in 1:length(num.sites)){
     sites.by.timestep[[i]] <- list(by.locID = NA, by.pid = NA) 
-    sites.by.timestep[[i]]$by.locID <- selected.pool[1:sum(num.sites[1:i])]
+    num.to.use <- sum(num.sites[1:i])
+    if(num.to.use == 0){
+      sites.by.timestep[[i]]$by.locID <- numeric(0)
+    } else {
+      sites.by.timestep[[i]]$by.locID <- selected.pool[1:num.to.use]
+    }
   }
   names(sites.by.timestep) <- paste("Period", rep.var.lvl, sep = "_")
   
