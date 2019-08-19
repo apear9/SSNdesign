@@ -14,7 +14,6 @@ EKOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   ssn2@obspoints@SSNPoints[[1]]@point.data <- ssn@obspoints@SSNPoints[[1]]@point.data[ind.x, ] 
   
   # Cut down SSN pred points similarly
-  #indp.x <- ssn@predpoints@SSNPoints[[1]]@point.data$pid %in% row.names(extra.arguments$Matrices.prd$d)
   indp.c <- row.names(ssn@predpoints@SSNPoints[[1]]@point.coords) %in% row.names(extra.arguments$Matrices.prd$d)
   cds.prd <- ssn2@predpoints@SSNPoints[[1]]@point.coords[indp.c, ]
   colnames(cds.prd) <- c("x", "y")

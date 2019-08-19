@@ -44,13 +44,6 @@ KOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, e
   ua <- glmssn$args$use.anisotropy
   re <- glmssn$sampInfo$REs
   
-  # ## Simulate covparms from priors
-  # cvp.cols <- length(glmssn$estimates$theta)
-  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  # for(i in 1:cvp.cols){
-  #   cvp[, i] <- prior.parameters[[i]](n.draws)
-  # }
-  
   ## Loop here to find utilities across all simulations
   
   # initialise empty vector to store results

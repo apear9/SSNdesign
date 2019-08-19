@@ -24,11 +24,6 @@ sequentialEDOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Simulate parameters as required
-  # cvp.cols <- length(glmssn$estimates$theta)
-  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  # for(i in 1:cvp.cols){
-  #   cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
-  # }
   fep <- extra.arguments$Empirical.FEP
   
   # Extract model formula

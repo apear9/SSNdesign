@@ -124,12 +124,6 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
   # Turn the SSN into a graph so that the SSN design functions can operate on them
   graph.info <- readshpnw(ssn)
   graphs <- nel2igraph(graph.info[[2]], graph.info[[3]], eadf = graph.info[[5]], Directed = TRUE)
-  # Construct corresponding data frame
-  # line.data <- data.frame(
-  #   rid = edge_attr(graphs)["rid"],
-  #   netID = edge_attr(graphs)["netID"]
-  # ) # PROBLEM HERE
-  # line.data <- dplyr::arrange(line.data, netID, rid)
   
   # Extract information from graphs to make the design functions usable
   for(i in 1:n.n){
@@ -333,7 +327,7 @@ generateSites <- function(ssn, obsDesign, predDesign = SSN:::noPoints, o.write =
     ssn@predpoints@ID[[1]] <- "preds"
   }
   
-  # Finally, dump out the result
+  # Finally, return the result
   if(total.pred > 0){
     return(importSSN(path, predpts = "preds"))
   } else {

@@ -21,11 +21,6 @@ EDOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
   # Simulate parameters as required
-  # cvp.cols <- length(glmssn$estimates$theta)
-  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  # for(i in 1:cvp.cols){
-  #   cvp[, i] <- prior.parameters[[i]](n.draws) # The covariance parameters
-  # }
   fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
   fep <- unname(fep)
   

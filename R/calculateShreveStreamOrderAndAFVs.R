@@ -32,7 +32,7 @@ calculateShreveStreamOrderAndAFVs <- function(ssn, BID.tables = NULL){
   if(is.null(BID.tables)){
     BID.tables <- getBIDtables(ssn)
     if(ns > 1e4){
-      print("Large spatial stream network detected. Reading in the binary ID tables may take several minutes.")
+      message("Large spatial stream network detected. Reading in the binary ID tables may take several minutes.")
     }
   }
 
