@@ -28,6 +28,23 @@ An object of class SpatialStreamNetwork. Note, any prediction points will have t
 \description{
 This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs any of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
 }
+\examples{
+
+\dontrun{
+
+# Create stream network
+s <- createSSN(10, systematicDesign(.25), path = tempPath("s.ssn"), importToR = T)
+createDistMat(s)
+# Plot systematic design
+plot(s)
+# Now find a GRTS design
+g <- drawStreamNetworkSamples(s, tempPath("g.ssn"), sample.method = "GRTS", sample.size = 10)
+# Plot this design
+plot(g)
+
+}
+
+}
 \references{
 Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
 }
