@@ -13,7 +13,7 @@ Maintainer: Alan Pearse <apearse9@gmail.com>
 Description: Pseudo-Bayesian optimal and adaptive sampling design on stream networks.
 Depends: R (>= 3.5.0), SSN, doParallel, doRNG, spsurvey, shp2graph
 License: GPL-2
-Imports: rgdal, igraph, foreach, itertools, iterators, RSQLite, DBI, maptools, stringr, ggplot2, MASS, dplyr, methods
+Imports: rgdal, igraph, foreach, itertools, iterators, RSQLite, DBI, maptools, stringr, ggplot2, MASS, dplyr, methods, sp
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

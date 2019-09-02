@@ -57,5 +57,7 @@
 #' @importFrom methods is new
 #' @importFrom stats as.formula contrasts dist glm model.frame model.matrix optim optimize rbinom rnorm rpois sd terms
 #' @importFrom utils read.table
+#' @importFrom sp spTransform SpatialPointsDataFrame SpatialLines SpatialLinesDataFrame
+#' @importFrom parallel makeCluster stopCluster
 NULL
 ## NULL
