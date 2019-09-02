@@ -4,13 +4,16 @@ Version: 0.0.0.9000
 Authors@R: c(
   person("Alan", "Pearse", email = "apearse9@gmail.com", role = c("aut", "cre")),
   person("James", "McGree", email = "james.mcgree@qut.edu.au", role = c("aut")),
-  person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut")),
-  person("Jay", "Ver Hoef", email = "jay.verhoef@noaa.gov", role = c("aut")),
-  person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut"))
+  person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut", "ctb")),
+  person("Jay", "Ver Hoef", email = "jay.verhoef@noaa.gov", role = c("aut", "ctb")),
+  person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut", "ctb"))
   )
-Author: Alan Pearse [aut, cre], James McGree [aut], Nicholas Som [aut], Jay Ver Hoef [aut], Erin Peterson [aut] 
+Author: Alan Pearse [aut, cre], James McGree [aut], Nicholas Som [aut, ctb], Jay Ver Hoef [aut, ctb], Erin Peterson [aut, ctb] 
 Maintainer: Alan Pearse <apearse9@gmail.com>
-Description: Pseudo-Bayesian optimal and adaptive sampling design on stream networks.
+Description: Solve pseudo-Bayesian optimal and adaptive sampling design problems 
+	on stream networks. Given a geostatistical stream network model and a utility function, this 
+	package will optimise a sampling design so that one gets the best information from their stream
+	water samples.
 Depends: R (>= 3.5.0), SSN, doParallel, doRNG, spsurvey, shp2graph
 License: GPL-2
 Imports: rgdal, igraph, foreach, itertools, iterators, RSQLite, DBI, maptools, stringr, ggplot2, MASS, dplyr, methods, sp
