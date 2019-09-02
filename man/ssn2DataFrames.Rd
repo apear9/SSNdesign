@@ -23,7 +23,8 @@ This function takes a SpatialStreamNetwork and returns a list of one to three da
 
 # Create a SSN
 
-s <- createSSN(100, binomialDesign(10), binomialDesign(10), paste(tempdir(), "s.ssn", sep = "/"), TRUE)
+s <- createSSN(100, binomialDesign(10), 
+binomialDesign(10), paste(tempdir(), "s.ssn", sep = "/"), TRUE)
 
 # Coerce to data.frame
 

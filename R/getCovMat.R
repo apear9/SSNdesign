@@ -7,12 +7,7 @@
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn A fitted glmssn object. Optional if other arguments are provided.
 #' @param addfunccol The name of the column in the point.data slot of the obspoints slot of a SpatialStreamNetwork object containing the additive function values used to weight the tail up component of a covariance function.
-#' @param theta A vector of covariance parameters. Optional if glmssn is provided.
-#' @param useTailDownWeight A logical indicating whether the taildown component of a covariance function should be weighted by the additive function value
-#' @param CorModels The covariance components to use.
-#' @param use.nugget A logical indicating whether a nugget effect should be included in the covariance function.
-#' @param use.anisotropy NOT YET IMPLEMENTED IN SSN. SET TO FALSE IF REQUIRED.
-#' @param REs A logical indicating whether random effects are to be used. 
+#' @param ... Additional arguments to \code{SSN:::makeCovMat}. 
 #' @return A list containing the covariance matrix and its determinant.
 #' 
 #' @export

@@ -2,9 +2,9 @@
 #' 
 #'@description
 #'
-#'\code{systematicDesign} replaces a function of the same name from the package SSN.
+#'\code{systematicDesign} replaces a function of the same name from the package SSN. This version of the function can be used with \code{generateSites}.
 #'
-#'@param ... Arguments for the function \code{systematicDesign} as in the package SSN.
+#'@inheritParams SSN::systematicDesign
 #'@return Result not seen by user.
 #'
 #'@details

@@ -4,7 +4,7 @@
 \alias{find.segment.lengths}
 \title{Find the length of every reach in a SpatialStreamNetwork.}
 \usage{
-\code{find.segment.lengths(raw.ssn, bin.table)}
+find.segment.lengths(raw.ssn, bin.table)
 }
 \arguments{
 \item{raw.ssn}{an object of class SpatialStreamNetwork}

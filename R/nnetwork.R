@@ -9,7 +9,8 @@
 #'
 #'@examples
 #'
-#'s <- createSSN(c(10, 10), binomialDesign(c(2, 2)), path = paste(tempdir(), "tmp.ssn", sep = "/"), importToR = TRUE)
+#'s <- createSSN(c(10, 10), binomialDesign(c(2, 2)),
+#' path = paste(tempdir(), "tmp.ssn", sep = "/"), importToR = TRUE)
 #'nnetwork(s) # reports 2
 #'      
 #'@export

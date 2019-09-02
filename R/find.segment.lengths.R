@@ -3,11 +3,7 @@
 #'@description 
 #' 
 #'For a SpatialStreamNetwork, find the length of all reaches.
-#' 
-#'@usage 
-#'    
-#'\code{find.segment.lengths(raw.ssn, bin.table)} 
-#' 
+#'
 #'@param raw.ssn an object of class SpatialStreamNetwork
 #'@param bin.table an object of class data.frame which represents the bindaryID object for a SpatialStreamNetwork
 #'@return a data.frame

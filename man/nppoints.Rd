@@ -19,13 +19,18 @@ The function \code{nppoints} returns the number of prediction points on a Spatia
 }
 \details{
 To find the number of design points on a SpatialStreamNetwork object, use \code{\link{ndpoints}}.
+}
+\examples{
 
 set.seed(1)
 
-s1 <- createSSN(10, binomialDesign(10),binomialDesign(10), path = paste(tempdir(), "s1_no_reps_preds.ssn", sep = "/"), importToR = TRUE)
+s1 <- createSSN(10, binomialDesign(10),binomialDesign(10), 
+path = paste(tempdir(), "s1_no_reps_preds.ssn", sep = "/"), importToR = TRUE)
 nppoints(s1)
 
-s2 <- createSSN(10, binomialDesign(10, 2, "Time"), binomialDesign(10, 2, "Time"), path = paste(tempdir(), "s2_reps_preds.ssn", sep = "/"), importToR = TRUE)  
+s2 <- createSSN(10, binomialDesign(10, 2, "Time"), binomialDesign(10, 2, "Time"),
+path = paste(tempdir(), "s2_reps_preds.ssn", sep = "/"), importToR = TRUE)  
 nppoints(s2) # total number of observations
 nppoints(s2, "locIDs") # total number of sites
+
 }

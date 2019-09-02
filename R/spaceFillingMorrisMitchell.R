@@ -18,7 +18,7 @@
 #'
 #'For examples, please see \code{\link{constructSpaceFillingDesign}}.
 #' 
-#' @references 
+#'@references 
 #' 
 #' Morris, M.D. & Mitchell, T.J. (1995). Exploratory Designs for Computational Experiments. \emph{Journal of Statistical Planning and Inference}, \emph{43}, 381-402. 
 #' 

@@ -34,11 +34,13 @@
 #' \dontrun{
 #' 
 #'  # Create a simulated SpatialStreamNetwork object
-#'  s <- createSSN(50, binomialDesign(100), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+#'  s <- createSSN(50, binomialDesign(100), 
+#'  path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
 #'  createDistMat(s)
 #'  
 #'  # Construct a space filling design
-#'  space.filling <- constructSpaceFillingDesign(s, paste(tempdir(), "r.ssn", sep = "/"), 50, "maximin")
+#'  space.filling <- constructSpaceFillingDesign(s, 
+#'  paste(tempdir(), "r.ssn", sep = "/"), 50, "maximin")
 #'  
 #'  # Plot result to check
 #'  plot(space.filling$ssn.new)

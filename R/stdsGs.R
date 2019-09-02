@@ -9,7 +9,7 @@
 #'@examples
 #'
 #'x <- rnorm(100, 4, 2)
-#'x.std <- stdGs(x)
+#'x.std <- stdsGs(x)
 #'par(mfrow = c(1, 2))
 #'plot(density(x), main = "Unstandardised")
 #'plot(density(x.std), main = "Standardised")

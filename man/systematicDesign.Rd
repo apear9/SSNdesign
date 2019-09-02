@@ -8,13 +8,27 @@ systematicDesign(spacing, replications = 1, rep.variable = "Time",
   rep.values)
 }
 \arguments{
-\item{...}{Arguments for the function \code{systematicDesign} as in the package SSN.}
+\item{spacing}{
+	 A numeric vector having length 1 or the same length as the number of networks. This represents the desired spacing for the regular grid of points. 
+	}
+
+\item{replications}{
+		The number of replications of each point.
+	}
+
+\item{rep.variable}{
+		The name of the variable that will distinguish between the replicated points.
+	}
+
+\item{rep.values}{
+		The values that will be given to the variable named \code{rep.variable}. \code{rep.values[1]} will be assigned for replication 1, \code{rep.values[2]} for replication 2, etc. Defaults to \code{1:replications} if no value is given. 
+	}
 }
 \value{
 Result not seen by user.
 }
 \description{
-\code{systematicDesign} replaces a function of the same name from the package SSN.
+\code{systematicDesign} replaces a function of the same name from the package SSN. This version of the function can be used with \code{generateSites}.
 }
 \details{
 This function was written to deal with errors resulting in the \code{systematicDesign} function from the package SSN when it was used with SpatialStreamNetworks built from real spatial data. It is back-compatible with the \code{createSSN} function from SSN.

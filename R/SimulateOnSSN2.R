@@ -1,6 +1,9 @@
 #' Wrapper function for SimulateOnSSN
 #' 
-#' @inherit SSN::SimulateOnSSN
+#' @description This function was developed as a workaround for an error that occurs in \code{SSN::SimulateOnSSN} when a \code{SpatialStreamNetwork} object has temporal replicates on its sites.
+#' 
+#' @param ... Arguments for \code{SSN::SimulateOnSSN}.
+#' @return A \code{SpatiaLStreamNetwork} object like the one returned in the \code{ssn.object} element of the list output from \code{SSN::SimulateOnSSN}. 
 #' 
 #' @export
 SimulateOnSSN2 <- function(...){

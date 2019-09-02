@@ -4,10 +4,6 @@
 #'
 #' Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
 #' 
-#' @usage
-#'
-#' \code{utility.function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments)}
-#' 
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn A fitted model object of class glmssn.
 #' @param design.points A vector of pids corresponding to a set of observed sites in the obspoints slot of the SpatialStreamNetwork object.
@@ -44,11 +40,14 @@
 #' \dontrun{
 #' 
 #' # Create stream network
-#' s <- createSSN(100, systematicDesign(0.25), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+#' s <- createSSN(100, systematicDesign(0.25), 
+#' path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
 #' createDistMat(s)
 #' 
 #' # Simulate data on network
-#' s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),addfunccol = "addfunccol")$ssn.object
+#' s <- SimulateOnSSN(s, getSSNdata.frame(s), 
+#' formula = ~1, coefficients = 1, CorParms = c(1,2,1,2,1,2,0.1),
+#' addfunccol = "addfunccol")$ssn.object
 #' 
 #' # Fit a model to the simulated data
 #' m <- glmssn(Sim_Values ~ 1, s, addfunccol = "addfunccol")
@@ -57,7 +56,8 @@
 #' p <- constructLogNormalCovPriors(m)
 #' 
 #' # Find the optimal design using D-optimality as the utility function
-#' r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"), m, 25, utility.function = DOptimality, prior.parameters = p)
+#' r <- optimiseSSNDesign(s, paste(tempdir(), "r.ssn", sep = "/"),
+#'  m, 25, utility.function = DOptimality, prior.parameters = p)
 #' 
 #' # Plot result to check
 #' plot(r$ssn.new, "Sim_Values")

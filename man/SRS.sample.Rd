@@ -4,7 +4,7 @@
 \alias{SRS.sample}
 \title{This function selects a simple random sample of points from a stream network object of class SpatialStreamNetwork.}
 \usage{
-\code{SRS.sample(ssn.obj, sample.size)}
+SRS.sample(ssn.obj, sample.size)
 }
 \arguments{
 \item{ssn.obj}{an object of class SpatialStreamNetwork}

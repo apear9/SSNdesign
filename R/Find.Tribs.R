@@ -4,10 +4,6 @@
 #' 
 #'For each tributary junction in a SpatialStreamNetwork, find the rids of all reaches that meet to form the tributary junction.
 #' 
-#'@usage 
-#'    
-#'\code{Find.Tribsfunction(ssn.obj, bin.table)} 
-#' 
 #'@param ssn.obj an object of class SpatialStreamNetwork
 #'@param bin.table an object of class data.frame which represents the bindaryID object for a SpatialStreamNetwork
 #'@return a data.frame

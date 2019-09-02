@@ -4,7 +4,7 @@
 \alias{first.loc}
 \title{Find the first sampling location in a clustered sample}
 \usage{
-\code{first.loc(ssn.DF.now, start.point.method)}
+first.loc(ssn.DF.now, start.point.method)
 }
 \arguments{
 \item{ssn.DF.now}{an object of class data.frame which is a single reach's subset of the point.data slot fomr a SpatialStreamNetwork}

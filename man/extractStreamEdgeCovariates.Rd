@@ -4,7 +4,7 @@
 \alias{extractStreamEdgeCovariates}
 \title{Extract covariates on stream edges to observed and/or predicted sites}
 \usage{
-\code{extractStreamEdgeCovariates(ssn, columns)}
+extractStreamEdgeCovariates(ssn, columns)
 }
 \arguments{
 \item{ssn}{an object of class SpatialStreamNetwork}
@@ -22,9 +22,10 @@ This function transfers specified variables recorded on the edges of a SpatialSt
 set.seed(1)
 
 # Create an SSN
-s <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+s <- createSSN(10, binomialDesign(10), 
+path = paste(tempdir(), "example01.ssn", sep = "/"), importToR = TRUE)
 
 # Extract stream edge covariates
-s <- extractStreamEdgeCovariates(ssn, "Length")
+s <- extractStreamEdgeCovariates(s, "Length")
 
 }

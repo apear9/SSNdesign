@@ -2,9 +2,9 @@
 #' 
 #'@description
 #'
-#'\code{hardCoreDesign} replaces a function of the same name from the package SSN.
+#'\code{hardCoreDesign} replaces a function of the same name from the package SSN. This version of the function can be used with \code{generateSites}.
 #' 
-#'@param ... Arguments for the function \code{hardCoreDesign} in the package SSN.
+#'@inheritParams SSN::hardCoreDesign
 #'@return The output is not seen by the user.
 #'
 #'@details

@@ -4,7 +4,8 @@
 \alias{simulateFromSSNM}
 \title{Simulate data, with error, from a glmssn object}
 \usage{
-\code{simulateFromSSNM(ssn, glmssn, fixed.effects = NULL, covariance.type = NULL, covariance.parms = NULL)}
+simulateFromSSNM(ssn, glmssn, fixed.effects = NULL,
+  covariance.type = NULL, covariance.parms = NULL)
 }
 \arguments{
 \item{ssn}{An object of class SpatialStreamNetwork}

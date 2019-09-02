@@ -4,7 +4,7 @@
 \alias{OneSampPerSeg}
 \title{For a given list of rids, this function randomly selects a single sampling location from each reach.}
 \usage{
-\code{OneSampPerSeg(ssn.obj, segment.vector)}
+OneSampPerSeg(ssn.obj, segment.vector)
 }
 \arguments{
 \item{ssn.obj}{an object of class SpatialStreamNetwork}

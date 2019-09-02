@@ -78,7 +78,8 @@ There are several aspects of this function that require explanations beyond the 
 
 \dontrun{
 ## Simulate an ssn
-s <- createSSN(c(100, 100), binomialDesign(c(25, 25)), path = paste(tempdir(), "s1.ssn", sep = "/"), importToR = TRUE)
+s <- createSSN(c(100, 100), binomialDesign(c(25, 25)),
+ path = paste(tempdir(), "s1.ssn", sep = "/"), importToR = TRUE)
 createDistMat(s)
 ## Simulating data
 s <- SimulateOnSSN(
@@ -99,9 +100,9 @@ r.together <- optimiseSSNDesign(
  utility.function = DOptimality, prior.parameters = p, n.cores = 2, parallelism = "windows", 
 parallelism.seed = 123, n.optim = 1, n.draws = 100)
 r.apart <- optimiseSSNDesign(
- ssn = s, new.ssn.path = paste(tempdir(), "s3.ssn", sep = "/"), glmssn = m, n.points = c("1" = 7, "2" = 8), 
- utility.function = DOptimality, prior.parameters = p, n.cores = 2, parallelism = "windows", 
- parallelism.seed = 123, n.optim = 1, n.draws = 100)
+ ssn = s, new.ssn.path = paste(tempdir(), "s3.ssn", sep = "/"), glmssn = m, 
+ n.points = c("1" = 7, "2" = 8), utility.function = DOptimality, prior.parameters = p,
+  n.cores = 2, parallelism = "windows", parallelism.seed = 123, n.optim = 1, n.draws = 100)
 }
 
 }

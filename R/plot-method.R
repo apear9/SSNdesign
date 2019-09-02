@@ -16,6 +16,7 @@
 #' 
 #' The plot method produces line plots tracing the expected utility of the best design in the algorithm for each set of coordinate exchanges.
 #' 
+#' @method plot ssndesign
 #' @export plot.ssndesign
 plot.ssndesign <- function(x, y, which.iteration = 1:length(x$trace.per.random.start), legend = TRUE, ...){
   # Check that no one has input the y argument

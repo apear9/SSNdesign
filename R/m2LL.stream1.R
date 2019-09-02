@@ -6,11 +6,7 @@ m2LL.stream1 <- function(theta, m2LLdata, X, dist.hydro = NULL,
 	EstMeth = "REML",
 	REs=NULL, scale, maxrang = NULL)
 {
-	# if((max(theta) > 20) | (min(theta) < -20)) print("WHAT"); return(1e+32)
 	theta1 <- SSN:::untrans.theta(theta = theta, scale = scale)
-  # theta1 <- theta
-	# if(!is.null(maxrang))
-		# if (any(theta1[!is.na(maxrang)] > maxrang[!is.na(maxrang)])) print("Nah"); return(1e+32)
 	z <- m2LLdata
 	n <- length(z)
 	p <- length(X[1,])

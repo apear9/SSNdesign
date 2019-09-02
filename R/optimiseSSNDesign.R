@@ -50,7 +50,8 @@
 #' 
 #' \dontrun{
 #' ## Simulate an ssn
-#' s <- createSSN(c(100, 100), binomialDesign(c(25, 25)), path = paste(tempdir(), "s1.ssn", sep = "/"), importToR = TRUE)
+#' s <- createSSN(c(100, 100), binomialDesign(c(25, 25)),
+#'  path = paste(tempdir(), "s1.ssn", sep = "/"), importToR = TRUE)
 #' createDistMat(s)
 #' ## Simulating data
 #' s <- SimulateOnSSN(
@@ -71,9 +72,9 @@
 #'  utility.function = DOptimality, prior.parameters = p, n.cores = 2, parallelism = "windows", 
 #' parallelism.seed = 123, n.optim = 1, n.draws = 100)
 #' r.apart <- optimiseSSNDesign(
-#'  ssn = s, new.ssn.path = paste(tempdir(), "s3.ssn", sep = "/"), glmssn = m, n.points = c("1" = 7, "2" = 8), 
-#'  utility.function = DOptimality, prior.parameters = p, n.cores = 2, parallelism = "windows", 
-#'  parallelism.seed = 123, n.optim = 1, n.draws = 100)
+#'  ssn = s, new.ssn.path = paste(tempdir(), "s3.ssn", sep = "/"), glmssn = m, 
+#'  n.points = c("1" = 7, "2" = 8), utility.function = DOptimality, prior.parameters = p,
+#'   n.cores = 2, parallelism = "windows", parallelism.seed = 123, n.optim = 1, n.draws = 100)
 #' }
 #' 
 #'@references
@@ -327,9 +328,28 @@ optimiseSSNDesign <- function(
     
   }
   # As required for ED and EK optimality
-  fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
-  fep <- unname(fep)
-  extra.arguments$Empirical.FEP <- fep
+  # Have two possible cases here
+  # 1. No list element for fixed effect priors, so use estimates and SEs from glmssn object
+  # 2. List element for fixed effect priors, so use those instead
+  fep <- matrix()
+  fixed.effects.priors <- extra.arguments$priors.fixed.effects
+  if(is.null(fixed.effects.priors)){
+    fep <- MASS::mvrnorm(n.draws, glmssn$estimates$betahat, glmssn$estimates$covb) # The fixed effects
+    fep <- unname(fep)
+    extra.arguments$Empirical.FEP <- fep
+  } else {
+    if(is.matrix(fixed.effects.priors)){
+      fep <- fixed.effects.priors
+      n.f.draws <- nrow(fep)
+      if(n.f.draws != n.draws) stop("The number of draws from the priors on the fixed effects parameters does not match the number of draws from the priors on the covariance parameters.")
+    } else {
+      n.f.parms <- length(fixed.effects.priors)
+      fep <- matrix(0, ncol = n.f.parms, nrow = n.draws)
+      for(f.parameter in 1:n.f.parms){
+        fep[, f.parameter] <- fixed.effects.priors[[f.parameter]](n.draws)
+      }
+    }
+  }
   
   # Construct sets of candidate points
   if(by.locID){

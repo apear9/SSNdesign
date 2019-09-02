@@ -4,10 +4,6 @@
 #' 
 #' This function simulates data on a SpatialStreamNetwork based on information from a fitted model object. It essentially acts as a wrapper for SimulateOnSSN. 
 #' 
-#' @usage 
-#' 
-#' \code{simulateFromSSNM(ssn, glmssn, fixed.effects = NULL, covariance.type = NULL, covariance.parms = NULL)}
-#' 
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn An object of class glmssn
 #' @param fixed.effects A numeric vector specifying the values of the fixed effects. Leave as NULL unless you specifically intend to override the information about the fixed effects you get from the glmssn.

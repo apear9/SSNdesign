@@ -4,10 +4,6 @@
 #'
 #' This function transfers specified variables recorded on the edges of a SpatialStreamNetwork object to the observed (and possibly prediction) sites in that SpatialStreamNetwork object. 
 #' 
-#'@usage 
-#' 
-#'\code{extractStreamEdgeCovariates(ssn, columns)}
-#' 
 #'@param ssn an object of class SpatialStreamNetwork
 #'@param columns a vector of column names that should be extracted from the data slot of the SpatialStreamNetwork object
 #'@return An object of class SpatialStreamNetwork. 
@@ -17,10 +13,11 @@
 #'set.seed(1)
 #'
 #'# Create an SSN
-#'s <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+#'s <- createSSN(10, binomialDesign(10), 
+#'path = paste(tempdir(), "example01.ssn", sep = "/"), importToR = TRUE)
 #'
 #'# Extract stream edge covariates
-#'s <- extractStreamEdgeCovariates(ssn, "Length")
+#'s <- extractStreamEdgeCovariates(s, "Length")
 #'
 #'@export
 extractStreamEdgeCovariates <- function(ssn, columns){

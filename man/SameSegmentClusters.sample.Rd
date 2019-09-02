@@ -4,7 +4,9 @@
 \alias{SameSegmentClusters.sample}
 \title{For sampling designs including clusters of samples, this function selects clustered samples within each reach that is provided.}
 \usage{
-\code{SameSegmentClusters.sample(ssn.obj, ClustDistMethod="prop.shortest.seg", segment.vector, max.dist=NA, cluster.size, start.point.method="random", bin.table)}
+SameSegmentClusters.sample(ssn.obj,
+  ClustDistMethod = "prop.shortest.seg", segment.vector, max.dist = NA,
+  cluster.size, start.point.method = "random", bin.table)
 }
 \arguments{
 \item{ssn.obj}{an object of class SpatialStreamNetwork}
@@ -14,6 +16,8 @@
 \item{segment.vector}{a numeric vector of rids for which clustered samples are desired.}
 
 \item{max.dist}{an optional distance provided as the upper limit for a distance between two locations within a common reach whereby those locations can be selected into a common cluster.}
+
+\item{cluster.size}{the number of points per cluster.}
 
 \item{start.point.method}{a character vector providing the method for how the first location in each cluster should be selected}
 

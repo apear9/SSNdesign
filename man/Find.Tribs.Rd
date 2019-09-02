@@ -4,7 +4,7 @@
 \alias{Find.Tribs}
 \title{For each tributary junction in a SpatialStreamNetwork, find the rids of all reaches that meet to form the tributary junction.}
 \usage{
-\code{Find.Tribsfunction(ssn.obj, bin.table)}
+Find.Tribs(ssn.obj, bin.table)
 }
 \arguments{
 \item{ssn.obj}{an object of class SpatialStreamNetwork}

@@ -23,11 +23,13 @@ The ssn.object must have a valid folder path stored in its path slot. This folde
 \examples{
 
 # Single network
-s <- createSSN(50, binomialDesign(20), path = tempPath("s.ssn"), importToR = TRUE)
+s <- createSSN(50, binomialDesign(20), 
+path = tempPath("example04.ssn"), importToR = TRUE)
 tabs <- getBIDtables(s)
 
 # Multiple networks
-s <- createSSN(c(50, 50), binomialDesign(c(20, 20)), path = tempPath("s.ssn"), importToR = TRUE)
+s <- createSSN(c(50, 50), binomialDesign(c(20, 20)),
+path = tempPath("example05.ssn"), importToR = TRUE)
 tabs <- getBIDtables(s)
 
 }

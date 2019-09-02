@@ -22,14 +22,23 @@ The argument std can be of length 1, in which case all covariance parameters (pa
 }
 \examples{
 
+# Set seed
+set.seed(1)
+
 # Create SSN
-s <- createSSN(10, binomialDesign(10), path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+s <- createSSN(10, binomialDesign(10), 
+path = paste(tempdir(), "example00.ssn", sep = "/"), importToR = TRUE)
+# And distance matrix
+createDistMat(s)
 
 # Simulate data
-s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~ 1, CorModels = c("Spherical.tailup"), CorParms = c(1, 2, 0.1), addfunccol = "addfunccol")$ssn.object
+s <- SimulateOnSSN(s, getSSNdata.frame(s), formula = ~ 1, coefficients = c(1),
+ CorModels = c("Spherical.tailup"), CorParms = c(1, 2, 0.1), 
+ addfunccol = "addfunccol")$ssn.object
 
 # Fit model
-m <- glmssn(s, formula = Sim_Values ~ 1, CorModels = c("Spherical.tailup"), addfunccol = "addfunccol")
+m <- glmssn(s, formula = Sim_Values ~ 1, CorModels = c("Spherical.tailup"),
+ addfunccol = "addfunccol")
 
 # Construct log-normal priors
 p <- constructLogNormalPriors(m)

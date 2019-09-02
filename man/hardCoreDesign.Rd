@@ -8,13 +8,31 @@ hardCoreDesign(n, inhibition_region, replications = 1,
   rep.variable = "Time", rep.values)
 }
 \arguments{
-\item{...}{Arguments for the function \code{hardCoreDesign} in the package SSN.}
+\item{n}{
+	A numeric vector having length 1 or the same length as the number of networks. This represents the number of points to be spread across a network.
+}
+
+\item{inhibition_region}{
+	A numeric vector having length 1 or the same length as the number of networks. This represents the size of the inhibition region on a network.
+}
+
+\item{replications}{
+		The number of replications of each point.
+	}
+
+\item{rep.variable}{
+		The name of the variable that will distinguish between the replicated points.
+	}
+
+\item{rep.values}{
+		The values that will be given to the variable named \code{rep.variable}. \code{rep.values[1]} will be assigned for replication 1, \code{rep.values[2]} for replication 2, etc. Defaults to \code{1:replications} if no value is given. 
+	}
 }
 \value{
 The output is not seen by the user.
 }
 \description{
-\code{hardCoreDesign} replaces a function of the same name from the package SSN.
+\code{hardCoreDesign} replaces a function of the same name from the package SSN. This version of the function can be used with \code{generateSites}.
 }
 \details{
 This function was written to deal with errors resulting in the \code{hardCoreDesign} function from the package SSN when it was used with SpatialStreamNetworks built from real spatial data. It is back-compatible with the \code{createSSN} function from SSN.

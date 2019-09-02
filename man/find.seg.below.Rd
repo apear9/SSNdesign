@@ -4,7 +4,7 @@
 \alias{find.seg.below}
 \title{Find the rid for the reach immediatley downstream of another reach.}
 \usage{
-\code{find.seg.below(x, IDtable)}
+find.seg.below(x, IDtable)
 }
 \arguments{
 \item{x}{a numeric scaler which represents the binaryID address for a rich object of class data.frame which is a single reach's subset of the point.data slot fomr a SpatialStreamNetwork}
