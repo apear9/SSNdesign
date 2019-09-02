@@ -8,37 +8,3 @@
 \description{
 The SSNdesign package builds on the SSN package to provide a framework for solving design problems on SpatialStreamNetwork objects.
 }
-\section{SSNdesign functions}{
-
-the SSNdesign package contains the following functions:
-- constructTotalMatrix
-- CPOptimality
-- doAdaptiveDesign
-- doAdaptiveDesignParallel
-- DOptimality
-- EDOptimality
-- EKOptimality
-- findOptimalDesign
-- findOptimalDesignParallel
-- generateSites
-- getBIDtables
-- getImportantMatrices.obs
-- getImportantMatrices.pxo
-- getStreamDistMatsInOrder.predsxobs
-- getStreamDistMatsInOrder
-- glmssn_minimal
-- hardCoreDesign
-- importStreams
-- KOptimality
-- ndpoints
-- nnetwork
-- nppoints
-- searchAllDesigns
-- sequentialCPOptimality
-- sequentialDOptimality
-- sequentialEDOptimality
-- SimulateOnSSN_minimal
-- stableInverse
-- systematicDesign
-}
-
