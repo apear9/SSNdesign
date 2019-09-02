@@ -1,10 +1,6 @@
 #' Plot trace of the Greedy Exchange Algorithm
 #' 
-#' @description 
-#' 
-#' A generic plot function adapted for `ssndesign` objects. It plots the traces from the optimisation algorithm.
-#' 
-#' @method plot ssndesign
+#' @description A generic plot function adapted for `ssndesign` objects. It plots the traces from the optimisation algorithm.
 #' 
 #' @param x An object of class \code{ssndesign}
 #' @param y Not used 
@@ -16,8 +12,7 @@
 #' 
 #' The plot method produces line plots tracing the expected utility of the best design in the algorithm for each set of coordinate exchanges.
 #' 
-#' @method plot ssndesign
-#' @export plot.ssndesign
+#' @export 
 plot.ssndesign <- function(x, y, which.iteration = 1:length(x$trace.per.random.start), legend = TRUE, ...){
   # Check that no one has input the y argument
   if(!missing(y)){

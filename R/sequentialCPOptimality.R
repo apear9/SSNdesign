@@ -2,10 +2,15 @@
 #'@export
 sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, extra.arguments){
   
+  # Get increment for numerical differentiation
+  h <- extra.arguments$h 
+  if(is.null(h)) h <- 1e-8 # safe default value
+  
   # Extract out the Hessian (observed information) from the glmssn object
   old.information <- getCalculatedCovMatrix(glmssn)
   if(is.null(glmssn$optimOutput$hessian)){
-    stop("No hessian in optim output in the glmssn object.")
+    # Exit with error code if no hessian
+    return(-1e9)
   }
   
   # Get design matrix
@@ -24,10 +29,6 @@ sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   mat$w <-  mat$w[ind.mat, ind.mat]
   n.zero <- extra.arguments$net.zero.obs[ind.mat, ind.mat]
   
-  ## Simulate covariance parameters
-  # cvp.cols <- length(glmssn$estimates$theta)
-  # cvp <- matrix(nrow = n.draws, ncol = cvp.cols)
-  
   ## Get other model parameters
   td <- glmssn$args$useTailDownWeight
   cm <- glmssn$args$CorModels
@@ -35,11 +36,6 @@ sequentialCPOptimality <- function(ssn, glmssn, design.points, prior.parameters,
   ua <- glmssn$args$use.anisotropy
   re <- glmssn$sampInfo$REs
   
-  ## Simulate covparms from priors
-  # for(i in 1:cvp.cols){
-  #   cvp[, i] <- prior.parameters[[i]](n.draws)
-  # }
-  # 
   ## Perform MC simulations
   FIM <- vector("numeric", n.draws)
   for(i in 1:n.draws){
