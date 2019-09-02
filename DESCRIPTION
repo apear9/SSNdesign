@@ -4,11 +4,11 @@ Version: 0.0.0.9000
 Authors@R: c(
   person("Alan", "Pearse", email = "apearse9@gmail.com", role = c("aut", "cre")),
   person("James", "McGree", email = "james.mcgree@qut.edu.au", role = c("aut")),
-  person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut", "ctb")),
-  person("Jay", "Ver Hoef", email = "jay.verhoef@noaa.gov", role = c("aut", "ctb")),
-  person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut", "ctb"))
+  person("Nicholas", "Som", email = "nicholas_som@fws.gov", role = c("aut")),
+  person("Jay", "Ver Hoef", email = "jay.verhoef@noaa.gov", role = c("aut")),
+  person("Erin", "Peterson", email = "erin.peterson@qut.edu.au", role = c("aut"))
   )
-Author: Alan Pearse [aut, cre], James McGree [aut], Nicholas Som [aut, ctb], Jay Ver Hoef [aut, ctb], Erin Peterson [aut, ctb] 
+Author: Alan Pearse [aut, cre], James McGree [aut], Nicholas Som [aut], Jay Ver Hoef [aut], Erin Peterson [aut] 
 Maintainer: Alan Pearse <apearse9@gmail.com>
 Description: Solve pseudo-Bayesian optimal and adaptive sampling design problems 
 	on stream networks. Given a geostatistical stream network model and a utility function, this 
