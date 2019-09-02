@@ -168,7 +168,7 @@ glmssn1_minimal <- function(formula, ssn.object,
       if(length(theta) ==1) {
         lowerb <- log(.1*exp(theta))
         upperb <- log(10*exp(theta))
-        parmest1.out <- optimize(m2LL.stream, interval =
+        parmest1.out <- optimize(SSN:::m2LL.stream, interval =
                                    c(lowerb,upperb), m2LLdata = zt, X = X2,
                                  dist.hydro = dist.hydro.data, weight = w.matrix.data,
                                  net.zero = net.zero.data,
