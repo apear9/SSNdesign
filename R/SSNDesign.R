@@ -49,11 +49,11 @@
 #' @import RSQLite
 #' @import stringr
 #' @import doRNG
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom dplyr left_join inner_join
+#' @importFrom ggplot2 fortify
 #' @import spsurvey
-#' @import MASS
-#' @importFrom graphics lines
+#' @importFrom MASS mvrnorm
+#' @importFrom graphics plot lines
 #' @importFrom methods is new
 #' @importFrom stats as.formula contrasts dist glm model.frame model.matrix optim optimize rbinom rnorm rpois sd terms
 #' @importFrom utils read.table
