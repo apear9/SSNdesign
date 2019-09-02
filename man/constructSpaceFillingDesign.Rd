@@ -49,12 +49,12 @@ The argument n.points can be a single number or a vector. If the user supplies a
 
  # Create a simulated SpatialStreamNetwork object
  s <- createSSN(50, binomialDesign(100), 
- path = paste(tempdir(), "s.ssn", sep = "/"), importToR = TRUE)
+ path = tempPath("s.ssn"), importToR = TRUE)
  createDistMat(s)
  
  # Construct a space filling design
  space.filling <- constructSpaceFillingDesign(s, 
- paste(tempdir(), "r.ssn", sep = "/"), 50, "maximin")
+ tempPath("r.ssn"), 50, "maximin")
  
  # Plot result to check
  plot(space.filling$ssn.new)
