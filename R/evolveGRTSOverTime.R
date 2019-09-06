@@ -63,7 +63,7 @@ evolveGRTSOverTime <- function(ssn, num.sites, rep.variable){
     ycoord = "ycoord", 
     shapefile=FALSE
   )))
-  selected.pool <- design.grts$id
+  selected.pool <- anum(design.grts$locID)
   sites.by.timestep <- vector("list", length(num.sites))
   for(i in 1:length(num.sites)){
     sites.by.timestep[[i]] <- list(by.locID = NA, by.pid = NA) 
