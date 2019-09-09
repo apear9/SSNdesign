@@ -45,20 +45,18 @@ evolveRandOverTime <- function(ssn, num.sites, rep.variable){
   # Select sites randomly
   pot.locs <- ssn.df$locID
   pot.locs <- unique(pot.locs)
-  # sel.locs <- vector("list", length(rep.var.lvl))
-  # for(i in 1:length(rep.var.lvl)){
-  #   sel.locs[[i]] <- sample(pot.locs, num.sites[i], FALSE)
-  #   pot.locs <- pot.locs[!pot.locs %in% sel.locs[[i]]]
-  #   if(i != 1){
-  #     sel.locs[[i]] <- c(sel.locs[[i]], sel.locs[[i-1]])
-  #   }
-  # }
-  
   selected.pool <- sample(pot.locs, samp.sz, FALSE)
+  
+  # Add year upon year
   sites.by.timestep <- vector("list", length(num.sites))
   for(i in 1:length(num.sites)){
+    num.to.use <- sum(num.sites[1:i])
     sites.by.timestep[[i]] <- list(by.locID = NA, by.pid = NA) 
-    sites.by.timestep[[i]]$by.locID <- selected.pool[1:sum(num.sites[1:i])]
+    if(num.to.use == 0){
+      sites.by.timestep[[i]]$by.locID <- numeric(0)
+    } else {
+      sites.by.timestep[[i]]$by.locID <- selected.pool[1:num.to.use]
+    }
   }
   names(sites.by.timestep) <- paste("Period", rep.var.lvl, sep = "_")
   

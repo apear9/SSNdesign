@@ -4,10 +4,16 @@
 #' 
 #' This function takes a \code{SpatialStreamNetwork} object with temporally replicated sites and returns a GRTS design that evolves over time.
 #' 
+#' The 'master sample' approach was described by Larsen et al. (2008). It exploits the fact that ordered subsets of GRTS designs are themselves GRTS designs in order to sequentially construct GRTS designs.
+#' 
 #' @param ssn A \code{SpatialStreamNetwork} object
 #' @param num.sites A numeric vector. This vector can contain a single element or as many elements as there are temporal steps in the \code{ssn} sites
 #' @param rep.variable A string being the variable on which the temporal replicates are defined
 #' @return A list which indicates the design for each timestep. The designs are given in lists with two named elements: \code{by.locID}, where the sites are given by their locID values; \code{by.pid}, where the sites are given by their pid values. 
+#' 
+#' @references 
+#' 
+#' Larsen, D.P., Olsen, A.R., and Stevens, D.L. (2008). Using a Master Sample to Integrate Stream Monitoring Programs. Journal of Agricultural, Biological and Environmental Statistics, 13(3), 243-254.
 #' 
 #' @export
 evolveGRTSOverTime <- function(ssn, num.sites, rep.variable){
@@ -58,7 +64,7 @@ evolveGRTSOverTime <- function(ssn, num.sites, rep.variable){
     type.frame="finite",
     src.frame = "att.frame", 
     att.frame = dsn.df, 
-    id = "locID", 
+    id = "id", 
     xcoord="xcoord",
     ycoord = "ycoord", 
     shapefile=FALSE
