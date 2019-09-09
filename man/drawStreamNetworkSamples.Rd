@@ -14,7 +14,7 @@ drawStreamNetworkSamples(ssn, new.ssn.path, overwrite.path = FALSE,
 
 \item{overwrite.path}{A logical indicating whether the ssn directory referred to in new.ssn.path should be overwritten, if it exists already. Defaults to FALSE.}
 
-\item{sample.method}{A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Extreme.Clust.and.Singles", "Trib.Sets.Ext.Singles.sample", "Trib.Sets.Ext.Singles.Mouth.sample"}
+\item{sample.method}{A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Headwater.Clust.and.Singles", "Trib.Sets.Head.Singles.sample", "Trib.Sets.Head.Singles.Mouth.sample"}
 
 \item{sample.size}{A numeric scalar specifying the desired sample size.}
 

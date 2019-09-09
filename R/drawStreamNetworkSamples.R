@@ -7,7 +7,7 @@
 #' @param ssn An object of class SpatialStreamNetwork.
 #' @param new.ssn.path A path for the new .ssn directory where the results should be written out.
 #' @param overwrite.path A logical indicating whether the ssn directory referred to in new.ssn.path should be overwritten, if it exists already. Defaults to FALSE.
-#' @param sample.method A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Extreme.Clust.and.Singles", "Trib.Sets.Ext.Singles.sample", "Trib.Sets.Ext.Singles.Mouth.sample"
+#' @param sample.method A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Headwater.Clust.and.Singles", "Trib.Sets.Head.Singles.sample", "Trib.Sets.Head.Singles.Mouth.sample"
 #' @param sample.size A numeric scalar specifying the desired sample size.
 #' @param use.locID A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE. 
 #' @param ... Other arguments to Stream.Network.Samples. An example is \code{cluster.number}, which is required for some sample.method arguments.
@@ -53,9 +53,9 @@ drawStreamNetworkSamples <- function(
     "GRTS", 
     "GRTSmouth", 
     "GRTSclus", 
-    "Extreme.Clust.and.Singles", 
-    "Trib.Sets.Ext.Singles.sample", 
-    "Trib.Sets.Ext.Singles.Mouth.sample"
+    "Headwater.Clust.and.Singles", 
+    "Trib.Sets.Head.Singles.sample", 
+    "Trib.Sets.Head.Singles.Mouth.sample"
   )
   if(!is.logical(overwrite.path)){
     stop("The argument overwrite.path must be a logical.")

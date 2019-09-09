@@ -2,7 +2,7 @@
 % Please edit documentation in R/Stream.Network.Samples.R
 \name{Stream.Network.Samples}
 \alias{Stream.Network.Samples}
-\title{For a Spatial Stream Network with a dense grid of potential sampling locations, this function draws samples according to the sampling designs found most optimal in Som et al. (2014), and a few others.}
+\title{For a SpatialStreamNetwork object with a dense grid of potential sampling locations, this function draws samples according to the sampling designs found most optimal in Som et al. (2014), and a few others.}
 \usage{
 Stream.Network.Samples(ssn.list, sample.method, sample.size, use.locID,
   cluster.number = NULL, Wmat = NULL, DistMat = NULL,
@@ -11,7 +11,7 @@ Stream.Network.Samples(ssn.list, sample.method, sample.size, use.locID,
 \arguments{
 \item{ssn.list}{an object of class list that contains one item names "ssn.object" which is a SpatialStreamNetwork and another item named "bin.table" which is the binaryID table for the assoicated SpatialStreamNetwork}
 
-\item{sample.method}{a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", H1 "Extreme.Clust.and.Singles", C3 "Trib.Sets.Ext.Singles.sample", C4 "Trib.Sets.Ext.Singles.Mouth.sample"}
+\item{sample.method}{a character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus", "Headwater.Clust.and.Singles", "Trib.Sets.Head.Singles.sample", "Trib.Sets.Head.Singles.Mouth.sample"}
 
 \item{sample.size}{a numeric scalar with the desired sample size (USUALLY) but can differ depending on sampling design chosen - something to clean up.}
 
