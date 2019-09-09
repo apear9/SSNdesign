@@ -18,4 +18,9 @@ A list which indicates the design for each timestep. The designs are given in li
 }
 \description{
 This function takes a \code{SpatialStreamNetwork} object with temporally replicated sites and returns a GRTS design that evolves over time.
+
+The 'master sample' approach was described by Larsen et al. (2008). It exploits the fact that ordered subsets of GRTS designs are themselves GRTS designs in order to sequentially construct GRTS designs.
+}
+\references{
+Larsen, D.P., Olsen, A.R., and Stevens, D.L. (2008). Using a Master Sample to Integrate Stream Monitoring Programs. Journal of Agricultural, Biological and Environmental Statistics, 13(3), 243-254.
 }
