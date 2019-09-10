@@ -188,14 +188,6 @@ predict.glmssn_minimal <- function(
   M <- rbind(Vpred, t(Xpred), parsilvec)
   XXSiXi <- Xobs %*% covb
   XSi <- t(Xobs) %*% Vi
-  # print(M)
-  # print(covb)
-  # print(XXSiXi)
-  # print(XSi)
-  # print(Vi)
-  # print(z)
-  # print(n)
-  # print(p)
   pred.out <- t(apply(M, 2, SSN:::UK4Apply, covb = covb,
                       XXSiXi = XXSiXi, XSi = XSi, Vi = Vi, z = z, n = n, p = p))
   datap1[,response.col] <- pred.out[,1]

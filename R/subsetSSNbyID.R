@@ -13,9 +13,7 @@
 #' 
 #' @details 
 #' 
-#' Note, the SpatialStreamNetwork that is returned will have been re-imported from the new.ssn.path directory after the subset operations are complete.
-#' 
-#' @author Erin E. Peterson and Alan R. Pearse
+#' Note, the SpatialStreamNetwork that is returned will have been re-imported from the \code{new.ssn.path} directory after the subset operations are complete.
 #' 
 #' @export
 subsetByID <- function(ssn, new.ssn.path, obs, preds, locID = FALSE){

@@ -8,8 +8,6 @@
 #' @param subset A logical condition used to subset the prediction sites.
 #' @return A SpatialStreamNetwork. The new preds shapefile overwrites the old one in \code{ssn@path}.
 #' 
-#' @author Erin E. Peterson and Alan R. Pearse
-#' 
 #' @export
 subsetPreds <- function(ssn, subset){
   

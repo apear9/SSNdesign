@@ -2,7 +2,7 @@
 #' 
 #' @description
 #'
-#' Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
+#' Functions written in the pattern of the following \code{utility.function} can be used with \code{\link{optimiseSSNDesign}}. Off-the-shelf implementations are provided for the utility functions outlined in Falk et al. (2014) and modifications of these intended for creating adaptive designs.
 #' 
 #' @param ssn An object of class SpatialStreamNetwork
 #' @param glmssn A fitted model object of class glmssn.

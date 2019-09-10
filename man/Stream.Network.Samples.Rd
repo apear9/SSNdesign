@@ -35,3 +35,6 @@ a list containing a SpatialStreamNetwork for the selected samples, and a numeric
 \description{
 For a Spatial Stream Network with a dense grid of potential sampling locations, this function draws samples according to the sampling designs found most optimal in Som et al. (2014), and a few others.
 }
+\references{
+Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
+}

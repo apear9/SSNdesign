@@ -16,6 +16,10 @@
 #'@param ... Other arguments to internal functions. None implemented as yet.
 #'@return a list containing a SpatialStreamNetwork for the selected samples, and a numeric vector with the selected pids
 #'  
+#'@references 
+#' 
+#' Som, N.A., Monestiez, P., Ver Hoef, J.M., Zimmerman, D.L., & Peterson, E.E. (2014). Spatial sampling on streams: principles for inference on aquatic networks. \emph{Environmetrics}, \emph{25}(5), 306-323. doi: 10.1002/env.2284.
+#'  
 #'@export 
 Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID, cluster.number=NULL, Wmat=NULL, DistMat=NULL, ClustDistMethod, max.dist, ...){
   #ssn.object

@@ -24,7 +24,7 @@ CPDOptimality(ssn, glmssn, design.points, prior.parameters, n.draws,
 A single number representing the expected utility for the design specified by \code{design.points}.
 }
 \description{
-Functions with the signature `utility.function` can be used with \code{\link{optimiseSSNDesign}}. They are implementations of the utility functions outlined in ...
+Functions written in the pattern of the following \code{utility.function} can be used with \code{\link{optimiseSSNDesign}}. Off-the-shelf implementations are provided for the utility functions outlined in Falk et al. (2014) and modifications of these intended for creating adaptive designs.
 }
 \details{
 The following utility functions have been implemented.

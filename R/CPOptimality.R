@@ -31,11 +31,6 @@ CPOptimality <- function(ssn, glmssn, design.points, prior.parameters, n.draws, 
   ua <- glmssn$args$use.anisotropy
   re <- glmssn$sampInfo$REs
   
-  ## Simulate covparms from priors
-  # for(i in 1:cvp.cols){
-  #   cvp[, i] <- prior.parameters[[i]](n.draws)
-  # }
-  
   ## Perform MC simulations
   FIM <- vector("numeric", n.draws)
   

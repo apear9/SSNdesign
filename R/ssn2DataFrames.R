@@ -2,7 +2,7 @@
 #' 
 #' @description
 #' 
-#' This function takes a SpatialStreamNetwork and returns a list of one to three data.frame objects. The first data.frame object is for the stream edges and the second is for the observed points. The third data.frame is only produced when \code{preds = TRUE}. This function is intended to simplify the process of preparing a SpatialStreamNetwork to plot with ggplot2, which only accepts data.frame objects.
+#' This function takes a SpatialStreamNetwork and returns a list of one to three data.frame objects. The first data.frame object is for the stream edges and the second is for the observed points. The third data.frame is only produced when \code{preds = TRUE}. An example of how function could be used is to convert a SpatialStreamNetwork into a series of \code{data.frame} objects to plot with \code{ggplot2}.
 #' 
 #' @param ssn An object of class SpatialStreamNetwork. 
 #' @param preds A logical to specify whether the prediction points in the SSN (if any) should be coerced to data.frame. Defaults to FALSE.

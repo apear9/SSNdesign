@@ -8,6 +8,8 @@
 #' @param covparms A vector of covariance parameter values. These are extracted from the glmssn object by default.
 #' @param diff The step size used for finite differencing. 
 #' @return The expected Fisher information matrix.
+#' 
+#' @export
 extractExpectedFisherInformation <- function(glmssn, covparms = glmssn$estimates$theta, diff = 1e-8){
   
   # Get information ready

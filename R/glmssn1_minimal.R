@@ -22,7 +22,6 @@ glmssn1_minimal <- function(formula, ssn.object,
                     net.zero.data
 )
 {
-  
   Warnlog <- NULL
   data <- ssn.object@obspoints@SSNPoints[[1]]@point.data # replace with matrix
   data <- cbind(data, ssn.object@obspoints@SSNPoints[[1]]@point.coords) # replace with matrix
@@ -43,7 +42,7 @@ glmssn1_minimal <- function(formula, ssn.object,
                                addfunccol = addfunccol,
                                family = family,
                                EstMeth = EstMeth,
-                               ssn = ssn.object) # Necessary?
+                               ssn = ssn.object) 
   
   if(Err$Err == 1) return(print(Err$message))
   
@@ -53,12 +52,12 @@ glmssn1_minimal <- function(formula, ssn.object,
                        trans.power = trans.power,
                        trans.shift = trans.shift,
                        CorModels = CorModels,
-                       distord = distord) # REPLACE WITH MATRICES
+                       distord = distord) 
   
   REs <- dataXY.out$REs # OTHER ARGUMENTS
   REmodelmatrices <- dataXY.out$REmodelmatrices
   n.all <- dataXY.out$sampsizes$n.all # nrow of matrix
-  ind <- dataXY.out$indvecs$ind.allxy # not sure if needed
+  ind <- dataXY.out$indvecs$ind.allxy 
   xcoord <- data[distord,xcol]
   ycoord <- data[distord,ycol]
   xcoord.data <- xcoord#[ind]
@@ -346,7 +345,6 @@ glmssn1_minimal <- function(formula, ssn.object,
   p <-  dataXY.out$Xmats$p
   if(use.nugget == TRUE)  nugget <- parmest[length(parmest)]
   
-  # UNCLEAR IF BELOW NEEDED
   is.na(data[,dataXY.out$respvecs$response.col])
   nobs <- length(ssn.object@obspoints@SSNPoints[[1]]@point.data[,1])
   # if any missing data, create prediction set in the SSN object
@@ -398,7 +396,7 @@ glmssn1_minimal <- function(formula, ssn.object,
       trans.shift = trans.shift,
       algorithm = "orig"
     ),
-    ssn.object = ssn.object, # DO NOT INCLUDE
+    ssn.object = ssn.object,
     sampinfo = list(
       ind.obs = ind,
       ind.RespNA = dataXY.out$indvecs$ind.RespNA,

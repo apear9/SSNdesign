@@ -25,7 +25,7 @@
 #' 
 #' @references 
 #' 
-#' Falk, M., Pettitt, A., McGree, J.M. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, 21(\emph{4}), 751-773.
+#' Falk, M., Pettitt, A., McGree, J.M. (2014). Sampling designs on stream networks using the pseudo-Bayesian approach. \emph{Environmental and Ecological Statistics}, \emph{21}(4), 751-773.
 #' 
 #' Morris, M.D. & Mitchell, T.J. (1995). Exploratory Designs for Computational Experiments. \emph{Journal of Statistical Planning and Inference}, \emph{43}, 381-402. 
 #' 

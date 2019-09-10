@@ -17,6 +17,3 @@ A SpatialStreamNetwork. The new preds shapefile overwrites the old one in \code{
 \description{
 This function works like subsetSSN, but instead of focussing on the observed sites, this allows the prediction sites alone to be subsetted according to some logical criterion or criteria. It is particularly useful when attempting to keep only prediction sites with certain PIDs.
 }
-\author{
-Erin E. Peterson and Alan R. Pearse
-}
