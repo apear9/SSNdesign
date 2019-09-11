@@ -2,14 +2,14 @@
 #' 
 #' @description 
 #' 
-#' This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs any of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
+#' This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs many of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
 #' 
 #' @param ssn An object of class SpatialStreamNetwork.
 #' @param new.ssn.path A path for the new .ssn directory where the results should be written out.
 #' @param overwrite.path A logical indicating whether the ssn directory referred to in new.ssn.path should be overwritten, if it exists already. Defaults to FALSE.
 #' @param sample.method A character vector providing the label for the specific sampling design that is desired, with references to Som et al. (2014) including simple random sample "SRS", "GRTS", "GRTSmouth", "GRTSclus","Headwater.Clust.and.Singles", "Trib.Sets.Head.Singles.sample", "Trib.Sets.Head.Singles.Mouth.sample"
 #' @param sample.size A numeric scalar specifying the desired sample size.
-#' @param use.locID A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE. 
+#' @param use.locID A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE. NOTE: NOT CURRENTLY IMPLEMENTED.
 #' @param ... Other arguments to Stream.Network.Samples. An example is \code{cluster.number}, which is required for some sample.method arguments.
 #' @return An object of class SpatialStreamNetwork. Note, any prediction points will have to be imported separately.  
 #' 

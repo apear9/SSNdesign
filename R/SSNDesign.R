@@ -19,7 +19,7 @@
 #' @import doRNG
 #' @importFrom dplyr left_join inner_join
 #' @importFrom ggplot2 fortify
-#' @import spsurvey
+#' @importFrom spsurvey grts
 #' @importFrom MASS mvrnorm
 #' @importFrom graphics plot lines legend
 #' @importFrom methods is new

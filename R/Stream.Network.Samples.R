@@ -56,9 +56,9 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
       
       Des1 <- list(None=list(panel=c(Panel1=sample.size[i]),seltype="Equal", over=0))
       Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
-                    src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
+                    src.frame = "att.frame", att.frame = cdat, id = "id", xcoord="xcoord",
                     ycoord = "ycoord", shapefile=FALSE)
-      chosen <- sort(Grts2$id)
+      chosen <- sort(Grts2$pid)
       cdat$Selected.Sample <- 0
       cdat$Selected.Sample[cdat$pid %in% chosen] <- 1
       PID.selected<-c(PID.selected, chosen)
@@ -84,9 +84,9 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
       sampsize <- sample.size[i] - 1
       Des1 <- list(None=list(panel=c(Panel1=sampsize),seltype="Equal", over=0))
       Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
-                    src.frame = "att.frame", att.frame = cdat2, id = "pid", xcoord="xcoord",
+                    src.frame = "att.frame", att.frame = cdat2, id = "id", xcoord="xcoord",
                     ycoord = "ycoord", shapefile=FALSE)
-      chosen <- c(chosen, sort(Grts2$id))
+      chosen <- c(chosen, sort(Grts2$pid))
       cdat$Selected.Sample <- 0
       cdat$Selected.Sample[cdat$pid %in% chosen] <- 1
       PID.selected<-c(PID.selected, chosen)
@@ -112,11 +112,11 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
         cluster.size <- sample.size[i]/cluster.number
         Des1 <- list(None=list(panel=c(Panel1=grts.size),seltype="Equal", over=0))
         Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
-                      src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
+                      src.frame = "att.frame", att.frame = cdat, id = "id", xcoord="xcoord",
                       ycoord = "ycoord", shapefile=FALSE)
         
         ## get the segments from these samples
-        Grids <- unique(cdat$rid[cdat$pid %in% Grts2$id])
+        Grids <- unique(cdat$rid[cdat$pid %in% Grts2$pid])
         ## Get the clusters
         if(missing(ClustDistMethod)) ClustDistMethod <- "prop.shortest.seg"
         if(missing(max.dist)) max.dist <- NA
@@ -132,11 +132,11 @@ Stream.Network.Samples<-function(ssn.list, sample.method, sample.size, use.locID
         grts.size <- cluster.number + n.singles
         Des1 <- list(None=list(panel=c(Panel1=grts.size),seltype="Equal", over=0))
         Grts2 <- spsurvey::grts(Des1, DesignID="Site", SiteBegin=1, type.frame="finite",
-                      src.frame = "att.frame", att.frame = cdat, id = "pid", xcoord="xcoord",
+                      src.frame = "att.frame", att.frame = cdat, id = "id", xcoord="xcoord",
                       ycoord = "ycoord", shapefile=FALSE)
         
         ## randomly pull out cluster.number of the chosen pids to cluster with, keep rest as pids
-        chosen.pid1 <- sort(Grts2$id)
+        chosen.pid1 <- sort(Grts2$pid)
         forclust <- sample(chosen.pid1, cluster.number, replace=F)
         chosen.pid <- chosen.pid1[!(chosen.pid1 %in% forclust)]
         ## get the segments from these cluster samples

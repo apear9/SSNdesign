@@ -18,7 +18,7 @@ drawStreamNetworkSamples(ssn, new.ssn.path, overwrite.path = FALSE,
 
 \item{sample.size}{A numeric scalar specifying the desired sample size.}
 
-\item{use.locID}{A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE.}
+\item{use.locID}{A logical indicating whether sampling sites should be selected by locID instead of pid. Defaults to FALSE. NOTE: NOT CURRENTLY IMPLEMENTED.}
 
 \item{...}{Other arguments to Stream.Network.Samples. An example is \code{cluster.number}, which is required for some sample.method arguments.}
 }
@@ -26,7 +26,7 @@ drawStreamNetworkSamples(ssn, new.ssn.path, overwrite.path = FALSE,
 An object of class SpatialStreamNetwork. Note, any prediction points will have to be imported separately.
 }
 \description{
-This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs any of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
+This function is a wrapper for \code{\link{Stream.Network.Samples}}. This function constructs many of the designs outlined in Som et al. (2014), such as GRTS and stream network designs with clusters around confluences.
 }
 \examples{
 
